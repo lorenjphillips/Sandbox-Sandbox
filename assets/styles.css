@@ -27,7 +27,7 @@
   --muted: #705c49;
   --rule: #d8c8af;
   --accent: #8d4c26;
-  --meadow-edge: #2e4524;
+  --meadow: #2e4524;
   --gutter: clamp(16px, 4vw, 64px);
   --sans: "DM Sans", system-ui, sans-serif;
   --serif: Fraunces, Georgia, serif;
@@ -41,7 +41,14 @@
 [hidden] { display: none !important; }
 html { min-width: 320px; }
 body { margin: 0; min-height: 100svh; background: radial-gradient(ellipse at 45% 26%, #fcf5e7 0%, transparent 69%); }
-body:has(#atlas-view:not([hidden])) { background: var(--meadow-edge); }
+html:has(#atlas-view:not([hidden])) {
+  background-color: var(--meadow);
+  background-image: linear-gradient(145deg, #678a2a16, #14271648), url(grass.jpg);
+  background-position: center top;
+  background-repeat: no-repeat, repeat;
+  background-size: auto, min(710px, 100vw) auto;
+}
+body:has(#atlas-view:not([hidden])) { background: none; }
 h1, h2, h3, p { margin: 0; }
 button, input, select { color: inherit; font: inherit; }
 button { cursor: pointer; }

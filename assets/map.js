@@ -534,34 +534,8 @@ function sceneLayer(ratio=1.45,area=SCENE) {
   canvas.height=Math.ceil(height*ratio);
   const ctx=canvas.getContext('2d');
   ctx.setTransform(canvas.width/width,0,0,canvas.height/height,-area.left*canvas.width/width,-area.top*canvas.height/height);
-  return {canvas,ctx,width,height};
+  return {canvas,ctx};
 }
-
-function createGrassPatches() {
-  const patches=document.createElement('canvas');
-  patches.width=236;
-  patches.height=116;
-  const patchesCtx=patches.getContext('2d');
-  const paint=patchesCtx.createImageData(patches.width,patches.height);
-  for(let y=0;y<patches.height;y++) {
-    for(let x=0;x<patches.width;x++) {
-      const low=noise(x*.038+41,y*.053+16);
-      const middle=noise(x*.098+7,y*.105+25);
-      const high=noise(x*.324+19,y*.392+3);
-      const sun=1-Math.hypot(x/patches.width-.29,y/patches.height-.13)*.54;
-      const tint=clamp(low*.49+middle*.22+high*.13+sun*.16);
-      const index=(y*patches.width+x)*4;
-      paint.data[index]=lerp(24,79,tint);
-      paint.data[index+1]=lerp(44,105,tint);
-      paint.data[index+2]=lerp(19,53,tint);
-      paint.data[index+3]=255;
-    }
-  }
-  patchesCtx.putImageData(paint,0,0);
-  return patches;
-}
-
-const grassPatches=createGrassPatches();
 
 function fillTexture(ctx,texture,area,xScale,yScale,blend,alpha) {
   if(!texture) return;
@@ -573,44 +547,6 @@ function fillTexture(ctx,texture,area,xScale,yScale,blend,alpha) {
   ctx.fillStyle=pattern;
   ctx.fillRect(area.left,area.top,area.right-area.left,area.bottom-area.top);
   ctx.restore();
-}
-
-function createGrassLayer(area=SCENE,ratio=1.05) {
-  const {canvas,ctx,width,height}=sceneLayer(ratio,area);
-  const fieldWidth=SCENE.right-SCENE.left;
-  const fieldHeight=SCENE.bottom-SCENE.top;
-  ctx.imageSmoothingQuality='high';
-  ctx.drawImage(grassPatches,SCENE.left,SCENE.top,fieldWidth,fieldHeight);
-  fillTexture(ctx,grassTexture,area,.59,.40,'source-over',.81);
-  ctx.fillStyle=ramp(ctx,{x:SCENE.left,y:SCENE.top},{x:SCENE.right,y:SCENE.bottom},[[0,'#596f2a24'],[.51,'#1a341b1c'],[1,'#0f231791']]);
-  ctx.fillRect(area.left,area.top,width,height);
-  const bladeColors=['#1c351c84','#94a96032','#516a2e96','#2a4e2692','#9bb25850','#63894376'];
-  for(const [tone,bladeColor] of bladeColors.entries()) {
-    ctx.beginPath();
-    for(let i=0;i<(grassTexture?2520:6930);i++) {
-      const x=SCENE.left+hash(i+41,tone*17+3)*fieldWidth;
-      const y=SCENE.top+hash(tone*19+1,i+100)*fieldHeight;
-      if(x<area.left-7||x>area.right+7||y<area.top-8||y>area.bottom+8) continue;
-      const tuft=noise(x*.023+74,y*.047+39);
-      const bladeHeight=1+hash(i,tone+14)*(2.4+tuft*3.5);
-      const lean=(hash(i+19,tone*11)-.5)*bladeHeight;
-      ctx.moveTo(x,y);
-      ctx.quadraticCurveTo(x+lean*.19,y-bladeHeight*.56,x+lean,y-bladeHeight);
-    }
-    ctx.lineCap='round';
-    ctx.strokeStyle=bladeColor;
-    ctx.lineWidth=.65+tone*.075;
-    ctx.stroke();
-  }
-
-  ctx.globalCompositeOperation='destination-in';
-  const horizontal=ramp(ctx,{x:SCENE.left,y:0},{x:SCENE.right,y:0},[[0,'#0000'],[.078,'#000'],[.922,'#000'],[1,'#0000']]);
-  ctx.fillStyle=horizontal;
-  ctx.fillRect(area.left,area.top,width,height);
-  const vertical=ramp(ctx,{x:0,y:SCENE.top},{x:0,y:SCENE.bottom},[[0,'#0000'],[.078,'#000'],[.90,'#000'],[1,'#0000']]);
-  ctx.fillStyle=vertical;
-  ctx.fillRect(area.left,area.top,width,height);
-  return canvas;
 }
 
 function createTrayLayer(area=SCENE,ratio=1.45) {
@@ -739,16 +675,14 @@ function loadTexture(file) {
   return image.decode().then(()=>image).catch(()=>null);
 }
 
-let grassTexture=null;
 let sandTexture=null;
 let artRevision=0;
-let sceneArt={grass:createGrassLayer(),tray:createTrayLayer(),area:SCENE};
-const assetsReady=Promise.all([loadTexture('./grass.jpg'),loadTexture('./sand.jpg')]).then(([grass,sand])=>{
-  grassTexture=grass;
+let sceneArt={tray:createTrayLayer(),area:SCENE};
+const assetsReady=loadTexture('./sand.jpg').then(sand=>{
+  if(!sand) return;
   sandTexture=sand;
-  if(!grass&&!sand) return;
   artRevision++;
-  sceneArt={grass:createGrassLayer(),tray:createTrayLayer(),area:SCENE};
+  sceneArt={tray:createTrayLayer(),area:SCENE};
 });
 const [logos,brandColors]=await Promise.all(['./logos/manifest.json','./brand-colors.json'].map(path=>
   fetch(new URL(path,import.meta.url))
@@ -791,10 +725,17 @@ export class Board {
     }
     this.depthOrder=[...this.tiles].sort((a,b)=>a.depth-b.depth || a.x-b.x);
     this.frontOrder=this.depthOrder.toReversed();
+    this.logoSeats=this.tiles.map(tile=>{
+      if(this.projectedTileAt(tile.screen)===tile) return tile.screen;
+      return tile.top.map(point=>({x:lerp(tile.screen.x,point.x,.7),y:lerp(tile.screen.y,point.y,.7)}))
+        .find(point=>this.projectedTileAt(point)===tile);
+    });
     this.sites=makeSites(companies,this.tiles);
     this.siteList=[...this.sites.values()];
     this.home=new Map(this.siteList.map(site=>[site.index,site.company.id]));
     this.layoutCache=new Map();
+    this.logoAnchorCache=new WeakMap();
+    this.logoAnchors=new Map();
     this.pulses=new Set();
     this.camera={...ORIGIN,z:MIN_ZOOM};
     this.activityTiles=[];
@@ -847,6 +788,7 @@ export class Board {
 
   setLayout(layout,category,flash=new Set()) {
     const dirty=this.owners!==layout || this.category!==category || this.drawnSelection!==this.selected;
+    if(this.owners!==layout) this.logoAnchors=this.anchorsFor(layout);
     this.owners=layout;
     this.category=category;
     this.pulses=flash;
@@ -859,6 +801,48 @@ export class Board {
       this.animateFlash();
     }
     this.draw();
+  }
+
+  anchorsFor(layout) {
+    const cached=this.logoAnchorCache.get(layout);
+    if(cached) return cached;
+    const anchors=new Map();
+    const visited=new Uint8Array(this.tiles.length);
+    for(const tile of this.tiles) {
+      const owner=layout[tile.index];
+      if(!owner||visited[tile.index]) continue;
+      const component=[tile.index];
+      visited[tile.index]=1;
+      const centroid={x:0,y:0};
+      for(let cursor=0;cursor<component.length;cursor++) {
+        const index=component[cursor];
+        const {x,y}=this.tiles[index].screen;
+        centroid.x+=x;
+        centroid.y+=y;
+        for(const neighbor of this.neighbors.get(index)) {
+          if(neighbor===undefined||visited[neighbor]||layout[neighbor]!==owner) continue;
+          visited[neighbor]=1;
+          component.push(neighbor);
+        }
+      }
+      if((anchors.get(owner)?.size||0)>=component.length) continue;
+      centroid.x/=component.length;
+      centroid.y/=component.length;
+      let seat;
+      let nearest=Infinity;
+      for(const index of component) {
+        const point=this.logoSeats[index];
+        if(!point) continue;
+        const distance=range(point,centroid);
+        if(distance<nearest) {
+          seat=point;
+          nearest=distance;
+        }
+      }
+      if(seat) anchors.set(owner,{screen:seat,size:component.length});
+    }
+    this.logoAnchorCache.set(layout,anchors);
+    return anchors;
   }
 
   paintTiles(ctx,area) {
@@ -1081,7 +1065,7 @@ export class Board {
       const pixels=(crop.right-crop.left)*(crop.bottom-crop.top);
       if(pixels<=0) return;
       const renderRatio=Math.min(ratio,Math.sqrt(3800000/pixels));
-      this.detailArt={grass:createGrassLayer(crop,renderRatio),tray:createTrayLayer(crop,renderRatio),area:crop,ratio,revision:artRevision};
+      this.detailArt={tray:createTrayLayer(crop,renderRatio),area:crop,ratio,revision:artRevision};
       this.draw(false);
     },110);
     return sceneArt;
@@ -1104,7 +1088,6 @@ export class Board {
     ctx.scale(v.zoom,v.zoom);
     const art=this.backdrop(v,scale);
     const {left,top,right,bottom}=art.area;
-    ctx.drawImage(art.grass,left,top,right-left,bottom-top);
     ctx.drawImage(art.tray.backdrop,left,top,right-left,bottom-top);
     this.drawTerrain(v,scale);
     const opacity=motionReduced.matches ? 0 : Math.max(0,1-(performance.now()-this.flashStart)/770);
@@ -1157,11 +1140,12 @@ export class Board {
       const id=site.company.id;
       const key=KEY_IDS.includes(id);
       const selected=this.selected===id;
-      const at=screen(site);
+      const anchor=this.logoAnchors.get(id);
+      const at=anchor && screen(anchor);
       const radius=compact?(key?13:10):(key?17:13);
-      const overlaps=occupied.some(seat=>range(seat,at)<seat.radius+radius+2);
-      const mayShow=inside(at) && (this.category==='all'||this.category===site.company.category)
+      const mayShow=at && inside(at) && (this.category==='all'||this.category===site.company.category)
         && (selected||key||!compact||this.camera.z>1.32);
+      const overlaps=mayShow && occupied.some(seat=>range(seat,at)<seat.radius+radius+2);
       let node=this.labelNodes.get(id);
       if(mayShow && (!overlaps||selected)) {
         if(!node) {
@@ -1223,17 +1207,20 @@ export class Board {
     return rank===-1 ? 100 : rank;
   }
 
-  ownerAt(x,y) {
-    const view=this.viewport();
-    if(!view.zoom) return undefined;
-    const at={x:(x-view.dx)/view.zoom,y:(y-view.dy)/view.zoom};
+  projectedTileAt(at) {
     if(sceneArt.tray.occlusions.some(face=>contains(face,at.x,at.y))) return undefined;
-    const found=this.frontOrder.find(tile=>{
+    return this.frontOrder.find(tile=>{
       const {left,top,right,bottom}=tile.bounds;
       return at.x>=left&&at.x<=right&&at.y>=top&&at.y<=bottom&&(
         contains(tile.shoulder,at.x,at.y)||contains(tile.top,at.x,at.y)||tile.sides.some(side=>contains(side,at.x,at.y))
       );
     });
+  }
+
+  ownerAt(x,y) {
+    const view=this.viewport();
+    if(!view.zoom) return undefined;
+    const found=this.projectedTileAt({x:(x-view.dx)/view.zoom,y:(y-view.dy)/view.zoom});
     if(!found) return undefined;
     const id=this.owners?.[found.index];
     const company=this.sites.get(id)?.company;
