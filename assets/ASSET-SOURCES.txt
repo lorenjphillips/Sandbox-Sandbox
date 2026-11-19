@@ -1,12 +1,16 @@
 Third-party artwork
 
 grass.jpg
-Grass.png by ZaninDevelopers, Seamless Realistic Texture Pack Vol. 1. CC0 1.0.
+Rearranged and color graded from Grass.png by ZaninDevelopers, Seamless Realistic Texture Pack Vol. 1. CC0 1.0.
 https://opengameart.org/content/photographed-seamless-texture-pack-vol-1
 
 sand.jpg
 Ground 089 color map by ambientCG. CC0 1.0.
 https://ambientcg.com/view?id=Ground089
+
+wood-grain.jpg
+Individual board crops from Wooden Planks by Charlotte Baglioni and Dario Barresi, Poly Haven. CC0.
+https://polyhaven.com/a/wooden_planks
 
 twitter-x.svg
 Official white X mark from the X brand toolkit.

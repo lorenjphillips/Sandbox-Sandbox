@@ -117,9 +117,10 @@ function makeSites(companies,tiles) {
 }
 
 
-const TRAY = {lip:42,floor:-10,base:-42};
+const TRAY = {lip:31,floor:-10,base:-38};
 const OUTLINE = [[156,-104],[944,-104],[1208,320],[944,744],[156,744],[-108,320]];
 const BED = OUTLINE.map(([x,y])=>[lerp(WIDTH/2,x,.915),lerp(HEIGHT/2,y,.915)]);
+const RIM = OUTLINE.map(([x,y])=>[lerp(WIDTH/2,x,.97),lerp(HEIGHT/2,y,.97)]);
 const BED_POINTS = BED.map(([x,y])=>({x,y}));
 const YAW = .128;
 const SIN_YAW = Math.sin(YAW);
@@ -160,13 +161,13 @@ function fitsTray(x,y) {
 
 function temperBrand(brand,index) {
   const saturation=Math.max(...brand)-Math.min(...brand);
-  const quiet=[182,170,145];
+  const quiet=[184,173,148];
   const neutral=[215,208,192];
   if(saturation<24) {
     const bias=(hash(index+31,14)-.5)*18;
     return brand.map((value,channel)=>lerp(value,neutral[channel],.54)+bias);
   }
-  return brand.map((value,channel)=>lerp(value,quiet[channel],.28));
+  return brand.map((value,channel)=>lerp(value,quiet[channel],.42));
 }
 
 function point([x,y,z]) {
@@ -214,57 +215,45 @@ function strokeLine(ctx,positions,style,size=1) {
   ctx.stroke();
 }
 
-function woodBoard(ctx,corners,parallel,styles,seed) {
-  const p=corners.map(point);
-  const long=(parallel ? [p[0],p[1],p[3],p[2]] : [p[0],p[3],p[1],p[2]]);
-  const middle=(a,b)=>({x:(a.x+b.x)/2,y:(a.y+b.y)/2});
-  polygon(ctx,p);
-  ctx.fillStyle=ramp(ctx,middle(long[0],long[1]),middle(long[2],long[3]),styles);
+function woodBoard(ctx,corners,styles,strip) {
+  const [a,b,c,d]=corners.map(point);
+  const middle=(p,q)=>({x:(p.x+q.x)/2,y:(p.y+q.y)/2});
+  polygon(ctx,[a,b,c,d]);
+  ctx.fillStyle=ramp(ctx,middle(a,b),middle(c,d),styles);
   ctx.fill();
+  if(!woodTexture) return;
+  const length=range(a,b);
+  const along={x:(b.x-a.x)/length,y:(b.y-a.y)/length};
+  const normal={x:-along.y,y:along.x};
+  const span=(p,axis)=>(p.x-a.x)*axis.x+(p.y-a.y)*axis.y;
+  const ends=[a,b,c,d].map(p=>span(p,along));
+  const edges=[a,b,c,d].map(p=>span(p,normal));
+  const left=Math.min(...ends)-1,right=Math.max(...ends)+1;
+  const top=Math.min(...edges)-1,bottom=Math.max(...edges)+1;
+  const stripHeight=woodTexture.height/8;
   ctx.save();
   ctx.clip();
-  for(let i=0;i<87;i++) {
-    const off=hash(i+seed,190);
-    const start=hash(i,seed)*.25;
-    const stop=.65+hash(i+seed,24)*.38;
-    const waviness=(hash(i,seed+9)-.5)*.085;
-    ctx.beginPath();
-    for(let j=0;j<=25;j++) {
-      const t=lerp(start,stop,j/25);
-      const across=off+waviness*Math.sin(t*6+hash(i,31)*5)+.016*Math.sin(t*21+i*.4);
-      const lx=lerp(long[0].x,long[1].x,t),ly=lerp(long[0].y,long[1].y,t);
-      const rx=lerp(long[2].x,long[3].x,t),ry=lerp(long[2].y,long[3].y,t);
-      const x=lerp(lx,rx,across),y=lerp(ly,ry,across);
-      if(j===0)ctx.moveTo(x,y);
-      else ctx.lineTo(x,y);
-    }
-    ctx.strokeStyle=i%3===0?'rgba(255,231,180,.22)':'rgba(89,44,17,.15)';
-    ctx.lineWidth=.36+hash(i,12)*1.5;
-    ctx.stroke();
-  }
+  ctx.transform(along.x,along.y,normal.x,normal.y,a.x,a.y);
+  ctx.globalCompositeOperation='soft-light';
+  ctx.globalAlpha=.60;
+  ctx.drawImage(woodTexture,0,strip*stripHeight,woodTexture.width,stripHeight,
+    left,top,right-left,bottom-top);
   ctx.restore();
-  polygon(ctx,p);
-  ctx.strokeStyle='#6f411c99';
-  ctx.lineWidth=1.3;
-  ctx.stroke();
 }
 
-function nail(ctx,x,y) {
+function screw(ctx,x,y) {
   const at=project(x,y,TRAY.lip);
   ctx.save();
   ctx.translate(at.x,at.y);
-  ctx.scale(1,.67);
+  ctx.scale(1,.66);
+  ellipse(ctx,.2,.5,2.7,2.7,'#edcfaa9e');
+  ellipse(ctx,0,0,2.35,2.35,'#684d3c');
+  ellipse(ctx,-.1,.2,1.8,1.8,'#a38a70');
   ctx.beginPath();
-  ctx.arc(0,0,4,0,Math.PI*2);
-  ctx.fillStyle='#785739';
-  ctx.fill();
-  ctx.lineWidth=1.2;
-  ctx.strokeStyle='#f0ca88a6';
-  ctx.stroke();
-  ctx.beginPath();
-  ctx.moveTo(-1.8,1.5);
-  ctx.lineTo(1.8,-1.5);
-  ctx.strokeStyle='#d6ae6c';
+  ctx.moveTo(-.9,.75);
+  ctx.lineTo(.9,-.75);
+  ctx.strokeStyle='#534a3e';
+  ctx.lineWidth=.8;
   ctx.stroke();
   ctx.restore();
 }
@@ -276,18 +265,25 @@ function sandRakeLines(ctx,x,y,angle,length,count) {
   ctx.rotate(angle);
   ctx.scale(1,.67);
   for(let i=0;i<count;i++) {
-    const cy=i*6;
+    const cy=i*4.7;
+    const start=hash(i,length)*7;
+    const end=length-hash(length,i)*12;
+    const taper=ctx.createLinearGradient(0,0,length,2);
+    taper.addColorStop(0,'#7b594300');
+    taper.addColorStop(.19,'#7b59432d');
+    taper.addColorStop(.75,'#7b594326');
+    taper.addColorStop(1,'#7b594300');
     ctx.beginPath();
-    ctx.moveTo(0,cy);
-    ctx.bezierCurveTo(length*.4,cy-12,length*.78,cy+18,length,cy+3);
-    ctx.strokeStyle='#a6733a31';
-    ctx.lineWidth=2.3;
+    ctx.moveTo(start,cy);
+    ctx.bezierCurveTo(length*.4,cy-12,length*.78,cy+18,end,cy+3);
+    ctx.strokeStyle=taper;
+    ctx.lineWidth=1.8;
     ctx.stroke();
-    ctx.translate(0,1.7);
-    ctx.strokeStyle='#ffe8b17c';
-    ctx.lineWidth=1.2;
+    ctx.translate(0,1.3);
+    ctx.strokeStyle='#ffedca36';
+    ctx.lineWidth=.9;
     ctx.stroke();
-    ctx.translate(0,-1.7);
+    ctx.translate(0,-1.3);
   }
   ctx.restore();
 }
@@ -479,52 +475,46 @@ const MOUNDS=[
   [862,592,74,83,41],[555,4,150,66,19],[1023,332,68,104,24]
 ];
 
-function sculptedSand(x,y) {
-  let rise=0;
+function sandLight(x,y) {
   let slopeX=0;
   let slopeY=0;
   for(const [cx,cy,rx,ry,peak] of MOUNDS) {
     const sx=(x-cx)/rx,sy=(y-cy)/ry;
     const part=peak*Math.exp(-(sx*sx+sy*sy));
-    rise+=part;
     slopeX-=2*sx/rx*part;
     slopeY-=2*sy/ry*part;
   }
-  const light=(.56*slopeX+.48*slopeY+.67)/Math.hypot(slopeX,slopeY,1)-.67;
-  return {rise,light};
+  return (.56*slopeX+.48*slopeY+.67)/Math.hypot(slopeX,slopeY,1)-.67;
 }
 
-function createSandMesh() {
-  const step=7;
-  const vertices=[];
-  for(let y=-110;y<=HEIGHT+110;y+=step) {
-    const row=[];
-    for(let x=-88;x<=WIDTH+88;x+=step) {
-      const relief=sculptedSand(x,y);
-      row.push({...project(x,y,TRAY.floor+relief.rise*.7),light:relief.light});
-    }
-    vertices.push(row);
-  }
-  return vertices;
-}
-
-const sandMesh=createSandMesh();
-
-function drawSandRelief(ctx,area) {
-  for(let y=1;y<sandMesh.length;y++) {
-    for(let x=1;x<sandMesh[y].length;x++) {
-      const a=sandMesh[y-1][x-1];
-      if(a.x<area.left-16||a.x>area.right+16||a.y<area.top-16||a.y>area.bottom+16) continue;
-      const poly=[a,sandMesh[y-1][x],sandMesh[y][x],sandMesh[y][x-1]];
-      const contrast=poly.reduce((sum,p)=>sum+p.light,0)/4;
-      if(Math.abs(contrast)<.012) continue;
-      polygon(ctx,poly);
-      const alpha=clamp(Math.abs(contrast)*2.04,0,.62);
-      ctx.fillStyle=contrast>0?'rgba(255,232,173,'+alpha+')':'rgba(105,62,31,'+alpha+')';
-      ctx.fill();
+function createSandRelief() {
+  const canvas=document.createElement('canvas');
+  const step=3;
+  canvas.width=Math.ceil((SCENE.right-SCENE.left)/step);
+  canvas.height=Math.ceil((SCENE.bottom-SCENE.top)/step);
+  const ctx=canvas.getContext('2d');
+  const pixels=ctx.createImageData(canvas.width,canvas.height);
+  for(let row=0;row<canvas.height;row++) {
+    const sy=SCENE.top+(row+.5)*step;
+    const depth=(sy-HEIGHT/2+TRAY.floor*.94)/(.64-TRAY.floor*.94/2400);
+    for(let col=0;col<canvas.width;col++) {
+      const sx=SCENE.left+(col+.5)*step;
+      const across=(sx-WIDTH/2)/(1+depth/2400);
+      const x=WIDTH/2+across*COS_YAW+depth*SIN_YAW;
+      const y=HEIGHT/2-across*SIN_YAW+depth*COS_YAW;
+      const light=sandLight(x,y);
+      const i=4*(row*canvas.width+col);
+      pixels.data[i]=light>0?255:111;
+      pixels.data[i+1]=light>0?244:85;
+      pixels.data[i+2]=light>0?217:65;
+      pixels.data[i+3]=Math.min(145,Math.abs(light)*390);
     }
   }
+  ctx.putImageData(pixels,0,0);
+  return canvas;
 }
+
+const sandRelief=createSandRelief();
 
 function sceneLayer(ratio=1.45,area=SCENE) {
   const canvas=document.createElement('canvas');
@@ -549,39 +539,81 @@ function fillTexture(ctx,texture,area,xScale,yScale,blend,alpha) {
   ctx.restore();
 }
 
+function grassAtFoot(ctx,a,b,index) {
+  const length=range(a,b);
+  const colors=['#687645','#788451','#586c41','#92945d','#586641','#928966'];
+  for(let k=0;k<length/4;k++) {
+    if(noise(k/6,index+2)+hash(k,index+48)*.46<.77) continue;
+    const t=(k+hash(k,index+12))*4/length;
+    const x=lerp(a.x,b.x,t), y=lerp(a.y,b.y,t)+1.8;
+    for(let j=0;j<4;j++) {
+      const seed=k*4+j;
+      const lean=(hash(seed,94)-.53)*7;
+      const h=1.6+hash(seed,index+33)*5.8;
+      const root=x+(hash(seed,27)-.5)*6;
+      ctx.beginPath();
+      ctx.moveTo(root-.45,y);
+      ctx.quadraticCurveTo(root+lean*.23,y-h*.6,root+lean,y-h);
+      ctx.quadraticCurveTo(root+lean*.26+.6,y-h*.56,root+.65,y);
+      ctx.fillStyle=colors[Math.floor(hash(seed,index+41)*colors.length)];
+      ctx.fill();
+    }
+  }
+}
+
 function createTrayLayer(area=SCENE,ratio=1.45) {
   const {canvas,ctx}=sceneLayer(ratio,area);
   const {canvas:foreground,ctx:near}=sceneLayer(ratio,area);
   const occlusions=[];
   const {lip,floor,base}=TRAY;
-  const outer=OUTLINE.map(([x,y])=>[x,y,lip]);
+  const outer=RIM.map(([x,y])=>[x,y,lip]);
   const inner=BED.map(([x,y])=>[x,y,lip]);
   const sand=BED.map(([x,y])=>[x,y,floor]);
-  const foot=OUTLINE.map(([x,y])=>[x,y,base]);
+  const foot=RIM.map(([x,y])=>[x,y,base]);
+  const sandEdges=sand.map(([x,y],i)=>{
+    const [bx,by]=sand[(i+1)%sand.length];
+    const steps=Math.ceil(Math.hypot(bx-x,by-y)/9);
+    return Array.from({length:steps+1},(_,step)=>{
+      const px=lerp(x,bx,step/steps),py=lerp(y,by,step/steps);
+      const bank=noise(px/65+9,py/65+4)*9+noise(px/18,py/18)*2;
+      return project(px,py,floor+bank);
+    });
+  });
   const shownFromFront=OUTLINE.map(([x,y],i)=>{
     const [nx,ny]=OUTLINE[(i+1)%OUTLINE.length];
     return (ny-y)*SIN_YAW-(nx-x)*COS_YAW>0;
   });
 
   ctx.save();
-  ctx.shadowColor='#152411aa';
-  ctx.shadowOffsetX=15;
-  ctx.shadowOffsetY=25;
-  ctx.shadowBlur=34;
-  worldShape(ctx,foot);
-  ctx.fillStyle='#283318';
-  ctx.fill();
+  const shadowScale=ctx.getTransform().a;
+  for(const [dx,dy,blur,shade] of [[12,15,19,'#28251991'],[2.4,3.6,3,'#1e241cb3']]) {
+    ctx.shadowColor=shade;
+    ctx.shadowOffsetX=dx*shadowScale;
+    ctx.shadowOffsetY=dy*shadowScale;
+    ctx.shadowBlur=blur*shadowScale;
+    worldShape(ctx,foot);
+    ctx.fillStyle='#433f2b';
+    ctx.fill();
+  }
   ctx.restore();
 
-  worldShape(ctx,sand);
-  ctx.fillStyle=ramp(ctx,project(0,0),project(WIDTH,HEIGHT),[[0,'#dbb47d'],[.4,'#eac78e'],[.76,'#e4bc80'],[1,'#d3a269']]);
+  for(const [i,a] of inner.entries()) {
+    if(shownFromFront[i]) continue;
+    const j=(i+1)%inner.length;
+    const face=[a,inner[j],sand[j],sand[i]];
+    woodBoard(ctx,face,[[0,'#ad8063'],[.18,'#966d53'],[.85,'#89664e'],[1,'#735642']],(i+4)%8);
+  }
+
+  polygon(ctx,sandEdges.flat());
+  ctx.fillStyle=ramp(ctx,project(0,0),project(WIDTH,HEIGHT),[[0,'#dac4a3'],[.38,'#f4e2c6'],[.72,'#ede0c6'],[1,'#dcc7a7']]);
   ctx.fill();
   ctx.save();
   ctx.clip();
-  fillTexture(ctx,sandTexture,area,.42,.285,'source-over',.73);
+  fillTexture(ctx,sandTexture,area,.35,.23,'soft-light',.78);
+  fillTexture(ctx,sandTexture,area,.35,.23,'multiply',.20);
   const sunlight=ctx.createRadialGradient(440,183,24,542,345,520);
-  sunlight.addColorStop(0,'#ffe8b63d');
-  sunlight.addColorStop(1,'#ffe8b600');
+  sunlight.addColorStop(0,'#fff7df33');
+  sunlight.addColorStop(1,'#fff7df00');
   ctx.fillStyle=sunlight;
   ctx.fillRect(SCENE.left,SCENE.top,SCENE.right-SCENE.left,SCENE.bottom-SCENE.top);
   const grainSpacing=sandTexture?6.55:2.65;
@@ -590,77 +622,70 @@ function createTrayLayer(area=SCENE,ratio=1.45) {
       const u=Math.floor(x),v=Math.floor(y);
       const random=hash(u+29,v+41);
       if(random<.29) continue;
-      const at=project(x+hash(u,7)*1.8,y+hash(v,u)*1.7,floor);
+      const at=project(x+hash(u,v)*grainSpacing,y+hash(v,u)*grainSpacing,floor);
       if(at.x<area.left||at.x>area.right||at.y<area.top||at.y>area.bottom) continue;
-      ctx.fillStyle=random>.64?'#ffeebe57':'#7e522530';
-      const grain=hash(u-12,v-5)*1.2+.42;
+      ctx.fillStyle=random>.64?'#fff6dc4f':'#785c3c24';
+      const grain=hash(u-12,v-5)*.95+.32;
       ctx.fillRect(at.x,at.y,grain,grain*.75);
     }
   }
-  drawSandRelief(ctx,area);
+  ctx.drawImage(sandRelief,SCENE.left,SCENE.top,sandRelief.width*3,sandRelief.height*3);
   sandRakeLines(ctx,354,644,.09,124,5);
   sandRakeLines(ctx,547,664,-.04,104,6);
   sandRakeLines(ctx,817,630,-.19,94,4);
   sandRakeLines(ctx,154,129,.11,94,4);
-  for(const [i,a] of sand.entries()) {
-    const b=sand[(i+1)%sand.length];
-    const inward=([x,y,z])=>[lerp(x,WIDTH/2,.18),lerp(y,HEIGHT/2,.18),z];
-    const next=inward(b);
-    const near=inward(a);
-    worldShape(ctx,[a,b,next,near]);
-    ctx.fillStyle=ramp(ctx,point(a),point(near),[[0,shownFromFront[i]?'#85573569':'#73472591'],[1,'#80512d00']]);
+  for(const [i,edge] of sandEdges.entries()) {
+    const start=edge[0],end=edge.at(-1);
+    const length=range(start,end);
+    const depth=shownFromFront[i]?6:(i===1?16:25);
+    const dx=(start.y-end.y)*depth/length;
+    const dy=(end.x-start.x)*depth/length;
+    const innerEdge=edge.map(p=>({x:p.x+dx,y:p.y+dy})).reverse();
+    const middle=edge[Math.floor(edge.length/2)];
+    polygon(ctx,edge.concat(innerEdge));
+    ctx.fillStyle=ramp(ctx,middle,{x:middle.x+dx,y:middle.y+dy},[[0,'#5d493964'],[.22,'#6655423b'],[1,'#76604800']]);
     ctx.fill();
   }
   ctx.restore();
 
-  for(const [i,a] of inner.entries()) {
-    if(shownFromFront[i]) continue;
-    const j=(i+1)%inner.length;
-    worldShape(ctx,[a,inner[j],sand[j],sand[i]]);
-    ctx.fillStyle=ramp(ctx,point(a),point(sand[i]),[[0,'#a17049'],[.72,'#825436'],[1,'#623f28']]);
-    ctx.fill();
-    strokeLine(ctx,[sand[i],sand[j]],'#643a2066',1.5);
-  }
-
+  const faceColors=[
+    ['#9d7358','#775440'],['#ae7d60','#896249'],['#a4775a','#7d5841']
+  ];
   for(const [i,a] of outer.entries()) {
     if(!shownFromFront[i]) continue;
     const j=(i+1)%outer.length;
-    const panel=[
-      [[0,'#a87850'],[.2,'#9e683e'],[.75,'#82512f'],[1,'#594126']],
-      [[0,'#d3a36c'],[.19,'#c08b51'],[.77,'#986338'],[1,'#795031']],
-      [[0,'#c4925e'],[.2,'#b27d4b'],[.78,'#946234'],[1,'#6e472a']]
-    ][i-2];
+    const [top,bottom]=faceColors[i-2];
     const face=[a,outer[j],foot[j],foot[i]];
-    woodBoard(near,face,true,panel,521+i*121);
+    woodBoard(near,face,[[0,top],[.89,bottom],[1,'#624a38']],(i+2)%8);
     occlusions.push(face.map(point));
     const atHeight=z=>[a,outer[j]].map(([x,y])=>[x,y,z]);
-    strokeLine(near,atHeight(lip-4),'#f8cd8a8f',1.35);
-    strokeLine(near,atHeight(base+8),'#633719a6',1.6);
-    strokeLine(near,atHeight(base),'#4f301fba',2.25);
-    strokeLine(near,[a,foot[i]],'#603b24af',1.4);
+    strokeLine(near,atHeight(lip-2),'#dfb48b73',.8);
+    strokeLine(near,atHeight(base),'#46372bd9',1.25);
+    strokeLine(near,[a,foot[i]],'#594332ad',1.2);
   }
 
   const woodStyles=[
-    [[0,'#f0c084'],[.27,'#d6a56b'],[.8,'#bf874f'],[1,'#e6ae6e']],
-    [[0,'#d0975d'],[.17,'#e8b47a'],[.72,'#c39058'],[1,'#b77d49']],
-    [[0,'#efbd80'],[.25,'#d9a46d'],[.72,'#c08b52'],[1,'#b78452']],
-    [[0,'#f1c788'],[.25,'#dcaa70'],[.72,'#d39e63'],[1,'#b78452']],
-    [[0,'#deaa70'],[.38,'#f1c487'],[.76,'#dca86e'],[1,'#c58f59']],
-    [[0,'#e6b57a'],[.32,'#edbd86'],[.76,'#d5a06b'],[1,'#c48a53']]
+    ['#c49c7f','#b08669'],['#be9476','#a77d61'],['#caa286','#b48c6d'],
+    ['#cda586','#b89070'],['#c5a083','#af8769'],['#c8a184','#b58d70']
   ];
   for(const [i,a] of outer.entries()) {
     const j=(i+1)%outer.length;
     const surface=shownFromFront[i]?near:ctx;
     const rail=[a,outer[j],inner[j],inner[i]];
-    woodBoard(surface,rail,true,woodStyles[i],194+i*121);
-    strokeLine(surface,[a,outer[j]],'#fff1c4bc',1.65);
-    strokeLine(surface,[inner[i],inner[j]],'#ffe1a083',1.55);
+    const [light,dark]=woodStyles[i];
+    woodBoard(surface,rail,[[0,light],[.1,light],[.93,dark],[1,'#a47e63']],i);
+    strokeLine(surface,[a,outer[j]],'#f4d4adad',1.65);
+    strokeLine(surface,[inner[i],inner[j]],'#72533d8c',1.1);
+    strokeLine(surface,[a,inner[i]],'#694e3c9c',1.2);
+    for(const t of [.036,.964]) {
+      const x=lerp((a[0]+inner[i][0])/2,(outer[j][0]+inner[j][0])/2,t);
+      const y=lerp((a[1]+inner[i][1])/2,(outer[j][1]+inner[j][1])/2,t);
+      screw(surface,x,y);
+    }
     if(shownFromFront[i]) occlusions.push(rail.map(point));
   }
-  for(const [i,[x,y]] of OUTLINE.entries()) {
-    const [ix,iy]=BED[i];
-    const previous=(i+OUTLINE.length-1)%OUTLINE.length;
-    nail(shownFromFront[i]||shownFromFront[previous]?near:ctx,(x+ix)/2,(y+iy)/2);
+  for(const [i,a] of foot.entries()) {
+    if(shownFromFront[i]) grassAtFoot(near,point(a),point(foot[(i+1)%foot.length]),i);
   }
   shovel(ctx,TOYS.shovel.x,TOYS.shovel.y+32);
   bucket(ctx,TOYS.bucket.x,TOYS.bucket.y+31);
@@ -676,11 +701,12 @@ function loadTexture(file) {
 }
 
 let sandTexture=null;
+let woodTexture=null;
 let artRevision=0;
 let sceneArt={tray:createTrayLayer(),area:SCENE};
-const assetsReady=loadTexture('./sand.jpg').then(sand=>{
-  if(!sand) return;
+const assetsReady=Promise.all([loadTexture('./sand.jpg'),loadTexture('./wood-grain.jpg')]).then(([sand,wood])=>{
   sandTexture=sand;
+  woodTexture=wood;
   artRevision++;
   sceneArt={tray:createTrayLayer(),area:SCENE};
 });
@@ -698,7 +724,7 @@ function tilePlane(tile,z,scale) {
 }
 
 const visibleSides=[0,1,2];
-const sideShade=[-22,-34,-13];
+const sideShade=[-14,-25,-9];
 
 export class Board {
   constructor(elements,companies,callbacks) {
@@ -710,9 +736,9 @@ export class Board {
       const grain=noise(tile.x/174+5,tile.y/141+3);
       const hill=clamp(heightAt(tile.x,tile.y)*.9 + (grain-.5)*.15,0,.86);
       const tiers=Math.floor(hill*7);
-      tile.elevation=TRAY.floor+7+tiers*6.1;
-      tile.top=tilePlane(tile,tile.elevation,.94);
-      tile.shoulder=tilePlane(tile,tile.elevation-2.4,.987);
+      tile.elevation=TRAY.floor+6+tiers*5.3;
+      tile.top=tilePlane(tile,tile.elevation,.965);
+      tile.shoulder=tilePlane(tile,tile.elevation-1.25,.987);
       tile.base=tilePlane(tile,TRAY.floor+.1,.987);
       tile.shadow=tile.base.map(({x,y})=>({x:x+3.4,y:y+4.5}));
       tile.sides=visibleSides.map(side=>{
@@ -763,7 +789,14 @@ export class Board {
       this.draw();
       this.scheduleActivity();
     }).observe(elements.stage);
-    assetsReady.then(()=>this.draw());
+    assetsReady.then(()=>{
+      if(sandTexture) {
+        this.tileGrain=this.terrainContext.createPattern(sandTexture,'repeat');
+        this.tileGrain.setTransform(new DOMMatrix().scale(.24,.155));
+        this.terrainRevision++;
+      }
+      this.draw();
+    });
   }
 
   layout(scores) {
@@ -859,14 +892,14 @@ export class Board {
       const site=this.sites.get(owner);
       const active=this.selected===owner;
       const dim=this.category!=='all' && this.category!==site.company.category;
-      const shade=(hash(tile.index,47)-.5)*12;
+      const shade=(hash(tile.index,47)-.5)*9;
       const base=dim ? site.color.map((value,index)=>lerp(value,[218,185,134][index],.74)) : site.color;
       const top=tile.top;
       for(const [index,side] of tile.sides.entries()) {
         polygon(ctx,side);
-        ctx.fillStyle=ramp(ctx,side[0],side[3],[[0,color(base,shade+sideShade[index])],[1,color(base,shade+sideShade[index]-24)]]);
+        ctx.fillStyle=ramp(ctx,side[0],side[3],[[0,color(base,shade+sideShade[index])],[1,color(base,shade+sideShade[index]-15)]]);
         ctx.fill();
-        ctx.strokeStyle='#6c472551';
+        ctx.strokeStyle='#614c3b35';
         ctx.lineWidth=.6;
         ctx.stroke();
       }
@@ -874,18 +907,18 @@ export class Board {
       ctx.fillStyle=color(base,shade-16);
       ctx.fill();
       polygon(ctx,top);
-      ctx.fillStyle=ramp(ctx,top[4],top[1],[[0,color(base,shade+22)],[.48,color(base,shade+6)],[1,color(base,shade-4)]]);
+      ctx.fillStyle=ramp(ctx,top[4],top[1],[[0,color(base,shade+12)],[1,color(base,shade-3)]]);
       ctx.fill();
-      ctx.strokeStyle=color(base,43,.7);
-      ctx.lineWidth=1;
+      ctx.strokeStyle=color(base,22,.55);
+      ctx.lineWidth=.65;
       ctx.stroke();
-
-      const p=tile.screen;
-      for(let i=0;i<7;i++) {
-        const x=(hash(tile.index+20,i+231)-.5)*16;
-        const y=(hash(i+63,tile.index+104)-.5)*10;
-        ctx.fillStyle=i%2===0?'#fff5c72c':'#50391e21';
-        ctx.fillRect(p.x+x,p.y+y,1,1);
+      if(this.tileGrain) {
+        ctx.fillStyle=this.tileGrain;
+        ctx.globalCompositeOperation='soft-light';
+        ctx.globalAlpha=.36;
+        ctx.fill();
+        ctx.globalCompositeOperation='source-over';
+        ctx.globalAlpha=1;
       }
 
       for(const [side,adjacent] of this.neighbors.get(tile.index).entries()) {
@@ -1075,6 +1108,13 @@ export class Board {
     const v=this.viewport();
     if(!v.width || !v.height) return;
     const {canvas}=this.elements;
+    const lawnView=[v.dx,v.dy,v.zoom].join('/');
+    if(this.lawnView!==lawnView) {
+      this.lawnView=lawnView;
+      const lawn=document.documentElement.style;
+      lawn.setProperty('--lawn-size',v.zoom*1060+'px '+v.zoom*700+'px');
+      lawn.setProperty('--lawn-origin',v.dx+'px '+v.dy+'px');
+    }
     const scale=Math.min(devicePixelRatio,2);
     if(canvas.width!==Math.round(v.width*scale) || canvas.height!==Math.round(v.height*scale)) {
       canvas.width=Math.round(v.width*scale);

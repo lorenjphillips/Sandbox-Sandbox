@@ -43,10 +43,13 @@ html { min-width: 320px; }
 body { margin: 0; min-height: 100svh; background: radial-gradient(ellipse at 45% 26%, #fcf5e7 0%, transparent 69%); }
 html:has(#atlas-view:not([hidden])) {
   background-color: var(--meadow);
-  background-image: linear-gradient(145deg, #678a2a16, #14271648), url(grass.jpg);
-  background-position: center top;
-  background-repeat: no-repeat, repeat;
-  background-size: auto, min(710px, 100vw) auto;
+  background-image:
+    radial-gradient(ellipse at 16% 19%, #fff0ae24, transparent 52%),
+    linear-gradient(117deg, #bbb77412, transparent 51%, #21342332),
+    url(grass.jpg);
+  background-position: center, center, var(--lawn-origin, center top);
+  background-repeat: no-repeat, no-repeat, repeat;
+  background-size: auto, auto, var(--lawn-size, min(900px, 100vw) auto);
 }
 body:has(#atlas-view:not([hidden])) {
   display: flex;
