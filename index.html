@@ -49,6 +49,7 @@
           <canvas id="board-canvas" aria-hidden="true"></canvas>
           <div id="map-labels" class="map-labels"></div>
           <div id="marker-layer" class="marker-layer"></div>
+          <div id="egg-layer" class="egg-layer"></div>
         </div>
         <div class="zoom-hint" id="zoom-hint" aria-hidden="true" hidden>
           <span class="zoom-hint-mouse">Scroll to zoom</span>
@@ -56,6 +57,17 @@
         </div>
         <div id="map-popover" class="map-popover" hidden></div>
       </div>
+      <aside id="egg-player" class="egg-player" aria-labelledby="egg-title" hidden>
+        <header>
+          <div>
+            <h2 id="egg-title"></h2>
+            <p id="egg-source"></p>
+          </div>
+          <button type="button" class="utility-button" id="egg-close" aria-label="Close clip">Close</button>
+        </header>
+        <div id="egg-media" class="egg-media"></div>
+        <a id="egg-original" class="evidence-link" target="_blank" rel="noopener noreferrer">Open on YouTube</a>
+      </aside>
     </section>
 
     <section id="updates-view" class="updates-view" hidden aria-labelledby="updates-title">

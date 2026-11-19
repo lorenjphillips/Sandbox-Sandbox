@@ -1,4 +1,5 @@
 import { Board, TERRITORY_WEIGHT } from './map.js';
+import { mountEasterEggPlayer } from './easter-eggs.js';
 const $ = selector => document.querySelector(selector);
 const DAY = 86_400_000;
 const LOOKBACK_DAYS = 180;
@@ -46,11 +47,15 @@ function findFront(event) {
 }
 
 const elements = {
-  stage:$('#stage'),canvas:$('#board-canvas'),labels:$('#map-labels'),markers:$('#marker-layer'),
+  stage:$('#stage'),canvas:$('#board-canvas'),labels:$('#map-labels'),markers:$('#marker-layer'),eggLayer:$('#egg-layer'),
   popover:$('#map-popover'),search:$('#map-search'),searchResults:$('#search-results'),
   updates:$('#updates-feed'),historyDate:$('#history-date'),historyDays:$('#history-days'),
   latestButton:$('#jump-latest'),zoomHint:$('#zoom-hint'),profile:$('#profile')
 };
+const easterEggs=mountEasterEggPlayer(elements.eggLayer,$('#egg-player'),()=>{
+  if(elements.profile.open) elements.profile.close();
+  clearSelection();
+});
 
 let atlas;
 try {
@@ -429,6 +434,7 @@ function renderDirectory() {
 
 function openProfile(id) {
   if(!companies.has(id)) return;
+  if(easterEggs.isOpen()) easterEggs.close();
   elements.searchResults.hidden=true;
   elements.search.value='';
   clearSelection(false);
@@ -519,6 +525,7 @@ function route() {
   const requested=location.hash.slice(1).split('?')[0];
   const nextView=['compare','method','updates'].includes(requested) ? requested : 'atlas';
   if(visibleView!==nextView && elements.profile.open) elements.profile.close();
+  if(nextView!=='atlas' && easterEggs.isOpen()) easterEggs.close();
   visibleView=nextView;
   for(const view of ['atlas','updates','compare','method']) $('#'+view+'-view').hidden=view!==visibleView;
   for(const link of document.querySelectorAll('[data-view]')) {
@@ -649,7 +656,8 @@ document.addEventListener('keydown',event=>{
     }
   }
   if(event.key==='Escape' && elements.searchResults.hidden) {
-    if(elements.profile.open) elements.profile.close();
+    if(easterEggs.isOpen()) easterEggs.close(true);
+    else if(elements.profile.open) elements.profile.close();
     else clearSelection();
   }
 });

@@ -469,6 +469,170 @@ function truck(ctx,x,y) {
   ctx.restore();
 }
 
+function paintedShape(ctx,path,fill,edge,width=1) {
+  const outline=new Path2D(path);
+  ctx.fillStyle=fill;
+  ctx.fill(outline);
+  if(edge) {
+    ctx.strokeStyle=edge;
+    ctx.lineWidth=width;
+    ctx.stroke(outline);
+  }
+}
+
+function sandSpill(ctx,x,y,rx,ry) {
+  const shade=ctx.createRadialGradient(x,y,0,x,y,rx);
+  shade.addColorStop(0,'#e1caa5');
+  shade.addColorStop(.63,'#e7d4b5db');
+  shade.addColorStop(1,'#e8d6bb00');
+  ctx.save();
+  ctx.translate(0,y);
+  ctx.scale(1,ry/rx);
+  ctx.translate(0,-y);
+  ellipse(ctx,x,y,rx,rx,shade);
+  ctx.restore();
+  for(let i=0;i<40;i++) {
+    const angle=hash(i,65)*Math.PI*2;
+    const radius=Math.sqrt(hash(77,i));
+    const px=x+Math.cos(angle)*radius*rx,py=y+Math.sin(angle)*radius*ry;
+    ctx.fillStyle=i%3?'#997d554d':'#fff2d5a6';
+    ctx.fillRect(px,py,.36+hash(i,41)*.63,.5);
+  }
+}
+
+function sandworm(ctx) {
+  ctx.rotate(-.12);
+  toyShadow(ctx,2,4.1,22,4.6);
+  const body='M-14-11 C-5-17 7-10 13-5 Q19-1 25-1 Q21 7 13 7 C6 8 0 7-9 10 Q-18 10-14-11Z';
+  paintedShape(ctx,body,ramp(ctx,{x:0,y:-14},{x:0,y:10},[[0,'#cfac7e'],[.32,'#b39570'],[.68,'#937859'],[1,'#735c46']]),'#806c53',.7);
+  ctx.save();
+  ctx.clip(new Path2D(body));
+  for(let i=0;i<10;i++) {
+    const x=-12+i*4.15;
+    const y=-12+Math.max(0,i-2)*1.3;
+    const rib=new Path2D();
+    rib.moveTo(x,y-2);
+    rib.bezierCurveTo(x+5,y-1,x+7,4,x+2,10);
+    ctx.strokeStyle='#66513db3';
+    ctx.lineWidth=1.35;
+    ctx.stroke(rib);
+    ctx.translate(.75,0);
+    ctx.strokeStyle='#e7c999ad';
+    ctx.lineWidth=.65;
+    ctx.stroke(rib);
+    ctx.translate(-.75,0);
+  }
+  ctx.restore();
+  ctx.save();
+  ctx.translate(-12,-1);
+  ctx.rotate(.20);
+  ellipse(ctx,0,0,10,11.9,ramp(ctx,{x:-8,y:-9},{x:8,y:11},[[0,'#d7bc93'],[.46,'#ab8b63'],[1,'#785e46']]));
+  ellipse(ctx,-.7,.1,8.1,9.6,'#604735');
+  ellipse(ctx,-1,0,5.6,6.8,'#392d26');
+  for(let i=0;i<40;i++) {
+    const a=i*Math.PI/20;
+    const length=.53+hash(i,59)*.20;
+    const x=Math.cos(a)*7.7,y=Math.sin(a)*9.1;
+    ctx.beginPath();
+    ctx.moveTo(x-.7,y+.15);
+    ctx.lineTo(x*length-.7,y*length+.3);
+    ctx.lineTo(Math.cos(a+.09)*7.7-.7,Math.sin(a+.09)*9.1);
+    ctx.fillStyle=i%3?'#caaf86':'#ead1ac';
+    ctx.fill();
+  }
+  ctx.restore();
+  sandSpill(ctx,20,3,11,5);
+  sandSpill(ctx,-8,10,11,2.5);
+}
+
+function anakinFigure(ctx) {
+  ctx.rotate(.34);
+  ctx.lineJoin='round';
+  ctx.lineCap='round';
+  toyShadow(ctx,3,6,9,13);
+  paintedShape(ctx,'M-6 5 L0 5 0 14-4 23-8 23-8 20-5 13Z','#48382e','#362d26',.7);
+  paintedShape(ctx,'M.2 5 L5 4 7 13 10 17 7 20 3 16 1 13Z','#524034','#392b23',.7);
+  paintedShape(ctx,'M-5.8 15 L-1.7 16-4 24-10 24 Q-11 21-7 20Z','#392e29');
+  paintedShape(ctx,'M3.8 16 L7.5 13.8 10.8 17.5 10 21 7 21Z','#342b27');
+  paintedShape(ctx,'M-4.8-9 Q0-12 4.3-9 L7-5 3 1 5 8 1.5 10-1.6 8-6.4 9-5 1-7-5Z',
+    ramp(ctx,{x:-6,y:-6},{x:5,y:6},[[0,'#85624a'],[.35,'#4f3c32'],[.75,'#655043'],[1,'#3f322c']]),'#46362b',.65);
+  paintedShape(ctx,'M-4.7-9 L-2-10 2-4 .2-1Z','#48352d');
+  paintedShape(ctx,'M2.2-9 L5-8 1 2-2.8 2Z','#312b28','#826b54',.45);
+  paintedShape(ctx,'M-5.2 .7 L3.9 .6 4.6 2.6-5.3 3Z','#352c28');
+  ctx.fillStyle='#b79b71';
+  ctx.fillRect(-.3,1.2,1.8,1.3);
+  paintedShape(ctx,'M-5.5-7 Q-8.4-8.3-9-4 L-9.2 2.1-7.2 6-5.7 4.8-6.6 1.6-4.2-3Z','#705341','#46372d',.65);
+  ellipse(ctx,-6.6,5.9,1.65,2.2,'#c59973');
+  paintedShape(ctx,'M4.7-8 Q8-8 8-5 L7.6-1 9.2-1 13-6.8 15.4-5.4 12 1.6 9 3.2 5.4 1.1 4.2-3.7Z','#4b3b32','#362f29',.75);
+  ctx.save();
+  ctx.translate(14.3,-6.7);
+  ctx.rotate(.20);
+  for(const [a,b,width,ink] of [[-3,-21,2.7,'#548dac'],[-3.3,-20.6,1.05,'#bfe6eb'],[1.7,-3.6,2.7,'#646b67'],[0,-3.1,.8,'#c8c4a5']]) {
+    ctx.beginPath();
+    ctx.moveTo(0,a);
+    ctx.lineTo(0,b);
+    ctx.lineWidth=width;
+    ctx.strokeStyle=ink;
+    ctx.stroke();
+  }
+  ellipse(ctx,-.7,.6,1.6,1.7,'#47392e');
+  ctx.restore();
+  ellipse(ctx,-.4,-10.5,2.45,2.8,'#bf906a');
+  paintedShape(ctx,'M-5.4-17 Q-6-23.6.5-23.3 6.2-23.1 5.3-16.2 L3.5-11.5 .5-10.7-2.3-11.8-4.5-14Z','#cfaa84','#775d47',.6);
+  paintedShape(ctx,'M-5.5-14.8 Q-8-16.7-6.3-19.6-7.3-22.5-4.4-23.3-3.8-25.4-.8-24.7 2.2-26.3 4.2-24.1 6.8-23.6 6.3-20.5 7-18.5 5-15.6 L4.1-18.5 2.6-20.7 Q.6-18.9-2.8-19.1 L-4-15.3-4.2-12.9Z','#71503a','#49372d',.6);
+  paintedShape(ctx,'M-5.3-21.8 Q-3-25 .2-23.6 2.5-25 4.6-22.9 2-23.7 .1-22.4-2.2-23.4-5.3-21.8Z','#a27851');
+  ctx.fillStyle='#5d4839';
+  ctx.fillRect(-2.6,-16.8,1.3,.55);
+  ctx.fillRect(1.5,-16.9,1.45,.55);
+  sandSpill(ctx,-4,23,7.2,2.4);
+}
+
+function cassetteRadio(ctx) {
+  ctx.rotate(-.15);
+  ctx.lineJoin='round';
+  toyShadow(ctx,2,6.5,17.3,4.2);
+  paintedShape(ctx,'M-10-6.5 L-9.7-12 Q-9.6-14-7.4-14 L7-14 Q10-14 10.2-11.8 L10.4-7 8.4-7 8-11.8-7.6-11.8-8-6.5Z','#555b51','#40463e',.6);
+  paintedShape(ctx,'M-18-7 L-14.7-10.4 17-10.4 18.8-8.1 17.1-5Z','#a6ada0','#656f64',.7);
+  paintedShape(ctx,'M-18-7 Q-17.8-8.2-16-8 L17.5-8 18.5-6.3 18.5 7.2 16.8 9-16.5 9.4-18.5 7.6Z',
+    ramp(ctx,{x:-4,y:-8},{x:3,y:10},[[0,'#94a397'],[.37,'#84968b'],[1,'#67786d']]),'#515e54',.85);
+  for(const x of [-12.8,12.6]) {
+    ellipse(ctx,x,1.4,4.3,5.2,'#536156');
+    ellipse(ctx,x,1.4,3.5,4.4,'#6d7c70');
+    for(let y=-1;y<=4;y+=1.4) {
+      const width=Math.sqrt(Math.max(0,1-((y-1.4)/4.4)**2))*5.3;
+      ctx.fillStyle='#414e43';
+      ctx.fillRect(x-width/2,y,width,.65);
+    }
+  }
+  ctx.fillStyle='#536359';
+  ctx.fillRect(-7.1,-1.3,14,8.8);
+  ctx.fillStyle='#afbaaa';
+  ctx.fillRect(-6.5,-.7,12.7,7.1);
+  ctx.fillStyle='#58665c';
+  ctx.fillRect(-5.25,.8,10.3,3.7);
+  for(const x of [-2.9,2.7]) {
+    ellipse(ctx,x,2.65,1.25,1.25,'#d4cbb1');
+    ellipse(ctx,x,2.65,.55,.55,'#576158');
+  }
+  ctx.fillStyle='#e3c896';
+  ctx.fillRect(-8.4,-6.2,16.7,4.1);
+  ctx.font='bold 2.75px sans-serif';
+  ctx.textAlign='center';
+  ctx.fillStyle='#514d3d';
+  ctx.fillText('SANDSTORM',0,-3.05,15);
+  for(let x=-6;x<=6;x+=3) {
+    ctx.fillStyle=x===6?'#ae7357':'#566056';
+    ctx.fillRect(x,-10.3,2.1,1.5);
+  }
+  sandSpill(ctx,11,8.2,12.5,4.1);
+}
+
+const EGGS=[
+  {id:'worm',label:'Inspect the little sandworm',x:796,y:-10,width:50,height:32,paint:sandworm},
+  {id:'anakin',label:'Inspect the Anakin Skywalker figure',x:293,y:10,width:43,height:57,paint:anakinFigure},
+  {id:'radio',label:'Play the buried cassette radio',x:837,y:560,width:43,height:33,paint:cassetteRadio}
+];
+
 const MOUNDS=[
   [154,120,77,93,31],[327,38,124,53,28],[906,104,78,128,40],
   [107,413,71,142,25],[303,618,115,70,31],[590,632,154,53,36],
@@ -687,6 +851,13 @@ function createTrayLayer(area=SCENE,ratio=1.45) {
   for(const [i,a] of foot.entries()) {
     if(shownFromFront[i]) grassAtFoot(near,point(a),point(foot[(i+1)%foot.length]),i);
   }
+  for(const egg of EGGS) {
+    const at=project(egg.x,egg.y,TRAY.floor);
+    ctx.save();
+    ctx.translate(at.x,at.y);
+    egg.paint(ctx);
+    ctx.restore();
+  }
   shovel(ctx,TOYS.shovel.x,TOYS.shovel.y+32);
   bucket(ctx,TOYS.bucket.x,TOYS.bucket.y+31);
   rake(ctx,TOYS.rake.x,TOYS.rake.y);
@@ -782,6 +953,17 @@ export class Board {
         return byPosition.get(col+','+row)?.index;
       }));
     }
+    this.eggNodes=elements.eggLayer ? EGGS.map(egg=>{
+      const node=document.createElement('button');
+      node.type='button';
+      node.className='egg-hotspot';
+      node.dataset.egg=egg.id;
+      node.setAttribute('aria-label',egg.label);
+      node.setAttribute('aria-controls','egg-player');
+      node.setAttribute('aria-expanded','false');
+      elements.eggLayer.append(node);
+      return {node,center:project(egg.x,egg.y,TRAY.floor),width:egg.width,height:egg.height};
+    }) : [];
     this.labelNodes=new Map();
     this.markerNodes=new Map();
     this.bind();
@@ -1166,6 +1348,17 @@ export class Board {
     const screen=(entry)=>({x:v.dx+entry.screen.x*v.zoom,y:v.dy+entry.screen.y*v.zoom});
     const inside=(at,padding=14)=>at.x>padding && at.x<v.width-padding && at.y>padding && at.y<v.height-padding &&
       !sceneArt.tray.occlusions.some(face=>contains(face,(at.x-v.dx)/v.zoom,(at.y-v.dy)/v.zoom));
+    for(const {node,center,width,height} of this.eggNodes) {
+      const x=v.dx+center.x*v.zoom,y=v.dy+center.y*v.zoom;
+      const w=width*v.zoom,h=height*v.zoom;
+      node.hidden=x+w/2<=0||x-w/2>=v.width||y+h/2<=0||y-h/2>=v.height;
+      if(node.hidden) continue;
+      const hitWidth=Math.max(28,w),hitHeight=Math.max(28,h);
+      node.style.width=hitWidth+'px';
+      node.style.height=hitHeight+'px';
+      node.style.left=(x-hitWidth/2)+'px';
+      node.style.top=(y-hitHeight/2)+'px';
+    }
     const occupied=[];
     const compact=v.width<650;
     const sites=[...this.siteList].sort((a,b)=>this.sitePriority(a)-this.sitePriority(b));
