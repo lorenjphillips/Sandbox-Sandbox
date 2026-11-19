@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "node scripts/preview.mjs",
-    "check": "node scripts/check.mjs"
+    "check": "node scripts/check.mjs",
+    "build": "node scripts/build.mjs",
+    "deploy": "npm run check && npm run build && npm exec --yes --package=wrangler@4.151.0 -- wrangler deploy"
   },
   "engines": {"node": ">=20"}
 }

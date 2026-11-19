@@ -1,0 +1,8 @@
+{
+  "name": "sandbox-sandbox",
+  "compatibility_date": "2026-11-19",
+  "assets": { "directory": "./dist" },
+  "workers_dev": false,
+  "preview_urls": false,
+  "routes": [{ "pattern": "sandboxsandbox.org", "custom_domain": true }]
+}

@@ -130,6 +130,17 @@ a { color: inherit; }
   text-decoration: underline;
   text-underline-offset: 5px;
 }
+.github-link {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 34px;
+  height: 34px;
+  margin-inline-start: -8px;
+  border-radius: 5px;
+}
+.github-link img { height: auto; }
+.github-link:hover { background: var(--page); }
 .shell { padding-bottom: 48px; }
 .shell:has(#atlas-view:not([hidden]), #compare-view:not([hidden])) {
   display: flex;
@@ -804,14 +815,30 @@ td .provider-link { color: var(--ink); font-weight: 700; font-size: 14px; paddin
   .profile { max-height: 48dvh; }
 }
 
-@media (max-width: 550px) {
-  .wordmark { font-size: clamp(15px, 4.9vw, 25px); letter-spacing: -.025em; }
-  .topbar-inner { display: grid; grid-template-columns: minmax(0, 1fr) auto; min-height: 0; padding-block: 11px 7px; gap: 4px 10px; }
+@media (max-width: 700px) {
+  .topbar-inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: "title source" "navigation search";
+    min-height: 0;
+    padding-block: 8px;
+    gap: 4px 8px;
+  }
   body:has(#atlas-view[hidden]) .topbar-inner { padding-block: 14px; }
-  .topbar nav { gap: clamp(9px, 2.5vw, 15px); }
-  .map-tools { grid-column: 1 / -1; display: flex; justify-content: flex-end; }
+  .wordmark { grid-area: title; font-size: clamp(19px, 4.9vw, 25px); letter-spacing: -.025em; justify-self: start; }
+  .topbar nav { grid-area: navigation; gap: clamp(8px, 2.5vw, 15px); margin-left: 0; }
+  .github-link { grid-area: source; justify-self: end; margin-inline-start: 0; }
+  .map-tools { grid-area: search; }
+  .map-search-wrap { width: clamp(110px, 36vw, 180px); }
   .search-box { min-height: 29px; }
   .search-box input { padding-block: 3px; }
+}
+
+@media (max-width: 380px) {
+  .map-search-wrap kbd { display: none; }
+}
+
+@media (max-width: 550px) {
   .history-controls { flex-direction: column; align-items: stretch; gap: 3px; }
   .history-jump { align-self: flex-end; font-size: 12px; }
   .egg-player {
