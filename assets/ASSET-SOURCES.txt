@@ -1,0 +1,15 @@
+Third-party artwork
+
+grass.jpg
+Grass.png by ZaninDevelopers, Seamless Realistic Texture Pack Vol. 1. CC0 1.0.
+https://opengameart.org/content/photographed-seamless-texture-pack-vol-1
+
+sand.jpg
+Ground 089 color map by ambientCG. CC0 1.0.
+https://ambientcg.com/view?id=Ground089
+
+twitter-x.svg
+Official white X mark from the X brand toolkit.
+https://about.x.com/en/who-we-are/brand-toolkit
+
+The provider logo sources are recorded in logos/manifest.json.

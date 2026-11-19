@@ -1,0 +1,250 @@
+{
+  "agent37": {
+    "file": "agent37.png",
+    "source": "https://www.agent37.com/favicon.ico"
+  },
+  "agentcomputer": {
+    "file": "agentcomputer.png",
+    "source": "https://www.agentcomputer.ai/icon?17c54e3ebaa5e96e"
+  },
+  "akamai": {
+    "file": "akamai.png",
+    "source": "https://www.akamai.com/favicon.ico"
+  },
+  "alien": {
+    "file": "alien.png",
+    "source": "https://www.alien.dev/icons/alien-192.png"
+  },
+  "aws": {
+    "file": "aws.png",
+    "source": "https://d1.awsstatic.com/onedam/marketing-channels/website/public/shared/architecture-icon-release/Icon-package_07312026.5846e92413caa21490223536cc97f1269e44fa92.zip"
+  },
+  "aws-lambda": {
+    "file": "aws-lambda.png",
+    "source": "https://d1.awsstatic.com/onedam/marketing-channels/website/public/shared/architecture-icon-release/Icon-package_07312026.5846e92413caa21490223536cc97f1269e44fa92.zip"
+  },
+  "azure": {
+    "file": "azure.png",
+    "source": "https://azure.microsoft.com/favicon.ico"
+  },
+  "baseten": {
+    "file": "baseten.png",
+    "source": "https://www.datocms-assets.com/104802/1792619555-favicon.png"
+  },
+  "beam": {
+    "file": "beam.png",
+    "source": "https://www.beam.cloud/favicon.svg"
+  },
+  "blacksmith": {
+    "file": "blacksmith.png",
+    "source": "https://www.blacksmith.sh/icon.svg?icon.426bjam5j1j9a.svg"
+  },
+  "blaxel": {
+    "file": "blaxel.png",
+    "source": "https://blaxel.ai/favicon.svg"
+  },
+  "boat": {
+    "file": "boat.png",
+    "source": "https://boat.dev/icon.svg"
+  },
+  "browserbase": {
+    "file": "browserbase.png",
+    "source": "https://www.browserbase.com/favicon.svg"
+  },
+  "browserpod": {
+    "file": "browserpod.png",
+    "source": "https://browserpod.io/favicon.png"
+  },
+  "buddy": {
+    "file": "buddy.png",
+    "source": "https://buddy.works/sandboxes/favicon.ico?favicon.1fiwhkznkyo1-.ico"
+  },
+  "celesto": {
+    "file": "celesto.png",
+    "source": "https://celesto.ai/favicon.ico"
+  },
+  "cloudflare": {
+    "file": "cloudflare.png",
+    "source": "https://www.cloudflare.com/favicon.ico"
+  },
+  "codesandbox": {
+    "file": "codesandbox.png",
+    "source": "https://codesandbox.stream/apple-touch-icon.png"
+  },
+  "daytona": {
+    "file": "daytona.png",
+    "source": "https://framerusercontent.com/images/6WPclDLAHHQgPFeA2DRTW1OXVSU.png"
+  },
+  "deno": {
+    "file": "deno.png",
+    "source": "https://deno.com/logo.svg?__frsh_c=2c7be834343e725c25fa21f2d98d4350fa3b3f96"
+  },
+  "depot": {
+    "file": "depot.png",
+    "source": "https://depot.dev/favicon-light/apple-touch-icon.png"
+  },
+  "digitalocean": {
+    "file": "digitalocean.png",
+    "source": "https://www.digitalocean.com/_do-www-marketing/646d1eeb/_next/static/media/favicon.91372345.svg"
+  },
+  "docker": {
+    "file": "docker.png",
+    "source": "https://www.docker.com/app/uploads/brand/icon/docker-favicon-192x192.png"
+  },
+  "e2b": {
+    "file": "e2b.png",
+    "source": "https://e2b.dev/icon2.png?icon2.2h_70q4cu8mj-.png"
+  },
+  "exe": {
+    "file": "exe.png",
+    "source": "https://exe.dev/apple-touch-icon.png"
+  },
+  "freestyle": {
+    "file": "freestyle.png",
+    "source": "https://www.freestyle.sh/favicon.png"
+  },
+  "google": {
+    "file": "google.png",
+    "source": "https://www.gstatic.com/cgc/super_cloud_gradient.png"
+  },
+  "hopx": {
+    "file": "hopx.png",
+    "source": "https://www.hopx.ai/favicon-96x96.png"
+  },
+  "instabox": {
+    "file": "instabox.png",
+    "source": "https://instabox.sh/assets/7977b8e91c65ba21/favicon.svg"
+  },
+  "instavm": {
+    "file": "instavm.png",
+    "source": "https://instavm.io/apple-touch-icon.png"
+  },
+  "islo": {
+    "file": "islo.png",
+    "source": "https://islo.dev/favicon.ico"
+  },
+  "koyeb": {
+    "file": "koyeb.png",
+    "source": "https://www.koyeb.com/favicon/apple-touch-icon.png"
+  },
+  "machine0": {
+    "file": "machine0.png",
+    "source": "https://machine0.io/icon.png?icon.0s_ephlrwnys2.png"
+  },
+  "maritime": {
+    "file": "maritime.png",
+    "source": "https://maritime.sh/icon.png"
+  },
+  "microsandbox": {
+    "file": "microsandbox.png",
+    "source": "https://microsandbox.dev/apple-icon"
+  },
+  "modal": {
+    "file": "modal.png",
+    "source": "https://modal.com/assets/favicon.svg"
+  },
+  "morph": {
+    "file": "morph.png",
+    "source": "https://www.morph.so/logo.png"
+  },
+  "mosaic": {
+    "file": "mosaic.png",
+    "source": "https://sandbox.mosaicos.com/favicon.svg"
+  },
+  "namespace": {
+    "file": "namespace.png",
+    "source": "https://namespace.so/favicon.svg"
+  },
+  "northflank": {
+    "file": "northflank.png",
+    "source": "https://northflank.com/favicon.ico"
+  },
+  "novita": {
+    "file": "novita.png",
+    "source": "https://novita.ai/icon-128x128.png"
+  },
+  "openai": {
+    "file": "openai.png",
+    "source": "https://openai.com/apple-icon.png?apple-icon.3o0tf8iy4mx7y.png"
+  },
+  "opencomputer": {
+    "file": "opencomputer.png",
+    "source": "https://docs-v1.opencomputer.dev/images/favicon.svg"
+  },
+  "opensandbox": {
+    "file": "opensandbox.png",
+    "source": "https://open-sandbox.ai/favicon.svg"
+  },
+  "openscale": {
+    "file": "openscale.png",
+    "source": "https://openscale.so/favicon.svg"
+  },
+  "openshell": {
+    "file": "openshell.png",
+    "source": "https://docs.nvidia.com/apple-touch-icon.png"
+  },
+  "pine": {
+    "file": "pine.png",
+    "source": "https://pinecomputer.io/_astro/favicon-lit.HW1B1gfx.svg"
+  },
+  "prized": {
+    "file": "prized.png",
+    "source": "https://prized.dev/favicon.svg"
+  },
+  "proton": {
+    "file": "proton.png",
+    "source": "https://app.proton.computer/"
+  },
+  "railway": {
+    "file": "railway.png",
+    "source": "https://railway.com/apple-touch-icon.png"
+  },
+  "render": {
+    "file": "render.png",
+    "source": "https://render.com/icon.svg?icon.00d01gt742wgb.svg?dpl=36f365e4bcaa"
+  },
+  "riza": {
+    "file": "riza.png",
+    "source": "https://riza.io/favicon.ico"
+  },
+  "runloop": {
+    "file": "runloop.png",
+    "source": "https://docs.runloop.ai/mintlify-assets/_mintlify/favicons/runloopai/pjXnHMZq1DfDYUjd/_generated/favicon/android-chrome-192x192.png"
+  },
+  "runtime": {
+    "file": "runtime.png",
+    "source": "https://withruntime.com/icon.svg?5a98e2cacd6c2678"
+  },
+  "spheron": {
+    "file": "spheron.png",
+    "source": "https://docs.spheron.ai/favicon.ico"
+  },
+  "sprites": {
+    "file": "sprites.png",
+    "source": "https://fly.io/phx/ui/images/favicon/apple-touch-icon-3e4c9ce127b5cd6f5516638d4bbf1dd5.png?vsn=d"
+  },
+  "superserve": {
+    "file": "superserve.png",
+    "source": "https://www.superserve.ai/assets/icons/icon-256x256.png"
+  },
+  "tangle": {
+    "file": "tangle.png",
+    "source": "https://docs.tangle.tools/favicon-v1.svg"
+  },
+  "tensorlake": {
+    "file": "tensorlake.png",
+    "source": "https://www.tensorlake.ai/icon-192.png"
+  },
+  "together": {
+    "file": "together.png",
+    "source": "https://cdn.prod.website-files.com/69654e88dce9154b5f1206dd/69a59cff65ed0f267dd2fbe8_touchicon.png"
+  },
+  "upstash": {
+    "file": "upstash.png",
+    "source": "https://upstash.com/icons/android-chrome-192x192.png"
+  },
+  "vercel": {
+    "file": "vercel.png",
+    "source": "https://assets.vercel.com/image/upload/q_auto/front/favicon/vercel/apple-touch-icon-180x180.png"
+  }
+}
