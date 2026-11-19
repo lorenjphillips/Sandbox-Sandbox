@@ -364,7 +364,7 @@
         "Tobi Lütke",
         "Aravind Srinivas"
       ],
-      "revenue": "Company reported about 25× revenue growth since Jan 2026 in Oct 2026; dollar figure undisclosed",
+      "revenue": "$100M annualized run rate disclosed by Daytona’s CEO in Nov 2026. Sandbox revenue breakout undisclosed.",
       "valuation": "$1B at Series B, company-reported Oct 2026",
       "pricing": [
         {
@@ -423,6 +423,10 @@
         {
           "label": "Source availability",
           "url": "https://www.daytona.io/dotfiles/updates/daytona-is-going-closed-source"
+        },
+        {
+          "label": "CEO run-rate disclosure",
+          "url": "https://www.daytona.io/dotfiles/1m-to-100m-run-rate-in-4-quarters"
         }
       ]
     },
@@ -454,12 +458,12 @@
         "Jérôme Gravel-Niquet",
         "Michael Dwan"
       ],
-      "funding": "$70M parent-company round, company-reported Jun 2023",
+      "funding": "$25M Series D announced July 2026, co-led by Dell Technologies Capital and Intel Capital. Fly.io previously announced a $70M round in June 2023.",
       "investors": [
         "EQT Ventures",
         "Andreessen Horowitz",
         "Intel Capital",
-        "Dell"
+        "Dell Technologies Capital"
       ],
       "revenue": null,
       "valuation": "$447.3M parent-company Series C valuation, Jun 2023, Forge financing data",
@@ -505,6 +509,10 @@
         {
           "label": "Sprites Fly6PN private networking",
           "url": "https://fly.io/changelog/introducing-sprites-fly6pn-connect-your-sprite-to-your-fly/"
+        },
+        {
+          "label": "Series D and Sprites investment",
+          "url": "https://fly.io/news/fly-io-launches-computers-for-agents/"
         }
       ]
     },
@@ -1562,7 +1570,7 @@
       "name": "Proton",
       "provider": "Collaborators Inc.",
       "category": "Sandboxes",
-      "description": "Persistent Linux cloud computers for long-running agents, sized in configurable vCPUs.",
+      "description": "Proton offered persistent cloud computers. The operator has closed new subscriptions and machine creation and has announced the service wind-down.",
       "products": [
         "Linux cloud computers",
         "Shell and SSH access",
@@ -1575,8 +1583,7 @@
         "Included NVMe storage and RAM scale with the selected CPU count."
       ],
       "tradeoffs": [
-        "Pausing can still incur storage-related costs and restart depends on capacity.",
-        "Shared CPU allocation and conditional burst RAM are part of the offering."
+        "No new subscriptions or machine creation. The operator scheduled remaining machines for deletion on December 20, 2026."
       ],
       "founded": null,
       "founders": [],
@@ -1586,12 +1593,12 @@
       "valuation": null,
       "pricing": [
         {
-          "label": "Running compute",
+          "label": "Running compute (historical)",
           "value": "$6 / vCPU per 730 hours",
           "detail": "Billed by the second. Smallest 2-vCPU machine is $12 for 730 running hours (~$0.0164/hour)."
         },
         {
-          "label": "Paused computer",
+          "label": "Paused computer (historical)",
           "value": "Size-dependent",
           "detail": "See the vendor price on the machine page before creating or resuming."
         }
@@ -1608,8 +1615,13 @@
         {
           "label": "Archived launch post",
           "url": "https://xitter.cf/yiliush/status/2110188591666385213"
+        },
+        {
+          "label": "Wind-down schedule",
+          "url": "https://cube.computer/sunset/"
         }
-      ]
+      ],
+      "status": "Winding down"
     },
     {
       "id": "docker",
@@ -4943,6 +4955,16 @@
       "front": "Network"
     },
     {
+      "company": "google",
+      "date": "2026-11-18",
+      "kind": "feature",
+      "title": "Google Gen AI SDK adds self-hosted sandbox environments",
+      "summary": "The JavaScript SDK v3.5.0 introduced self-hosted bring-your-own-sandbox mode and environment configuration fields.",
+      "url": "https://github.com/googleapis/js-genai/releases/tag/v3.5.0",
+      "source": "Google Gen AI SDK release",
+      "front": "Workflow"
+    },
+    {
       "company": "machine0",
       "date": "2026-11-17",
       "kind": "feature",
@@ -5095,6 +5117,26 @@
       "front": "Execution"
     },
     {
+      "company": "aws",
+      "date": "2026-11-16",
+      "kind": "feature",
+      "title": "AgentCore Runtime Instances expand to 15 regions",
+      "summary": "AWS extended the managed EC2 Runtime Instances option to six more regions. The instance-backed offering supports sessions up to 14 days.",
+      "url": "https://aws.amazon.com/about-aws/whats-new/2026/11/agentcore-aws-regions/",
+      "source": "AWS What's New",
+      "front": "Workflow"
+    },
+    {
+      "company": "google",
+      "date": "2026-11-16",
+      "kind": "feature",
+      "title": "Cloud Run sandboxes gain templates and in-memory volumes",
+      "summary": "The preview lets created sandboxes use their own container images and attach in-memory volumes on demand.",
+      "url": "https://docs.cloud.google.com/run/docs/release-notes#November_16_2026",
+      "source": "Google Cloud release notes",
+      "front": "State"
+    },
+    {
       "company": "instabox",
       "date": "2026-11-15",
       "kind": "feature",
@@ -5157,6 +5199,16 @@
       "summary": "OpenComputer released its coding-agent implementation and documentation for self-hosting persistent environments.",
       "url": "https://opencomputer.dev/blog/opencomputer-open-source-devin-alternative/",
       "source": "OpenComputer announcement"
+    },
+    {
+      "company": "azure",
+      "date": "2026-11-13",
+      "kind": "feature",
+      "title": "Manage Azure sandboxes from VS Code",
+      "summary": "Microsoft added sandbox group management, command execution, named snapshots and stop or resume controls to its Container Apps extension.",
+      "url": "https://techcommunity.microsoft.com/blog/appsonazureblog/introducing-azure-container-apps-sandboxes-in-visual-studio-code/4573296",
+      "source": "Microsoft Azure announcement",
+      "front": "Workflow"
     },
     {
       "company": "tensorlake",
@@ -5260,6 +5312,15 @@
       "url": "https://github.com/TencentCloud/CubeSandbox/releases/tag/v0.8.0",
       "source": "Tencent Cloud CubeSandbox release notes",
       "front": "State"
+    },
+    {
+      "company": "instabox",
+      "date": "2026-11-12",
+      "kind": "adoption",
+      "title": "InstaBox founder reports one million boxes created",
+      "summary": "Founder Hang Huang reported more than one million boxes created by users after less than one month in beta. The figure counts boxes and comes from the company.",
+      "url": "https://x.com/hanghuang_/status/2120909505290756137",
+      "source": "InstaBox co-founder on X"
     },
     {
       "company": "spheron",
@@ -5418,6 +5479,34 @@
       "source": "Maritime changelog"
     },
     {
+      "company": "novita",
+      "date": "2026-11-06",
+      "kind": "adoption",
+      "title": "Miles adds Novita as a sandbox backend",
+      "summary": "Novita documented its integration into Miles, which can use the sandbox for experimental Harbor and OpenEnv reinforcement-learning recipes.",
+      "url": "https://blogs.novita.ai/novita-sandbox-miles-integration/",
+      "source": "Novita integration announcement"
+    },
+    {
+      "company": "proton",
+      "date": "2026-11-06",
+      "kind": "retirement",
+      "title": "Collaborators announces the Proton wind-down",
+      "summary": "New subscriptions and machine creation closed. Machines on never-paid accounts were scheduled for deletion November 14, with all remaining machines scheduled for deletion December 20.",
+      "url": "https://cube.computer/sunset/",
+      "source": "Cube and Proton shutdown notice"
+    },
+    {
+      "company": "prized",
+      "date": "2026-11-06",
+      "kind": "feature",
+      "title": "Prized adds L4 GPU sandboxes and beta SDKs",
+      "summary": "In its launch-week recap, Prized reports rolling out NVIDIA L4 to paid plans and beta Python and TypeScript sandbox SDKs.",
+      "url": "https://prized.dev/docs/changelog#launch-week",
+      "source": "Prized launch-week recap",
+      "front": "Execution"
+    },
+    {
       "company": "digitalocean",
       "date": "2026-11-05",
       "kind": "feature",
@@ -5443,6 +5532,16 @@
       "summary": "Version 2 raised bandwidth and connection limits and added live CloudWatch image-build logs.",
       "url": "https://docs.aws.amazon.com/lambda/latest/dg/microvms-base-image-release-notes.html",
       "source": "AWS release notes"
+    },
+    {
+      "company": "google",
+      "date": "2026-11-05",
+      "kind": "feature",
+      "title": "GKE makes Agent Substrate generally available",
+      "summary": "Google announced Agent Substrate 1.0 and GKE general availability, along with donation of Agent Substrate, gVisor and OpenRL to the CNCF.",
+      "url": "https://cloud.google.com/blog/products/containers-kubernetes/open-infrastructure-for-autonomous-agents-comes-to-cncf",
+      "source": "Google Cloud announcement",
+      "front": "Execution"
     },
     {
       "company": "render",
@@ -5473,6 +5572,15 @@
       "source": "E2B product announcement"
     },
     {
+      "company": "daytona",
+      "date": "2026-11-03",
+      "kind": "adoption",
+      "title": "Daytona reports a $100M annualized run rate",
+      "summary": "In a November post, Daytona’s CEO reported that the company went from a $1M run rate to $100M over four quarters. The figure is a company-reported run rate.",
+      "url": "https://www.daytona.io/dotfiles/1m-to-100m-run-rate-in-4-quarters",
+      "source": "Daytona CEO"
+    },
+    {
       "company": "digitalocean",
       "date": "2026-11-02",
       "kind": "feature",
@@ -5498,6 +5606,16 @@
       "summary": "Maritime added ephemeral and persistent Linux sandboxes billed by the second, plus batch swarms and Windows desktops out of beta.",
       "url": "https://maritime.sh/changelog/2026-10-31-sandboxes",
       "source": "Maritime changelog"
+    },
+    {
+      "company": "alibaba",
+      "date": "2026-10-29",
+      "kind": "feature",
+      "title": "Alibaba’s sandbox template marketplace launches",
+      "summary": "Alibaba introduced preconfigured, cached images for command execution, code interpretation, browsers, desktops and software engineering evaluation.",
+      "url": "https://www.aliyun.com/product/news/31896",
+      "source": "Alibaba Cloud product release",
+      "front": "Workflow"
     },
     {
       "company": "beam",
@@ -5537,6 +5655,15 @@
       "front": "State"
     },
     {
+      "company": "browserbase",
+      "date": "2026-10-27",
+      "kind": "feature",
+      "title": "Browserbase adds Authenticated Fetch",
+      "summary": "Fetch can reuse cookies saved in a Browserbase browser context to retrieve authenticated pages without starting a fresh interactive session for each request.",
+      "url": "https://www.browserbase.com/blog/introducing-authenticated-fetch",
+      "source": "Browserbase announcement"
+    },
+    {
       "company": "digitalocean",
       "date": "2026-10-26",
       "kind": "feature",
@@ -5545,6 +5672,26 @@
       "url": "https://docs.digitalocean.com/release-notes/agent-harness-runtime/#26-october",
       "source": "DigitalOcean release notes",
       "front": "Execution"
+    },
+    {
+      "company": "docker",
+      "date": "2026-10-26",
+      "kind": "feature",
+      "title": "Docker keeps sandbox kit volumes across recreations",
+      "summary": "Release 0.50.0 adds configurable host mounts and retains persistent kit volumes when a sandbox is updated or recreated.",
+      "url": "https://github.com/docker/sbx-releases/releases/tag/v0.50.0",
+      "source": "Docker Sandboxes release notes",
+      "front": "State"
+    },
+    {
+      "company": "sprites",
+      "date": "2026-10-23",
+      "kind": "feature",
+      "title": "Sprites management moves into Fly MCP",
+      "summary": "Fly launched a unified MCP server for its resources, including Sprites. It consolidates Sprite management with other Fly organization tools.",
+      "url": "https://fly.io/changelog/new-fly-mcp/",
+      "source": "Fly.io changelog",
+      "front": "Workflow"
     },
     {
       "company": "opensandbox",
@@ -5573,6 +5720,16 @@
       "url": "https://docs.together.ai/docs/sdk-v3-migration-guide#removed-apis-and-parameters",
       "source": "Together AI SDK migration guide",
       "front": "Workflow"
+    },
+    {
+      "company": "google",
+      "date": "2026-10-22",
+      "kind": "launch",
+      "title": "Google announces Agent Compute Engine",
+      "summary": "Google unveiled hardware-isolated microVMs for agent workloads with delegated identity and credential injection handled outside the sandbox. Its announcement described internal use for Gemini agents.",
+      "url": "https://cloud.google.com/blog/topics/ai-infrastructure/introducing-agent-compute-engine-and-expanded-agent-governance",
+      "source": "Google Cloud announcement",
+      "front": "Execution"
     },
     {
       "company": "openshell",
@@ -5611,6 +5768,24 @@
       "source": "Daytona Series B announcement"
     },
     {
+      "company": "instabox",
+      "date": "2026-10-20",
+      "kind": "feature",
+      "title": "InstaBox adds machine-size and image choices",
+      "summary": "InstaBox added a choice of CPU and RAM sizes and ready-to-use images when creating cloud computers.",
+      "url": "https://instabox.sh/blog/machine-sizes-and-images",
+      "source": "InstaBox product announcement"
+    },
+    {
+      "company": "morph",
+      "date": "2026-10-20",
+      "kind": "feature",
+      "title": "Morph Cloud adds instance disk resizing to its SDK",
+      "summary": "The Python SDK and CLI can request a VM disk resize and track the resulting operation.",
+      "url": "https://github.com/morph-labs/morph-python-sdk/compare/v0.1.115...v0.1.116",
+      "source": "Morph Cloud SDK release diff"
+    },
+    {
       "company": "openai",
       "date": "2026-10-16",
       "kind": "feature",
@@ -5618,6 +5793,25 @@
       "summary": "OpenAI added the Artifact SDK and tools for spreadsheets, presentations, and Word documents to Agents API hosted sandboxes.",
       "url": "https://developers.openai.com/api/docs/changelog#october-2026",
       "source": "OpenAI API changelog"
+    },
+    {
+      "company": "e2b",
+      "date": "2026-10-15",
+      "kind": "adoption",
+      "title": "E2B reports more than two billion sandbox starts",
+      "summary": "E2B’s published figures describe a cumulative total across regions. The company says it crossed two billion in October, following the one-billion milestone in June.",
+      "url": "https://e2b.dev/resources/best-code-execution-sandboxes-for-ai-agents",
+      "source": "E2B company publication"
+    },
+    {
+      "company": "vercel",
+      "date": "2026-10-15",
+      "kind": "launch",
+      "title": "Vercel Drives become generally available",
+      "summary": "Persistent attachable storage for Sandbox became generally available on Hobby, Pro and Enterprise plans.",
+      "url": "https://vercel.com/changelog/vercel-drives-is-now-generally-available",
+      "source": "Vercel changelog",
+      "front": "State"
     },
     {
       "company": "tensorlake",
@@ -5657,6 +5851,16 @@
       "source": "Freestyle changelog"
     },
     {
+      "company": "prized",
+      "date": "2026-10-14",
+      "kind": "launch",
+      "title": "Prized opens its programmable sandboxes beta",
+      "summary": "The API and CLI provision Linux microVMs from templates, run commands, transfer files, pause and fork running environments.",
+      "url": "https://prized.dev/docs/changelog#sandboxes-beta",
+      "source": "Prized release notes",
+      "front": "Execution"
+    },
+    {
       "company": "daytona",
       "date": "2026-10-12",
       "kind": "feature",
@@ -5664,6 +5868,15 @@
       "summary": "SDK callers can specify a region on an individual sandbox or snapshot creation request.",
       "url": "https://www.daytona.io/changelog",
       "source": "Daytona changelog"
+    },
+    {
+      "company": "agent37",
+      "date": "2026-10-12",
+      "kind": "launch",
+      "title": "Agent37 debuts its hosted agent sandboxes",
+      "summary": "Agent37’s founders presented the service on Launch HN, offering API-managed persistent sandboxes for running different agent harnesses.",
+      "url": "https://news.ycombinator.com/item?id=50059096",
+      "source": "Agent37 founders on Launch HN"
     },
     {
       "company": "openai",
@@ -5682,6 +5895,44 @@
       "summary": "Deno announced that its team would join Cloudflare and that Deno Deploy would shut down after six months. Its Sandbox launch page now says new customers cannot sign up.",
       "url": "https://deno.com/blog/cloudflare",
       "source": "Deno announcement"
+    },
+    {
+      "company": "maritime",
+      "date": "2026-10-09",
+      "kind": "launch",
+      "title": "Maritime launches to YC Fall 2026",
+      "summary": "Maritime announced its YC batch launch. The product update included ARM-based Android computers and background command execution.",
+      "url": "https://maritime.sh/changelog/2026-10-09-launch",
+      "source": "Maritime changelog"
+    },
+    {
+      "company": "e2b",
+      "date": "2026-10-07",
+      "kind": "feature",
+      "title": "E2B launches its Secrets store",
+      "summary": "Stored credentials can be attached to matching outbound HTTPS requests outside the sandbox. Shared credentials can be rotated without restarting sandboxes.",
+      "url": "https://e2b.dev/resources/introducing-e2b-secrets",
+      "source": "E2B product announcement"
+    },
+    {
+      "company": "aws",
+      "date": "2026-10-07",
+      "kind": "launch",
+      "title": "AWS previews Strands Box",
+      "summary": "AWS released an Apache-2.0 developer preview of a local macOS agent sandbox that combines OS-level isolation with policies that can evaluate an agent’s prior actions.",
+      "url": "https://aws.amazon.com/blogs/opensource/introducing-strands-box-ai-agent-sandboxes-powered-by-dogwood/",
+      "source": "AWS Open Source announcement",
+      "front": "Network"
+    },
+    {
+      "company": "google",
+      "date": "2026-10-07",
+      "kind": "feature",
+      "title": "GKE microVM isolation reaches general availability",
+      "summary": "Google made hardware-isolated GKE Sandbox microVMs generally available on eligible v1.37 clusters using Kata Containers and Cloud Hypervisor.",
+      "url": "https://docs.cloud.google.com/kubernetes-engine/docs/release-notes-new-features#October_07_2026",
+      "source": "Google Cloud release notes",
+      "front": "Execution"
     },
     {
       "company": "tensorlake",
@@ -5749,6 +6000,25 @@
     },
     {
       "company": "e2b",
+      "date": "2026-10-01",
+      "kind": "adoption",
+      "title": "Arena reports up to 600,000 E2B runs per day",
+      "summary": "Arena uses E2B to execute code in model evaluations. A joint case study reports that Arena runs up to 600,000 E2B sandboxes per day.",
+      "url": "https://e2b.dev/customers/arena",
+      "source": "Arena and E2B customer case study"
+    },
+    {
+      "company": "digitalocean",
+      "date": "2026-10-01",
+      "kind": "launch",
+      "title": "DigitalOcean bundles sandbox compute into Agent Droplets",
+      "summary": "Agent Droplets introduced $50 Pro and $200 Team subscriptions that include discounts on Harness Runtime sandbox compute, memory and storage alongside other managed agent services.",
+      "url": "https://investors.digitalocean.com/news/news-details/2026/DigitalOcean-Introduces-Agent-Droplets-Everything-an-AI-Agent-Needs-One-Simple-Monthly-Price/default.aspx",
+      "source": "DigitalOcean investor announcement",
+      "front": "Workflow"
+    },
+    {
+      "company": "e2b",
       "date": "2026-09-30",
       "kind": "launch",
       "title": "E2B Embed packages runtime and dashboard",
@@ -5764,6 +6034,44 @@
       "summary": "A Durable Object can choose the sandbox image and machine size at runtime. Cloudflare announced faster container starts and native container controls.",
       "url": "https://blog.cloudflare.com/faster-agent-sandboxes/",
       "source": "Cloudflare engineering blog"
+    },
+    {
+      "company": "browserbase",
+      "date": "2026-09-30",
+      "kind": "feature",
+      "title": "Browserbase adds managed secrets to Functions",
+      "summary": "Browserbase Functions gained a secure store for credentials used by deployed workflows. Dashboard management followed separately in November.",
+      "url": "https://www.browserbase.com/blog/introducing-secrets-in-browserbase-functions",
+      "source": "Browserbase announcement"
+    },
+    {
+      "company": "daytona",
+      "date": "2026-09-30",
+      "kind": "partnership",
+      "title": "Daytona sandboxes become a Convex component",
+      "summary": "The component connects a Convex backend to Daytona sandboxes, so applications can create and manage execution environments from Convex.",
+      "url": "https://www.daytona.io/dotfiles/daytona-sandboxes-convex-component",
+      "source": "Daytona integration announcement"
+    },
+    {
+      "company": "vercel",
+      "date": "2026-09-30",
+      "kind": "feature",
+      "title": "Vercel Sandbox adds Secure Compute",
+      "summary": "Enterprise teams with Secure Compute can connect sandboxes to private AWS VPC resources over peering and route public traffic through dedicated static IPs.",
+      "url": "https://vercel.com/changelog/vercel-sandbox-now-supports-secure-compute",
+      "source": "Vercel changelog",
+      "front": "Network"
+    },
+    {
+      "company": "google",
+      "date": "2026-09-29",
+      "kind": "feature",
+      "title": "GKE publishes sandbox orchestration SDK for reinforcement learning",
+      "summary": "Google released a Python SDK for managing pools of sandboxes for reinforcement learning and evaluation, with integrations for Gymnasium, NVIDIA NeMo Gym and OpenHands.",
+      "url": "https://cloud.google.com/blog/products/containers-kubernetes/accelerate-agentic-rl-with-gke-agent-sandbox",
+      "source": "Google Cloud announcement",
+      "front": "Workflow"
     },
     {
       "company": "openshell",
@@ -5784,6 +6092,54 @@
       "source": "Baseten engineering announcement"
     },
     {
+      "company": "vercel",
+      "date": "2026-09-28",
+      "kind": "feature",
+      "title": "Vercel adds sandbox memory observability",
+      "summary": "Vercel added memory usage metrics and alerting to the sandbox dashboard and exposed memory usage through its CLI.",
+      "url": "https://vercel.com/changelog/vercel-sandbox-now-supports-memory-observability",
+      "source": "Vercel changelog",
+      "front": "Workflow"
+    },
+    {
+      "company": "exe",
+      "date": "2026-09-28",
+      "kind": "launch",
+      "title": "exe.dev introduces standalone on-demand sandboxes",
+      "summary": "Standalone VMs are billed by the hour. New resource pools let groups of VMs share regional CPU and memory capacity.",
+      "url": "https://blog.exe.dev/pools-our-newest-primitive",
+      "source": "exe.dev launch announcement",
+      "front": "Execution"
+    },
+    {
+      "company": "beam",
+      "date": "2026-09-26",
+      "kind": "feature",
+      "title": "Beam’s open-source runtime adds opt-in Cloud Hypervisor",
+      "summary": "Beam merged a Cloud Hypervisor backend into Beta9 for opt-in VM sandboxes. The merge records an open-source runtime change.",
+      "url": "https://github.com/beam-cloud/beta9/pull/1924",
+      "source": "Beam runtime repository",
+      "front": "Execution"
+    },
+    {
+      "company": "maritime",
+      "date": "2026-09-25",
+      "kind": "feature",
+      "title": "Maritime adds Android environments",
+      "summary": "Maritime exposed Android devices for agents and began alpha access to Windows environments.",
+      "url": "https://maritime.sh/changelog/2026-09-25-android",
+      "source": "Maritime changelog"
+    },
+    {
+      "company": "runtime",
+      "date": "2026-09-25",
+      "kind": "feature",
+      "title": "Runtime expands custom-image sandbox options",
+      "summary": "Runtime began starting sandboxes from prepared custom images and added paid sandbox configurations up to 16 vCPUs and 64 GiB.",
+      "url": "https://withruntime.com/docs/changelog",
+      "source": "Runtime Cloud changelog"
+    },
+    {
       "company": "northflank",
       "date": "2026-09-24",
       "kind": "launch",
@@ -5802,6 +6158,24 @@
       "source": "Docker launch announcement"
     },
     {
+      "company": "browserbase",
+      "date": "2026-09-24",
+      "kind": "feature",
+      "title": "Browserbase adds pause and resume to agent runs",
+      "summary": "Browserbase agents can pause for a human step and resume execution in the same session.",
+      "url": "https://www.browserbase.com/changelog/pause-and-resume-for-agents",
+      "source": "Browserbase changelog"
+    },
+    {
+      "company": "novita",
+      "date": "2026-09-24",
+      "kind": "adoption",
+      "title": "OpenEnv adds Novita as a sandbox backend",
+      "summary": "OpenEnv v0.6.0 added a provider that runs its evaluation environments on Novita AI sandboxes.",
+      "url": "https://github.com/openenv/OpenEnv/releases/tag/v0.6.0",
+      "source": "OpenEnv release notes"
+    },
+    {
       "company": "azure",
       "date": "2026-09-23",
       "kind": "launch",
@@ -5810,6 +6184,25 @@
       "url": "https://techcommunity.microsoft.com/blog/appsonazureblog/azure-container-apps-sandboxes-now-generally-available/4559125",
       "source": "Microsoft Azure announcement",
       "front": "Execution"
+    },
+    {
+      "company": "runtime",
+      "date": "2026-09-23",
+      "kind": "feature",
+      "title": "Runtime adds Daytona and Vercel SDK adapters",
+      "summary": "Runtime expanded its JavaScript and Python adapters so compatible workloads could switch sandboxes with an import change. The service already offered an E2B adapter.",
+      "url": "https://withruntime.com/docs/changelog",
+      "source": "Runtime Cloud changelog"
+    },
+    {
+      "company": "vercel",
+      "date": "2026-09-23",
+      "kind": "launch",
+      "title": "Vercel Drives enter public beta",
+      "summary": "The public beta made it possible to mount independently retained storage into Vercel sandboxes and access the same files across runs.",
+      "url": "https://vercel.com/changelog/drives-for-vercel-sandbox-are-now-in-public-beta",
+      "source": "Vercel changelog",
+      "front": "State"
     },
     {
       "company": "blaxel",
@@ -5831,6 +6224,55 @@
       "front": "Execution"
     },
     {
+      "company": "runtime",
+      "date": "2026-09-22",
+      "kind": "feature",
+      "title": "Runtime adds custom images and persistent volumes",
+      "summary": "Runtime published support for building custom sandbox images and attaching storage volumes that survive sandbox deletion.",
+      "url": "https://withruntime.com/docs/changelog",
+      "source": "Runtime Cloud changelog"
+    },
+    {
+      "company": "digitalocean",
+      "date": "2026-09-21",
+      "kind": "launch",
+      "title": "DigitalOcean previews Managed Agents and Harness Runtime",
+      "summary": "The public preview included isolated per-session microVMs, Chromium, pause, resume and fork controls, and a choice of agent harnesses.",
+      "url": "https://docs.digitalocean.com/release-notes/recent/#21-september",
+      "source": "DigitalOcean release notes",
+      "front": "Execution"
+    },
+    {
+      "company": "docker",
+      "date": "2026-09-21",
+      "kind": "feature",
+      "title": "Docker introduces composable sandbox kits",
+      "summary": "OCI kits package an agent workload and reusable tools, instructions and network configuration. Teams can publish a combination as one kit set.",
+      "url": "https://github.com/docker/sbx-releases/releases/tag/v0.45.0",
+      "source": "Docker Sandboxes release notes",
+      "front": "Workflow"
+    },
+    {
+      "company": "opensandbox",
+      "date": "2026-09-21",
+      "kind": "feature",
+      "title": "OpenSandbox adds a Firecracker runtime",
+      "summary": "The unified 1.1 release adds Fast Sandbox with microVM isolation, pause and resume, and template management in the SDKs.",
+      "url": "https://github.com/opensandbox-group/OpenSandbox/releases/tag/release-1.1.0",
+      "source": "OpenSandbox release notes",
+      "front": "Execution"
+    },
+    {
+      "company": "aws",
+      "date": "2026-09-18",
+      "kind": "launch",
+      "title": "AWS makes AgentCore Runtime v2 available",
+      "summary": "The opt-in second-generation serverless microVM runtime introduced elastic memory reclamation and snapshot-based starts across five initial regions.",
+      "url": "https://aws.amazon.com/about-aws/whats-new/2026/09/new-agentcore-runtime-generally-available/",
+      "source": "AWS What's New",
+      "front": "Execution"
+    },
+    {
       "company": "railway",
       "date": "2026-09-17",
       "kind": "launch",
@@ -5838,6 +6280,101 @@
       "summary": "Railway moved its Linux VM sandboxes from Priority Boarding to general availability. The product supports checkpoints, forks, and preinstalled coding agents.",
       "url": "https://railway.com/changelog/2026-09-18-railway-sandboxes",
       "source": "Railway changelog"
+    },
+    {
+      "company": "novita",
+      "date": "2026-09-17",
+      "kind": "adoption",
+      "title": "StarSling uses Novita sandboxes for CI",
+      "summary": "A Novita case study described StarSling running code and verifying fixes inside sandboxes as part of its automated continuous-integration workflow.",
+      "url": "https://novita.ai/blog/starsling-case-study/",
+      "source": "Novita customer case study"
+    },
+    {
+      "company": "tensorlake",
+      "date": "2026-09-16",
+      "kind": "feature",
+      "title": "Harbor adds multi-container execution on Tensorlake",
+      "summary": "Harbor 0.23.0 can run Docker Compose tasks in a single Tensorlake microVM, with an agent and its supporting services in separate containers.",
+      "url": "https://www.tensorlake.ai/blog/harbor-multi-container-tasks-on-tensorlake",
+      "source": "Tensorlake engineering"
+    },
+    {
+      "company": "google",
+      "date": "2026-09-16",
+      "kind": "adoption",
+      "title": "SeaVerse uses GKE Agent Sandbox in production",
+      "summary": "The gaming platform said it used GKE Agent Sandbox to isolate dynamic workloads and reported up to 60% lower infrastructure costs after moving to GKE and Agent Sandbox.",
+      "url": "https://cloud.google.com/blog/products/containers-kubernetes/seaverse-chooses-gke-agent-sandbox",
+      "source": "Google Cloud and SeaVerse case study",
+      "front": "Capital & adoption"
+    },
+    {
+      "company": "microsandbox",
+      "date": "2026-09-16",
+      "kind": "feature",
+      "title": "microsandbox adds shared cloud snapshot contracts",
+      "summary": "Release 0.7.0 adds common interfaces for cloud snapshots and more lifecycle and network telemetry.",
+      "url": "https://github.com/superradcompany/microsandbox/releases/tag/v0.7.0",
+      "source": "microsandbox release notes",
+      "front": "State"
+    },
+    {
+      "company": "boat",
+      "date": "2026-09-15",
+      "kind": "launch",
+      "title": "Box by ASCII rebrands as Boat",
+      "summary": "The service moved to Boat names and endpoints while keeping existing accounts, machines and data. Earlier integrations continued to work under deprecation notices.",
+      "url": "https://docs.boat.dev/migrating-from-box",
+      "source": "Boat migration guide"
+    },
+    {
+      "company": "tembo",
+      "date": "2026-09-15",
+      "kind": "launch",
+      "title": "Tembo launches Tembo Computer",
+      "summary": "Tembo launched managed Linux VM sandboxes for coding sessions, with a live desktop view and an option to bring your own cloud infrastructure.",
+      "url": "https://www.tembo.io/blog/announcing-tembo-computer",
+      "source": "Tembo product release"
+    },
+    {
+      "company": "aws-lambda",
+      "date": "2026-09-15",
+      "kind": "feature",
+      "title": "Step Functions integrates Lambda MicroVMs",
+      "summary": "AWS added direct workflow integration to start Lambda MicroVMs for individual tasks, including parallel orchestration and automated cleanup.",
+      "url": "https://aws.amazon.com/about-aws/whats-new/2026/06/aws-step-functions-integrations/",
+      "source": "AWS What's New",
+      "front": "Workflow"
+    },
+    {
+      "company": "buddy",
+      "date": "2026-09-15",
+      "kind": "feature",
+      "title": "Buddy adds granular sandbox variable permissions",
+      "summary": "Teams can scope variable access to sandboxes, pipelines and individual actions. The release also adds sandbox recreation to the REST API.",
+      "url": "https://buddy.works/blog/changelog/changelog-september-15-2026",
+      "source": "Buddy changelog",
+      "front": "Network"
+    },
+    {
+      "company": "maritime",
+      "date": "2026-09-11",
+      "kind": "feature",
+      "title": "Maritime exposes persistent desktops through MCP",
+      "summary": "Agents can ask Maritime for an on-demand Linux desktop through MCP and use the same state on later visits.",
+      "url": "https://maritime.sh/changelog/2026-09-11-computers-over-mcp-codex",
+      "source": "Maritime changelog"
+    },
+    {
+      "company": "google",
+      "date": "2026-09-11",
+      "kind": "launch",
+      "title": "GKE opens Agent Substrate for non-production use",
+      "summary": "The initial release suspends idle agents with memory and filesystem snapshots and restores them onto available sandboxes. Production support began on an allowlist.",
+      "url": "https://docs.cloud.google.com/kubernetes-engine/docs/release-notes-new-features#September_11_2026",
+      "source": "Google Cloud release notes",
+      "front": "State"
     },
     {
       "company": "vercel",
@@ -5858,6 +6395,26 @@
       "source": "Blaxel acquisition announcement"
     },
     {
+      "company": "upstash",
+      "date": "2026-09-10",
+      "kind": "feature",
+      "title": "Upstash adds a Box remote-work plugin",
+      "summary": "An Upstash Box plugin lets compatible agents send work to a remote workspace over MCP for tasks such as builds, previews and browser checks.",
+      "url": "https://upstash.com/blog/turn-any-agent-into-a-code-factory-with-an-mcp",
+      "source": "Upstash product blog"
+    },
+    {
+      "company": "openai",
+      "date": "2026-09-10",
+      "kind": "launch",
+      "title": "OpenAI opens hosted sandboxes in the Agents API",
+      "summary": "The Agents API entered public beta with an OpenAI-hosted sandbox for tools and code. Developers could also bring an externally hosted environment.",
+      "url": "https://openai.com/index/introducing-the-agents-api/",
+      "source": "OpenAI product announcement",
+      "front": "Execution",
+      "tweetUrl": "https://x.com/OpenAIDevs/status/2098130570048045453"
+    },
+    {
       "company": "google",
       "date": "2026-09-09",
       "kind": "launch",
@@ -5865,6 +6422,324 @@
       "summary": "Google Cloud made Shell and Computer Use sandboxes generally available and added private networking options, customer-managed encryption and pause/resume.",
       "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/release-notes?hl=en",
       "source": "Google Cloud release notes"
+    },
+    {
+      "company": "freestyle",
+      "date": "2026-09-09",
+      "kind": "feature",
+      "title": "Freestyle expands VM networking and sizes",
+      "summary": "Freestyle added private IPv4 and IPv6 networking, credential injection and reconnectable terminals. Pro VMs could be configured with up to 64 GiB of RAM.",
+      "url": "https://www.freestyle.sh/changelog/changelog-september-9",
+      "source": "Freestyle changelog"
+    },
+    {
+      "company": "tembo",
+      "date": "2026-09-09",
+      "kind": "feature",
+      "title": "Tembo exposes sandbox resources in its public API",
+      "summary": "Tembo’s API adds Sandboxes as a resource alongside sessions, projects, repositories and queues.",
+      "url": "https://www.tembo.io/changelog/public-api-resources-planning-mode-and-computer-preview-audio",
+      "source": "Tembo changelog"
+    },
+    {
+      "company": "vercel",
+      "date": "2026-09-08",
+      "kind": "feature",
+      "title": "Vercel routes Sandbox domains through regional replicas",
+      "summary": "Vercel moved public sandbox domain lookups to regional replicas. It reported an 18× routing speed improvement in its measurements.",
+      "url": "https://vercel.com/changelog/vercel-sandbox-routing-is-now-18x-faster-globally",
+      "source": "Vercel changelog",
+      "front": "Network"
+    },
+    {
+      "company": "eclipse-enclave",
+      "date": "2026-09-08",
+      "kind": "launch",
+      "title": "EclipseSource opens the Enclave project",
+      "summary": "EclipseSource published its agent sandbox as open source under the Eclipse Foundation, ahead of the 1.0 announcement in November.",
+      "url": "https://eclipsesource.com/blogs/2026/09/08/eclipse-enclave-sandbox-for-ai-coding-agents/",
+      "source": "EclipseSource project announcement",
+      "front": "Execution"
+    },
+    {
+      "company": "e2b",
+      "date": "2026-09-07",
+      "kind": "partnership",
+      "title": "E2B supports Cursor self-hosted agents",
+      "summary": "E2B documented running Cursor’s self-hosted agent VMs on its infrastructure, separating orchestration from where the work executes.",
+      "url": "https://docs.e2b.dev/changelog",
+      "source": "E2B changelog"
+    },
+    {
+      "company": "blaxel",
+      "date": "2026-09-04",
+      "kind": "feature",
+      "title": "Blaxel makes snapshots workspace resources",
+      "summary": "Workspace snapshots have their own names and API. They can outlive their source sandbox and retain the configuration needed for a fork.",
+      "url": "https://docs.blaxel.ai/changelog",
+      "source": "Blaxel changelog"
+    },
+    {
+      "company": "maritime",
+      "date": "2026-09-04",
+      "kind": "feature",
+      "title": "Maritime rolls out Linux desktops",
+      "summary": "Maritime began rolling out Linux desktops with screen, keyboard and mouse access and a live view that people can take over.",
+      "url": "https://maritime.sh/changelog/2026-09-04-computers",
+      "source": "Maritime changelog"
+    },
+    {
+      "company": "e2b",
+      "date": "2026-09-03",
+      "kind": "adoption",
+      "title": "Paper Instruments uses E2B for training rollouts",
+      "summary": "Paper Instruments runs reinforcement-learning rollouts in E2B sandboxes with isolated filesystems and per-trajectory state.",
+      "url": "https://e2b.dev/customers/paperinstruments",
+      "source": "E2B customer case study"
+    },
+    {
+      "company": "vercel",
+      "date": "2026-09-03",
+      "kind": "partnership",
+      "title": "Cursor Cloud Agents run on Vercel Sandbox",
+      "summary": "Cursor’s self-hosted machine integration made it possible to run Cloud Agent workspaces on Vercel Sandbox.",
+      "url": "https://vercel.com/changelog/run-cursor-cloud-agents-vercel-sandbox",
+      "source": "Vercel changelog",
+      "front": "Capital & adoption"
+    },
+    {
+      "company": "cloudflare",
+      "date": "2026-09-02",
+      "kind": "partnership",
+      "title": "Cursor Cloud Agents run on Cloudflare",
+      "summary": "An open-source integration let Cursor self-hosted machine pools place each assigned agent session in an isolated Cloudflare Container.",
+      "url": "https://developers.cloudflare.com/changelog/post/2026-09-02-cursor-cloud-agents/",
+      "source": "Cloudflare Sandbox changelog",
+      "front": "Capital & adoption"
+    },
+    {
+      "company": "modal",
+      "date": "2026-09-02",
+      "kind": "feature",
+      "title": "Modal charts sandbox CPU and memory pressure",
+      "summary": "Modal added per-app aggregate CPU, memory and CPU-pressure charts for sizing sandbox resource requests.",
+      "url": "https://modal.com/changelog/new-per-sandbox-cpu-memory-and-cpu-pressure-charts",
+      "source": "Modal changelog",
+      "front": "Workflow"
+    },
+    {
+      "company": "namespace",
+      "date": "2026-09-02",
+      "kind": "partnership",
+      "title": "Cursor Cloud Agents run on Namespace Devboxes",
+      "summary": "Cursor handles agent planning while the commands, repository operations and file edits execute in Linux or macOS Devboxes.",
+      "url": "https://namespace.so/changelog",
+      "source": "Namespace changelog",
+      "front": "Workflow"
+    },
+    {
+      "company": "namespace",
+      "date": "2026-09-01",
+      "kind": "launch",
+      "title": "Namespace macOS Devboxes reach general availability",
+      "summary": "Apple Silicon Devboxes are generally available with a choice of macOS and Xcode, network controls and the lifecycle operations available on Linux.",
+      "url": "https://namespace.so/changelog",
+      "source": "Namespace changelog",
+      "front": "Execution"
+    },
+    {
+      "company": "modal",
+      "date": "2026-08-28",
+      "kind": "feature",
+      "title": "Modal Sandbox Sidecars enter public alpha",
+      "summary": "Sidecars run helper containers beside a sandbox on the same host, allowing internal services such as custom network proxies to communicate with the main workspace.",
+      "url": "https://modal.com/changelog/sandbox-sidecars-are-now-in-public-alpha",
+      "source": "Modal changelog",
+      "front": "Execution"
+    },
+    {
+      "company": "tencent",
+      "date": "2026-08-28",
+      "kind": "feature",
+      "title": "CubeSandbox previews cross-node snapshot restore",
+      "summary": "Tencent’s self-hosted CubeSandbox 0.7.0 added a preview S3 backend for cross-node pause and resume and cloning from snapshots. It also changed its network provisioning architecture.",
+      "url": "https://github.com/TencentCloud/CubeSandbox/blob/master/docs/changelog/v0.7.0.md",
+      "source": "Tencent Cloud CubeSandbox release notes",
+      "front": "State"
+    },
+    {
+      "company": "aws",
+      "date": "2026-08-27",
+      "kind": "feature",
+      "title": "AgentCore Runtime reaches California and Hyderabad",
+      "summary": "AWS brought AgentCore Runtime to US West (Northern California) and Asia Pacific (Hyderabad), alongside its identity and session persistence services.",
+      "url": "https://aws.amazon.com/about-aws/whats-new/2026/08/bedrock-agentcore-two-new-regions/",
+      "source": "AWS What's New",
+      "front": "Workflow"
+    },
+    {
+      "company": "namespace",
+      "date": "2026-08-27",
+      "kind": "feature",
+      "title": "Namespace releases its Devbox TypeScript SDK",
+      "summary": "Version 1.0 covers lifecycle, commands, terminal sessions, file transfer and image management from Node.js.",
+      "url": "https://namespace.so/changelog",
+      "source": "Namespace changelog",
+      "front": "Workflow"
+    },
+    {
+      "company": "daytona",
+      "date": "2026-08-26",
+      "kind": "adoption",
+      "title": "Yutori uses Daytona for its Navigator n2 playground",
+      "summary": "Yutori and Daytona built a public model playground that executes computer-use tasks in Linux desktop sandboxes.",
+      "url": "https://www.daytona.io/dotfiles/real-computers-for-computer-use",
+      "source": "Daytona technical case study"
+    },
+    {
+      "company": "tensorlake",
+      "date": "2026-08-26",
+      "kind": "feature",
+      "title": "Tensorlake adds per-phase network policy for Harbor evaluations",
+      "summary": "Harbor trials can change a running Tensorlake sandbox between public, allowlisted and offline network policies as phases change.",
+      "url": "https://www.tensorlake.ai/blog/dynamic-network-policies-in-harbor",
+      "source": "Tensorlake engineering"
+    },
+    {
+      "company": "aws-lambda",
+      "date": "2026-08-25",
+      "kind": "feature",
+      "title": "Lambda MicroVMs support AWS PrivateLink",
+      "summary": "Customers can call Lambda MicroVM APIs and connect to sandbox HTTP endpoints privately from a VPC using interface endpoints.",
+      "url": "https://aws.amazon.com/about-aws/whats-new/2026/08/lambda-microvms-supports-privatelink/",
+      "source": "AWS What's New",
+      "front": "Network"
+    },
+    {
+      "company": "buddy",
+      "date": "2026-08-25",
+      "kind": "feature",
+      "title": "Buddy can create sandboxes from YAML",
+      "summary": "The REST API accepts declarative sandbox definitions at workspace and environment scope.",
+      "url": "https://buddy.works/blog/changelog/changelog-august-25-2026",
+      "source": "Buddy changelog",
+      "front": "Workflow"
+    },
+    {
+      "company": "machine0",
+      "date": "2026-08-20",
+      "kind": "feature",
+      "title": "machine0 builds VM images from Git repositories",
+      "summary": "Developers can build and snapshot a VM image from a public repository containing a NixOS flake.",
+      "url": "https://machine0.io/changelog",
+      "source": "machine0 changelog · v1.0.163"
+    },
+    {
+      "company": "upstash",
+      "date": "2026-08-18",
+      "kind": "feature",
+      "title": "Upstash Box adds browser tooling",
+      "summary": "Upstash documented adding a browser to Box so automated workflows can run browser tasks alongside the agent’s other tools.",
+      "url": "https://upstash.com/blog/box-browser",
+      "source": "Upstash product blog"
+    },
+    {
+      "company": "microsandbox",
+      "date": "2026-08-15",
+      "kind": "feature",
+      "title": "microsandbox adds per-sandbox network limits",
+      "summary": "Release 0.6.9 adds inbound and outbound bandwidth limits and support for cloud volume defaults in the SDK.",
+      "url": "https://github.com/superradcompany/microsandbox/releases/tag/v0.6.9",
+      "source": "microsandbox release notes",
+      "front": "Network"
+    },
+    {
+      "company": "alibaba",
+      "date": "2026-08-14",
+      "kind": "feature",
+      "title": "Alibaba integrates Key Management Service with Agent Sandbox",
+      "summary": "Alibaba Cloud announced support for invoking and verifying keys and secrets in sandbox environments for integration testing.",
+      "url": "https://www.alibabacloud.com/en/news/product/agent-sandbox-keycredential-integration-nv7?_p_lc=1",
+      "source": "Alibaba Cloud product release",
+      "front": "Network"
+    },
+    {
+      "company": "browserpod",
+      "date": "2026-08-13",
+      "kind": "feature",
+      "title": "BrowserPod 3.0 adds Rust programs",
+      "summary": "The browser-hosted runtime can run ordinary Rust applications compiled with stock tools. The release includes experimental Python support.",
+      "url": "https://labs.leaningtech.com/blog/browserpod-rust",
+      "source": "Leaning Technologies release",
+      "front": "Execution"
+    },
+    {
+      "company": "modal",
+      "date": "2026-08-12",
+      "kind": "feature",
+      "title": "Modal’s directory snapshots reach general availability",
+      "summary": "Developers can capture a directory within a running sandbox and mount it as an image in another sandbox, separately from the root filesystem.",
+      "url": "https://modal.com/changelog/directory-snapshots-are-now-generally-available",
+      "source": "Modal changelog",
+      "front": "State"
+    },
+    {
+      "company": "blacksmith",
+      "date": "2026-08-12",
+      "kind": "funding",
+      "title": "Blacksmith discloses $45M Series B",
+      "summary": "Blacksmith said it closed the Peak XV-led round in March at a $550M valuation. The company disclosed that round in August while expanding compute for its CI and agent workloads.",
+      "url": "https://www.blacksmith.sh/blog/announcing-blacksmiths-series-b-led-by-peak-xv-partners",
+      "source": "Blacksmith announcement",
+      "front": "Capital & adoption"
+    },
+    {
+      "company": "vercel",
+      "date": "2026-08-10",
+      "kind": "feature",
+      "title": "Vercel switches new sandboxes to Managed Images",
+      "summary": "Version 3 of the Sandbox SDK made an Ubuntu-based image with Node.js, Python and coding agents the default. Versioned images replace runtime selections for new configurations.",
+      "url": "https://vercel.com/changelog/vercel-sandbox-managed-images",
+      "source": "Vercel changelog",
+      "front": "State"
+    },
+    {
+      "company": "mosaic",
+      "date": "2026-08-05",
+      "kind": "adoption",
+      "title": "ComputeSDK adds a Mosaic provider",
+      "summary": "ComputeSDK published a Mosaic adapter that lets applications create and use Mosaic sandbox environments through its common interface.",
+      "url": "https://github.com/computesdk/computesdk/pull/687",
+      "source": "ComputeSDK provider integration"
+    },
+    {
+      "company": "google",
+      "date": "2026-08-05",
+      "kind": "feature",
+      "title": "Cloud Run extends sandbox preview to jobs and worker pools",
+      "summary": "Cloud Run expanded sandbox support from services to all resource types, including jobs and worker pools.",
+      "url": "https://docs.cloud.google.com/run/docs/release-notes#August_05_2026",
+      "source": "Google Cloud release notes",
+      "front": "Workflow"
+    },
+    {
+      "company": "sprites",
+      "date": "2026-08-03",
+      "kind": "feature",
+      "title": "Sprites get a scoped Fly Machines connector",
+      "summary": "Fly introduced a connector that lets a Sprite call the Fly Machines API using credentials scoped to an organization.",
+      "url": "https://fly.io/changelog/sprites-machines-api-connector/",
+      "source": "Fly.io changelog",
+      "front": "Workflow"
+    },
+    {
+      "company": "machine0",
+      "date": "2026-08-02",
+      "kind": "feature",
+      "title": "machine0 makes managed disks generally available",
+      "summary": "Persistent disks could be attached to new or existing virtual machines without enabling experimental features.",
+      "url": "https://machine0.io/changelog",
+      "source": "machine0 changelog · v1.0.154"
     },
     {
       "company": "daytona",
@@ -5876,6 +6751,15 @@
       "source": "Daytona changelog"
     },
     {
+      "company": "morph",
+      "date": "2026-07-29",
+      "kind": "feature",
+      "title": "Morph Cloud adds managed SSH key controls",
+      "summary": "The Morph Cloud SDK and CLI added creation, expiration updates and revocation for user-managed SSH keys.",
+      "url": "https://github.com/morph-labs/morph-python-sdk/compare/v0.1.112...v0.1.113",
+      "source": "Morph Cloud SDK release diff"
+    },
+    {
       "company": "tensorlake",
       "date": "2026-07-28",
       "kind": "feature",
@@ -5883,6 +6767,131 @@
       "summary": "Teams can provision Tensorlake sandbox runtimes inside their own AWS or GCP environment through the managed control plane.",
       "url": "https://www.tensorlake.ai/blog/introducing-tensorlake-byoc",
       "source": "Tensorlake product announcement"
+    },
+    {
+      "company": "microsandbox",
+      "date": "2026-07-25",
+      "kind": "feature",
+      "title": "microsandbox adds reusable network profiles",
+      "summary": "Release 0.6.7 introduces composable network profiles and updates how snapshot archives are stored.",
+      "url": "https://github.com/superradcompany/microsandbox/releases/tag/v0.6.7",
+      "source": "microsandbox release notes",
+      "front": "Network"
+    },
+    {
+      "company": "blaxel",
+      "date": "2026-07-24",
+      "kind": "feature",
+      "title": "Blaxel previews sandbox snapshots and forks",
+      "summary": "The private preview captures a sandbox’s filesystem, processes and memory so users can roll back or branch a sandbox.",
+      "url": "https://docs.blaxel.ai/changelog",
+      "source": "Blaxel changelog"
+    },
+    {
+      "company": "maritime",
+      "date": "2026-07-24",
+      "kind": "feature",
+      "title": "Maritime releases per-customer instances and SDKs",
+      "summary": "Maritime added instances for cloning an agent into distinct customer environments, alongside Python and TypeScript SDKs and a CLI.",
+      "url": "https://maritime.sh/changelog/2026-07-24-instances",
+      "source": "Maritime changelog"
+    },
+    {
+      "company": "sprites",
+      "date": "2026-07-24",
+      "kind": "funding",
+      "title": "Fly.io announces $25M to expand Sprites",
+      "summary": "Dell Technologies Capital and Intel Capital co-led a company-level Series D. Fly named Sprites as a focus and announced a new CEO, Scott Johnston.",
+      "url": "https://fly.io/news/fly-io-launches-computers-for-agents/",
+      "source": "Fly.io funding announcement",
+      "front": "Capital & adoption",
+      "tweetUrl": "https://x.com/scottcjohnston/status/2080670425902936242"
+    },
+    {
+      "company": "tencent",
+      "date": "2026-07-24",
+      "kind": "feature",
+      "title": "CubeSandbox deploys on Kubernetes and gains volume plugins",
+      "summary": "Tencent’s self-hosted CubeSandbox 0.6.0 added Helm deployment on TKE or standard Kubernetes and an E2B-compatible storage plugin framework.",
+      "url": "https://github.com/TencentCloud/CubeSandbox/blob/master/docs/changelog/v0.6.0.md",
+      "source": "Tencent Cloud CubeSandbox release notes",
+      "front": "Workflow"
+    },
+    {
+      "company": "tensorlake",
+      "date": "2026-07-22",
+      "kind": "partnership",
+      "title": "Tensorlake adds a Devin Outposts integration",
+      "summary": "A reference integration runs Cognition Devin’s commands in Tensorlake sandboxes while Devin retains the agent loop.",
+      "url": "https://www.tensorlake.ai/blog/devin-outposts-on-tensorlake",
+      "source": "Tensorlake engineering"
+    },
+    {
+      "company": "exe",
+      "date": "2026-07-22",
+      "kind": "adoption",
+      "title": "Antithesis uses exe.dev VMs for agent-assisted testing",
+      "summary": "The companies describe how Antithesis uses disposable exe.dev environments to run coding agents alongside its software tests.",
+      "url": "https://blog.exe.dev/how-antithesis-turned-exe-into-a-sandbox-for-agentic-software-tests",
+      "source": "exe.dev customer case study",
+      "front": "Capital & adoption"
+    },
+    {
+      "company": "e2b",
+      "date": "2026-07-21",
+      "kind": "feature",
+      "title": "E2B adds sandbox forking to its SDKs",
+      "summary": "JavaScript and Python developers can fork a running sandbox into independent copies and filter stored snapshots by name.",
+      "url": "https://docs.e2b.dev/changelog#sandbox-forking--snapshot-name-filters",
+      "source": "E2B changelog"
+    },
+    {
+      "company": "cloudflare",
+      "date": "2026-07-21",
+      "kind": "partnership",
+      "title": "Devin Outposts run on Cloudflare",
+      "summary": "Cognition’s Devin Outposts connected Devin agent sessions to isolated Cloudflare Containers for code execution and development tooling.",
+      "url": "https://developers.cloudflare.com/changelog/post/2026-07-21-devin-outposts/",
+      "source": "Cloudflare Sandbox changelog",
+      "front": "Capital & adoption"
+    },
+    {
+      "company": "e2b",
+      "date": "2026-07-20",
+      "kind": "adoption",
+      "title": "Anything runs app-building agents on E2B",
+      "summary": "E2B’s case study describes supplying the execution environments for the Anything app builder, which had more than one million users.",
+      "url": "https://e2b.dev/customers/anything",
+      "source": "E2B customer case study"
+    },
+    {
+      "company": "modal",
+      "date": "2026-07-16",
+      "kind": "adoption",
+      "title": "Modal reports millions of daily sandbox runs",
+      "summary": "Modal reported it was operating millions of sandbox runs per day and supporting up to 50,000 concurrent sandboxes per customer.",
+      "url": "https://modal.com/blog/scaling-to-1-million-concurrent-sandboxes-in-seconds",
+      "source": "Modal engineering report",
+      "front": "Capital & adoption"
+    },
+    {
+      "company": "superserve",
+      "date": "2026-07-15",
+      "kind": "adoption",
+      "title": "Phaser uses Superserve for game builds",
+      "summary": "Superserve reported that Phaser Game Agent builds and publishes a playable game inside a dedicated sandbox for each user workflow.",
+      "url": "https://www.superserve.ai/blog/phaser/",
+      "source": "Superserve customer case study"
+    },
+    {
+      "company": "tencent",
+      "date": "2026-07-14",
+      "kind": "feature",
+      "title": "Tencent begins commercial billing for Agent Sandbox",
+      "summary": "Tencent Cloud began charging for the managed Agent Sandbox service and put its associated service-level agreement into effect.",
+      "url": "https://cloud.tencent.cn/document/product/1814/123828",
+      "source": "Tencent Cloud Agent Runtime FAQ",
+      "front": "Workflow"
     },
     {
       "company": "instavm",
@@ -5894,6 +6903,36 @@
       "source": "InstaVM changelog"
     },
     {
+      "company": "koyeb",
+      "date": "2026-07-09",
+      "kind": "feature",
+      "title": "Koyeb’s Python SDK adds sandbox network policies",
+      "summary": "SDK v1.5.1 added support for setting network policies on Koyeb Sandboxes.",
+      "url": "https://github.com/koyeb/koyeb-python-sdk/releases/tag/v1.5.1",
+      "source": "Koyeb SDK release",
+      "front": "Network"
+    },
+    {
+      "company": "google",
+      "date": "2026-07-08",
+      "kind": "launch",
+      "title": "Cloud Run sandboxes enter public preview",
+      "summary": "Google Cloud announced lightweight isolated environments inside existing Cloud Run service instances for generated code and short-lived agent jobs.",
+      "url": "https://docs.cloud.google.com/run/docs/release-notes#July_08_2026",
+      "source": "Google Cloud release notes",
+      "front": "Execution"
+    },
+    {
+      "company": "tencent",
+      "date": "2026-07-03",
+      "kind": "feature",
+      "title": "CubeSandbox adds automatic pause and wake on request",
+      "summary": "Tencent’s self-hosted v0.5.0 release added idle suspension with memory and filesystem snapshots and restored the sandbox when another request arrived.",
+      "url": "https://github.com/TencentCloud/CubeSandbox/blob/master/docs/changelog/v0.5.0.md",
+      "source": "Tencent Cloud CubeSandbox release notes",
+      "front": "State"
+    },
+    {
       "company": "together",
       "date": "2026-07-01",
       "kind": "funding",
@@ -5901,6 +6940,45 @@
       "summary": "Together AI announced Series C financing to expand its open-model infrastructure. Funding covers the overall platform.",
       "url": "https://www.together.ai/blog/announcing-our-series-c",
       "source": "Together AI Series C announcement"
+    },
+    {
+      "company": "blaxel",
+      "date": "2026-06-30",
+      "kind": "feature",
+      "title": "Blaxel adds recurring sandbox schedules",
+      "summary": "Blaxel added sandbox schedules to run recurring work on an existing sandbox.",
+      "url": "https://docs.blaxel.ai/changelog",
+      "source": "Blaxel changelog"
+    },
+    {
+      "company": "vercel",
+      "date": "2026-06-29",
+      "kind": "feature",
+      "title": "Vercel bases sandbox expiration on last use",
+      "summary": "Vercel changed snapshot retention to measure from the snapshot’s most recent use.",
+      "url": "https://vercel.com/changelog/sandboxes-now-expire-based-on-last-use",
+      "source": "Vercel changelog",
+      "front": "State"
+    },
+    {
+      "company": "microsandbox",
+      "date": "2026-06-28",
+      "kind": "feature",
+      "title": "microsandbox adds Windows bind mounts",
+      "summary": "Release 0.6.1 adds bind-mount support for Windows hosts.",
+      "url": "https://github.com/superradcompany/microsandbox/releases/tag/v0.6.1",
+      "source": "microsandbox release notes",
+      "front": "State"
+    },
+    {
+      "company": "railway",
+      "date": "2026-06-24",
+      "kind": "feature",
+      "title": "Railway preinstalls four coding agents",
+      "summary": "Railway added Claude Code, Codex, OpenCode and Pi to the default sandbox image.",
+      "url": "https://blog.railway.com/p/agents-in-the-sandbox",
+      "source": "Railway announcement",
+      "front": "Workflow"
     },
     {
       "company": "baseten",
@@ -5921,6 +6999,166 @@
       "source": "AWS product announcement"
     },
     {
+      "company": "superserve",
+      "date": "2026-06-19",
+      "kind": "feature",
+      "title": "Superserve launches sandbox Secrets",
+      "summary": "Superserve added managed credentials that are inserted at the network edge for approved destinations and are kept outside the sandbox.",
+      "url": "https://www.superserve.ai/blog/introducing-secrets/",
+      "source": "Superserve product announcement"
+    },
+    {
+      "company": "tensorlake",
+      "date": "2026-06-16",
+      "kind": "adoption",
+      "title": "Deputies adds Tensorlake as a sandbox provider",
+      "summary": "The open-source background-agent control plane added Tensorlake as an execution backend.",
+      "url": "https://www.tensorlake.ai/blog/community-deputies-sandbox-provider",
+      "source": "Tensorlake and Deputies creator"
+    },
+    {
+      "company": "modal",
+      "date": "2026-06-15",
+      "kind": "feature",
+      "title": "Modal announces Linux VM sandbox alpha and outbound allowlists",
+      "summary": "Modal described its Linux VM sandbox alpha, which supports Docker and system features, and announced outbound domain restrictions for Sandboxes.",
+      "url": "https://modal.com/blog/product-updates-vm-sandboxes-domain",
+      "source": "Modal product update",
+      "front": "Execution"
+    },
+    {
+      "company": "opensandbox",
+      "date": "2026-06-15",
+      "kind": "feature",
+      "title": "OpenSandbox adds Credential Vault",
+      "summary": "Server 0.2.0 adds centrally configured credentials for sandbox requests, with resolved values kept outside application code.",
+      "url": "https://github.com/opensandbox-group/OpenSandbox/releases/tag/server/v0.2.0",
+      "source": "OpenSandbox release notes",
+      "front": "Network"
+    },
+    {
+      "company": "tencent",
+      "date": "2026-06-14",
+      "kind": "feature",
+      "title": "Tencent CubeSandbox adds outbound controls and log streaming",
+      "summary": "The self-hosted v0.4.0 release added a dedicated egress component and lets operators stream the sandbox init process’s output to host logs.",
+      "url": "https://github.com/TencentCloud/CubeSandbox/blob/master/docs/changelog/v0.4.0.md",
+      "source": "Tencent Cloud CubeSandbox release notes",
+      "front": "Network"
+    },
+    {
+      "company": "e2b",
+      "date": "2026-06-12",
+      "kind": "adoption",
+      "title": "Rogo uses E2B for financial agent workflows",
+      "summary": "Rogo uses E2B for isolated code execution alongside Claude Managed Agents. The case study describes a need for roughly 10,000 to 15,000 concurrent sandboxes.",
+      "url": "https://e2b.dev/customers/rogo",
+      "source": "E2B customer case study"
+    },
+    {
+      "company": "superserve",
+      "date": "2026-06-12",
+      "kind": "partnership",
+      "title": "Superserve adds Claude Managed Agents support",
+      "summary": "Anthropic’s hosted agent loop can run tool work inside Superserve microVMs. Sandboxes can pause between turns and retain their state.",
+      "url": "https://www.superserve.ai/blog/claude-managed-agents-on-superserve/",
+      "source": "Superserve integration announcement"
+    },
+    {
+      "company": "blaxel",
+      "date": "2026-06-11",
+      "kind": "partnership",
+      "title": "Blaxel adds Claude Managed Agents support",
+      "summary": "Claude Managed Agents can run their tools in Blaxel sandboxes while Anthropic hosts the agent loop.",
+      "url": "https://docs.blaxel.ai/changelog",
+      "source": "Blaxel changelog"
+    },
+    {
+      "company": "daytona",
+      "date": "2026-06-11",
+      "kind": "retirement",
+      "title": "Daytona closes its production source code",
+      "summary": "Daytona announced that it would stop maintaining the public production codebase. It kept the old repository available and moved client SDKs and documentation to a new organization.",
+      "url": "https://www.daytona.io/dotfiles/updates/daytona-is-going-closed-source",
+      "source": "Daytona company announcement"
+    },
+    {
+      "company": "namespace",
+      "date": "2026-06-11",
+      "kind": "feature",
+      "title": "Namespace ships ephemeral and reusable Devboxes",
+      "summary": "Teams can start throwaway Devboxes with no persistent storage or lease an existing environment by tag and reset its repository state.",
+      "url": "https://namespace.so/changelog",
+      "source": "Namespace changelog",
+      "front": "Execution"
+    },
+    {
+      "company": "blaxel",
+      "date": "2026-06-10",
+      "kind": "partnership",
+      "title": "Blaxel joins Stripe Projects",
+      "summary": "Blaxel documented provisioning and using its sandboxes through Stripe Projects.",
+      "url": "https://docs.blaxel.ai/changelog",
+      "source": "Blaxel changelog"
+    },
+    {
+      "company": "daytona",
+      "date": "2026-06-10",
+      "kind": "feature",
+      "title": "Daytona adds Windows sandbox snapshots and forks",
+      "summary": "Daytona v0.186.0 extended sandbox snapshot and fork support to Windows environments.",
+      "url": "https://www.daytona.io/changelog/windows-sandbox-snapshot-and-fork",
+      "source": "Daytona changelog"
+    },
+    {
+      "company": "e2b",
+      "date": "2026-06-10",
+      "kind": "partnership",
+      "title": "E2B joins Stripe Projects",
+      "summary": "AI agents can provision and authenticate E2B sandboxes through Stripe Projects, then manage the machines with E2B’s SDK.",
+      "url": "https://e2b.dev/resources/e2b-sandboxes-are-now-available-through-stripe-projects",
+      "source": "E2B announcement"
+    },
+    {
+      "company": "namespace",
+      "date": "2026-06-10",
+      "kind": "feature",
+      "title": "Namespace adds Devbox snapshot restore",
+      "summary": "The Devbox dashboard can restore an environment from a prior snapshot.",
+      "url": "https://namespace.so/changelog",
+      "source": "Namespace changelog",
+      "front": "State"
+    },
+    {
+      "company": "cloudflare",
+      "date": "2026-06-09",
+      "kind": "retirement",
+      "title": "Cloudflare deprecates Sandbox SDK 0.x features",
+      "summary": "Cloudflare deprecated legacy HTTP and WebSocket transports and older connectivity APIs. The built-in desktop API had already been removed in SDK 0.10.2.",
+      "url": "https://developers.cloudflare.com/changelog/post/2026-06-09-deprecating-sandbox-sdk-features/",
+      "source": "Cloudflare Sandbox changelog",
+      "front": "Workflow"
+    },
+    {
+      "company": "tensorlake",
+      "date": "2026-06-05",
+      "kind": "partnership",
+      "title": "Tensorlake adds Claude Managed Agents execution",
+      "summary": "Tensorlake documented running Anthropic-managed agents’ tool execution in its own sandbox runtime.",
+      "url": "https://www.tensorlake.ai/blog/claude-managed-agents",
+      "source": "Tensorlake engineering"
+    },
+    {
+      "company": "railway",
+      "date": "2026-06-05",
+      "kind": "launch",
+      "title": "Railway Sandboxes enter Priority Boarding",
+      "summary": "Railway introduced on-demand Linux sandboxes through its dashboard, CLI and TypeScript SDK. Users could connect via SSH, fork a sandbox, and build reusable environment templates.",
+      "url": "https://railway.com/changelog/2026-06-05-sandboxes",
+      "source": "Railway changelog",
+      "front": "Execution"
+    },
+    {
       "company": "e2b",
       "date": "2026-06-03",
       "kind": "adoption",
@@ -5930,6 +7168,84 @@
       "source": "E2B company timeline"
     },
     {
+      "company": "azure",
+      "date": "2026-06-02",
+      "kind": "launch",
+      "title": "Azure previews Container Apps Sandboxes",
+      "summary": "Microsoft opened the public preview of a new Container Apps resource with isolated microVMs, snapshot-based suspend and resume, custom images, and per-sandbox network controls.",
+      "url": "https://techcommunity.microsoft.com/blog/appsonazureblog/introducing-azure-container-apps-sandboxes-secure-infrastructure-for-agentic-wor/4524131",
+      "source": "Microsoft Azure announcement",
+      "front": "Execution"
+    },
+    {
+      "company": "azure",
+      "date": "2026-06-02",
+      "kind": "launch",
+      "title": "Durable Task Scheduler previews on-demand sandboxes",
+      "summary": "Microsoft announced a private preview for running standalone Durable Task SDK activities inside fresh microVM-backed environments, including apps hosted outside Azure Functions.",
+      "url": "https://techcommunity.microsoft.com/blog/appsonazureblog/introducing-on-demand-sandboxes-for-azure-durable-task-scheduler-private-preview/4522333",
+      "source": "Microsoft Azure announcement",
+      "front": "Workflow"
+    },
+    {
+      "company": "hopx",
+      "date": "2026-05-31",
+      "kind": "feature",
+      "title": "HopX publishes its sandbox command-line tool",
+      "summary": "HopX published the official CLI on npm. Its shell command can create a cloud sandbox and attach an interactive terminal.",
+      "url": "https://www.npmjs.com/package/@hopx-ai/cli/v/0.3.0",
+      "source": "HopX’s npm package"
+    },
+    {
+      "company": "vercel",
+      "date": "2026-05-29",
+      "kind": "feature",
+      "title": "Vercel Sandbox runs Docker containers",
+      "summary": "Vercel added support for running Docker and container development workflows inside Sandbox microVMs.",
+      "url": "https://vercel.com/changelog/run-docker-containers-inside-vercel-sandbox",
+      "source": "Vercel changelog",
+      "front": "Execution"
+    },
+    {
+      "company": "microsandbox",
+      "date": "2026-05-27",
+      "kind": "feature",
+      "title": "microsandbox adds Go SDK snapshot support",
+      "summary": "Release 0.5.0 documents the Go SDK and adds snapshot operations alongside updates to network policy and mount controls.",
+      "url": "https://github.com/superradcompany/microsandbox/releases/tag/v0.5.0",
+      "source": "microsandbox release notes",
+      "front": "State"
+    },
+    {
+      "company": "google",
+      "date": "2026-05-26",
+      "kind": "feature",
+      "title": "Google previews custom sandbox containers, templates and snapshots",
+      "summary": "Agent Platform added previews for custom images from Artifact Registry, reusable specifications backed by prewarmed pools, and snapshots that restore sandbox files and dependencies.",
+      "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/release-notes#May_26_2026",
+      "source": "Google Cloud release notes",
+      "front": "State"
+    },
+    {
+      "company": "vercel",
+      "date": "2026-05-26",
+      "kind": "feature",
+      "title": "Vercel makes sandbox snapshot persistence generally available",
+      "summary": "Vercel made automatic filesystem snapshots and restoration generally available. Named sandboxes keep filesystem state across sessions by default.",
+      "url": "https://vercel.com/changelog/sandbox-persistence-is-now-ga",
+      "source": "Vercel changelog",
+      "front": "State"
+    },
+    {
+      "company": "daytona",
+      "date": "2026-05-25",
+      "kind": "feature",
+      "title": "Daytona dedicates physical GPUs to sandboxes",
+      "summary": "Daytona v0.181.0 assigned each GPU sandbox its own physical accelerator on multi-GPU hosts.",
+      "url": "https://www.daytona.io/changelog/dedicated-physical-gpu-per-sandbox",
+      "source": "Daytona changelog"
+    },
+    {
       "company": "modal",
       "date": "2026-05-21",
       "kind": "funding",
@@ -5937,6 +7253,44 @@
       "summary": "General Catalyst and Redpoint led. Modal said sandboxes drove more than one-third of company revenue at the time.",
       "url": "https://modal.com/blog/modal-series-c",
       "source": "Modal Series C announcement"
+    },
+    {
+      "company": "runloop",
+      "date": "2026-05-20",
+      "kind": "feature",
+      "title": "Runloop adds custom domains for Devbox tunnels",
+      "summary": "Runloop added transparent proxy support so applications could serve Devbox tunnels from their own domains.",
+      "url": "https://runloop.ai/blog/release-transparent-proxy-for-tunnels",
+      "source": "Runloop product releases"
+    },
+    {
+      "company": "google",
+      "date": "2026-05-20",
+      "kind": "launch",
+      "title": "GKE Agent Sandbox becomes generally available",
+      "summary": "Google Cloud made the open-source sandbox controller generally available on GKE and reported over 16× growth in GKE sandboxes since the previous November’s preview.",
+      "url": "https://cloud.google.com/blog/products/containers-kubernetes/bringing-you-agent-sandbox-on-gke-and-agent-substrate",
+      "source": "Google Cloud announcement",
+      "front": "Execution"
+    },
+    {
+      "company": "namespace",
+      "date": "2026-05-20",
+      "kind": "partnership",
+      "title": "Claude Managed Agents can run on Namespace Devboxes",
+      "summary": "The integration provisions a fresh isolated Devbox per managed agent session and can use a team’s own image and toolchain.",
+      "url": "https://namespace.so/changelog",
+      "source": "Namespace changelog",
+      "front": "Workflow"
+    },
+    {
+      "company": "novita",
+      "date": "2026-05-19",
+      "kind": "adoption",
+      "title": "Harbor incorporates a Novita sandbox environment",
+      "summary": "Novita documented Harbor’s integration on the project’s main branch, where evaluation trials could target Novita sandboxes. It was not yet in Harbor’s published package as of the announcement.",
+      "url": "https://novita.ai/blog/run-harbor-agent-evaluations-novita-agent-sandbox/",
+      "source": "Novita integration note"
     },
     {
       "company": "novita",

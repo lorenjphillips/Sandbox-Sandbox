@@ -125,17 +125,18 @@ const OUTLINE = [[156,-104],[944,-104],[1208,320],[944,744],[156,744],[-108,320]
 const BED = OUTLINE.map(([x,y])=>[lerp(WIDTH/2,x,.915),lerp(HEIGHT/2,y,.915)]);
 const RIM = OUTLINE.map(([x,y])=>[lerp(WIDTH/2,x,.97),lerp(HEIGHT/2,y,.97)]);
 const BED_POINTS = BED.map(([x,y])=>({x,y}));
-const YAW = .128;
-const SIN_YAW = Math.sin(YAW);
-const COS_YAW = Math.cos(YAW);
+const HOME_YAW = .128;
+let yaw = HOME_YAW;
+let sinYaw = Math.sin(yaw);
+let cosYaw = Math.cos(yaw);
 
 function depthAt(x,y) {
-  return (x-WIDTH/2)*SIN_YAW + (y-HEIGHT/2)*COS_YAW;
+  return (x-WIDTH/2)*sinYaw + (y-HEIGHT/2)*cosYaw;
 }
 
 function project(x,y,z=0) {
   const depth=depthAt(x,y);
-  const across=(x-WIDTH/2)*COS_YAW - (y-HEIGHT/2)*SIN_YAW;
+  const across=(x-WIDTH/2)*cosYaw - (y-HEIGHT/2)*sinYaw;
   const perspective=1+depth/2400;
   return {
     x:WIDTH/2+across*perspective,
@@ -150,9 +151,27 @@ function bounds(points) {
   };
 }
 
-const trayBounds = bounds([TRAY.lip,TRAY.base].flatMap(z=>OUTLINE.map(([x,y])=>project(x,y,z))));
-const SCENE = {left:trayBounds.left-88,top:trayBounds.top-48,right:trayBounds.right+92,bottom:trayBounds.bottom+70};
-const ORIGIN = {x:(SCENE.left+SCENE.right)/2,y:(SCENE.top+SCENE.bottom)/2};
+function sceneBounds() {
+  return bounds([TRAY.lip,TRAY.base].flatMap(z=>OUTLINE.map(([x,y])=>project(x,y,z))));
+}
+
+function sceneArea(box) {
+  return {left:box.left-88,top:box.top-48,right:box.right+92,bottom:box.bottom+70};
+}
+
+function sceneCenter(area) {
+  return {x:(area.left+area.right)/2,y:(area.top+area.bottom)/2};
+}
+
+function unprojectFloor(x,y) {
+  const depth=(y-HEIGHT/2+TRAY.floor*.94)/(.64-TRAY.floor*.94/2400);
+  const across=(x-WIDTH/2)/(1+depth/2400);
+  return {x:WIDTH/2+across*cosYaw+depth*sinYaw,y:HEIGHT/2-across*sinYaw+depth*cosYaw};
+}
+
+let trayBounds=sceneBounds();
+let SCENE=sceneArea(trayBounds);
+let ORIGIN=sceneCenter(SCENE);
 
 function fitsTray(x,y) {
   for(let i=0;i<6;i++) {
@@ -224,7 +243,7 @@ function woodBoard(ctx,corners,styles,strip) {
   polygon(ctx,[a,b,c,d]);
   ctx.fillStyle=ramp(ctx,middle(a,b),middle(c,d),styles);
   ctx.fill();
-  if(!woodTexture) return;
+  if(!woodTexture || range(a,b)<.001) return;
   const length=range(a,b);
   const along={x:(b.x-a.x)/length,y:(b.y-a.y)/length};
   const normal={x:-along.y,y:along.x};
@@ -261,12 +280,17 @@ function screw(ctx,x,y) {
   ctx.restore();
 }
 
+function rotateGroundProp(ctx) {
+  const delta=yaw-HOME_YAW;
+  const sine=Math.sin(delta),cosine=Math.cos(delta);
+  ctx.transform(cosine,.64*sine,-sine/.64,cosine,0,0);
+}
+
 function sandRakeLines(ctx,x,y,angle,length,count) {
-  const at=project(x,y,TRAY.floor);
+  const at={x,y};
   ctx.save();
   ctx.translate(at.x,at.y);
   ctx.rotate(angle);
-  ctx.scale(1,.67);
   for(let i=0;i<count;i++) {
     const cy=i*4.7;
     const start=hash(i,length)*7;
@@ -295,6 +319,7 @@ function shovel(ctx,x,y) {
   const at=project(x,y,TRAY.floor+4);
   ctx.save();
   ctx.translate(at.x,at.y);
+  rotateGroundProp(ctx);
   ctx.rotate(1.21);
   ctx.scale(1.10,.85);
   ctx.shadowColor='#76452578';
@@ -406,6 +431,7 @@ function rake(ctx,x,y) {
   const at=project(x,y,TRAY.floor+2);
   ctx.save();
   ctx.translate(at.x,at.y);
+  rotateGroundProp(ctx);
   ctx.rotate(.20);
   toyShadow(ctx,5,7,54,6);
   ctx.lineCap='round';
@@ -661,34 +687,83 @@ function sandLight(x,y) {
   return (.56*slopeX+.48*slopeY+.67)/Math.hypot(slopeX,slopeY,1)-.67;
 }
 
-function createSandRelief() {
-  const canvas=document.createElement('canvas');
-  const step=3;
-  canvas.width=Math.ceil((SCENE.right-SCENE.left)/step);
-  canvas.height=Math.ceil((SCENE.bottom-SCENE.top)/step);
-  const ctx=canvas.getContext('2d');
-  const pixels=ctx.createImageData(canvas.width,canvas.height);
-  for(let row=0;row<canvas.height;row++) {
-    const sy=SCENE.top+(row+.5)*step;
-    const depth=(sy-HEIGHT/2+TRAY.floor*.94)/(.64-TRAY.floor*.94/2400);
-    for(let col=0;col<canvas.width;col++) {
-      const sx=SCENE.left+(col+.5)*step;
-      const across=(sx-WIDTH/2)/(1+depth/2400);
-      const x=WIDTH/2+across*COS_YAW+depth*SIN_YAW;
-      const y=HEIGHT/2-across*SIN_YAW+depth*COS_YAW;
-      const light=sandLight(x,y);
-      const i=4*(row*canvas.width+col);
+const SAND_AREA={left:-125,top:-116,right:1225,bottom:756};
+
+function createSandMaterial(texture) {
+  const {canvas,ctx}=sceneLayer(1.5,SAND_AREA);
+  const {left,top,right,bottom}=SAND_AREA;
+  const width=right-left,height=bottom-top;
+  ctx.fillStyle=ramp(ctx,{x:0,y:0},{x:WIDTH,y:HEIGHT},[[0,'#dac4a3'],[.38,'#f4e2c6'],[.72,'#ede0c6'],[1,'#dcc7a7']]);
+  ctx.fillRect(left,top,width,height);
+  if(texture) {
+    const pattern=ctx.createPattern(texture,'repeat');
+    pattern.setTransform(new DOMMatrix().scale(.35,.36));
+    ctx.fillStyle=pattern;
+    for(const [blend,alpha] of [['soft-light',.78],['multiply',.20]]) {
+      ctx.globalCompositeOperation=blend;
+      ctx.globalAlpha=alpha;
+      ctx.fillRect(left,top,width,height);
+    }
+    ctx.globalCompositeOperation='source-over';
+    ctx.globalAlpha=1;
+  }
+  const spacing=texture?6.55:3.85;
+  for(let x=left;x<right;x+=spacing) {
+    for(let y=top;y<bottom;y+=spacing) {
+      const u=Math.floor(x),v=Math.floor(y),random=hash(u+29,v+41);
+      if(random<.29) continue;
+      ctx.fillStyle=random>.64?'#fff6dc4f':'#785c3c24';
+      const size=hash(u-12,v-5)*.95+.32;
+      ctx.fillRect(x+hash(u,v)*spacing,y+hash(v,u)*spacing,size,size);
+    }
+  }
+  const relief=document.createElement('canvas');
+  relief.width=Math.ceil(width/4);
+  relief.height=Math.ceil(height/4);
+  const reliefCtx=relief.getContext('2d');
+  const pixels=reliefCtx.createImageData(relief.width,relief.height);
+  for(let row=0;row<relief.height;row++) {
+    for(let col=0;col<relief.width;col++) {
+      const light=sandLight(left+(col+.5)*4,top+(row+.5)*4);
+      const i=4*(row*relief.width+col);
       pixels.data[i]=light>0?255:111;
       pixels.data[i+1]=light>0?244:85;
       pixels.data[i+2]=light>0?217:65;
       pixels.data[i+3]=Math.min(145,Math.abs(light)*390);
     }
   }
-  ctx.putImageData(pixels,0,0);
+  reliefCtx.putImageData(pixels,0,0);
+  ctx.drawImage(relief,left,top,width,height);
+  const sunlight=ctx.createRadialGradient(440,130,24,535,345,550);
+  sunlight.addColorStop(0,'#fff7df33');
+  sunlight.addColorStop(1,'#fff7df00');
+  ctx.fillStyle=sunlight;
+  ctx.fillRect(left,top,width,height);
+  sandRakeLines(ctx,354,644,.09,124,5);
+  sandRakeLines(ctx,547,664,-.04,104,6);
+  sandRakeLines(ctx,817,630,-.19,94,4);
+  sandRakeLines(ctx,154,129,.11,94,4);
   return canvas;
 }
 
-const sandRelief=createSandRelief();
+function drawSand(ctx) {
+  const {left,top,right,bottom}=SAND_AREA;
+  const horizon=HEIGHT/2-TRAY.floor*.94;
+  const tilt=.64-TRAY.floor*.94/2400;
+  const edge=720;
+  const step=80;
+  for(let depth=-edge;depth<edge;depth+=step) {
+    const spread=1+(depth+step/2)/2400;
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(SCENE.left,horizon+depth*tilt,SCENE.right-SCENE.left,step*tilt+1);
+    ctx.clip();
+    ctx.translate(WIDTH/2,horizon);
+    ctx.transform(cosYaw*spread,sinYaw*tilt,-sinYaw*spread,cosYaw*tilt,0,0);
+    ctx.drawImage(sandMaterial,left-WIDTH/2,top-HEIGHT/2,right-left,bottom-top);
+    ctx.restore();
+  }
+}
 
 function sceneLayer(ratio=1.45,area=SCENE) {
   const canvas=document.createElement('canvas');
@@ -699,18 +774,6 @@ function sceneLayer(ratio=1.45,area=SCENE) {
   const ctx=canvas.getContext('2d');
   ctx.setTransform(canvas.width/width,0,0,canvas.height/height,-area.left*canvas.width/width,-area.top*canvas.height/height);
   return {canvas,ctx};
-}
-
-function fillTexture(ctx,texture,area,xScale,yScale,blend,alpha) {
-  if(!texture) return;
-  const pattern=ctx.createPattern(texture,'repeat');
-  pattern.setTransform(new DOMMatrix().translate(SCENE.left,SCENE.top).rotate(YAW*180/Math.PI).scale(xScale,yScale));
-  ctx.save();
-  ctx.globalCompositeOperation=blend;
-  ctx.globalAlpha=alpha;
-  ctx.fillStyle=pattern;
-  ctx.fillRect(area.left,area.top,area.right-area.left,area.bottom-area.top);
-  ctx.restore();
 }
 
 function grassAtFoot(ctx,a,b,index) {
@@ -735,7 +798,7 @@ function grassAtFoot(ctx,a,b,index) {
   }
 }
 
-function createTrayLayer(area=SCENE,ratio=1.45) {
+function createTrayLayer(area=SCENE,ratio=1.45,interactive=false) {
   const {canvas,ctx}=sceneLayer(ratio,area);
   const {canvas:foreground,ctx:near}=sceneLayer(ratio,area);
   const occlusions=[];
@@ -753,10 +816,8 @@ function createTrayLayer(area=SCENE,ratio=1.45) {
       return project(px,py,floor+bank);
     });
   });
-  const shownFromFront=OUTLINE.map(([x,y],i)=>{
-    const [nx,ny]=OUTLINE[(i+1)%OUTLINE.length];
-    return (ny-y)*SIN_YAW-(nx-x)*COS_YAW>0;
-  });
+  const outerRim=outer.map(point);
+  const shownFromFront=outerRim.map((a,i)=>a.x>outerRim[(i+1)%outerRim.length].x);
 
   ctx.save();
   const shadowScale=ctx.getTransform().a;
@@ -779,35 +840,9 @@ function createTrayLayer(area=SCENE,ratio=1.45) {
   }
 
   polygon(ctx,sandEdges.flat());
-  ctx.fillStyle=ramp(ctx,project(0,0),project(WIDTH,HEIGHT),[[0,'#dac4a3'],[.38,'#f4e2c6'],[.72,'#ede0c6'],[1,'#dcc7a7']]);
-  ctx.fill();
   ctx.save();
   ctx.clip();
-  fillTexture(ctx,sandTexture,area,.35,.23,'soft-light',.78);
-  fillTexture(ctx,sandTexture,area,.35,.23,'multiply',.20);
-  const sunlight=ctx.createRadialGradient(440,183,24,542,345,520);
-  sunlight.addColorStop(0,'#fff7df33');
-  sunlight.addColorStop(1,'#fff7df00');
-  ctx.fillStyle=sunlight;
-  ctx.fillRect(SCENE.left,SCENE.top,SCENE.right-SCENE.left,SCENE.bottom-SCENE.top);
-  const grainSpacing=sandTexture?6.55:2.65;
-  for(let x=-75;x<WIDTH+75;x+=grainSpacing) {
-    for(let y=-104;y<HEIGHT+105;y+=grainSpacing) {
-      const u=Math.floor(x),v=Math.floor(y);
-      const random=hash(u+29,v+41);
-      if(random<.29) continue;
-      const at=project(x+hash(u,v)*grainSpacing,y+hash(v,u)*grainSpacing,floor);
-      if(at.x<area.left||at.x>area.right||at.y<area.top||at.y>area.bottom) continue;
-      ctx.fillStyle=random>.64?'#fff6dc4f':'#785c3c24';
-      const grain=hash(u-12,v-5)*.95+.32;
-      ctx.fillRect(at.x,at.y,grain,grain*.75);
-    }
-  }
-  ctx.drawImage(sandRelief,SCENE.left,SCENE.top,sandRelief.width*3,sandRelief.height*3);
-  sandRakeLines(ctx,354,644,.09,124,5);
-  sandRakeLines(ctx,547,664,-.04,104,6);
-  sandRakeLines(ctx,817,630,-.19,94,4);
-  sandRakeLines(ctx,154,129,.11,94,4);
+  drawSand(ctx);
   for(const [i,edge] of sandEdges.entries()) {
     const start=edge[0],end=edge.at(-1);
     const length=range(start,end);
@@ -828,7 +863,7 @@ function createTrayLayer(area=SCENE,ratio=1.45) {
   for(const [i,a] of outer.entries()) {
     if(!shownFromFront[i]) continue;
     const j=(i+1)%outer.length;
-    const [top,bottom]=faceColors[i-2];
+    const [top,bottom]=faceColors[(i+1)%3];
     const face=[a,outer[j],foot[j],foot[i]];
     woodBoard(near,face,[[0,top],[.89,bottom],[1,'#624a38']],(i+2)%8);
     occlusions.push(face.map(point));
@@ -859,7 +894,7 @@ function createTrayLayer(area=SCENE,ratio=1.45) {
     if(shownFromFront[i]) occlusions.push(rail.map(point));
   }
   for(const [i,a] of foot.entries()) {
-    if(shownFromFront[i]) grassAtFoot(near,point(a),point(foot[(i+1)%foot.length]),i);
+    if(!interactive && shownFromFront[i]) grassAtFoot(near,point(a),point(foot[(i+1)%foot.length]),i);
   }
   for(const egg of EGGS) {
     const at=project(egg.x,egg.y,TRAY.floor);
@@ -872,7 +907,7 @@ function createTrayLayer(area=SCENE,ratio=1.45) {
   bucket(ctx,TOYS.bucket.x,TOYS.bucket.y+31);
   rake(ctx,TOYS.rake.x,TOYS.rake.y);
   truck(ctx,TOYS.truck.x,TOYS.truck.y+5);
-  return {backdrop:canvas,foreground,occlusions};
+  return {backdrop:canvas,foreground,occlusions,outerRim};
 }
 
 function loadTexture(file) {
@@ -883,11 +918,13 @@ function loadTexture(file) {
 
 let sandTexture=null;
 let woodTexture=null;
+let sandMaterial=createSandMaterial(null);
 let artRevision=0;
 let sceneArt={tray:createTrayLayer(),area:SCENE};
 const assetsReady=Promise.all([loadTexture('./sand.jpg'),loadTexture('./wood-grain.jpg')]).then(([sand,wood])=>{
   sandTexture=sand;
   woodTexture=wood;
+  if(sand) sandMaterial=createSandMaterial(sand);
   artRevision++;
   sceneArt={tray:createTrayLayer(),area:SCENE};
 });
@@ -897,15 +934,18 @@ const [logos,brandColors]=await Promise.all(['./logos/manifest.json','./brand-co
     .catch(()=>({}))
 ));
 
+const hexCorners=Array.from({length:6},(_,index)=>({
+  x:SIZE*Math.cos(index*Math.PI/3),y:SIZE*Math.sin(index*Math.PI/3)
+}));
+
 function tilePlane(tile,z,scale) {
-  return Array.from({length:6},(_,index)=>{
-    const theta=index*Math.PI/3;
-    return project(tile.x+SIZE*scale*Math.cos(theta),tile.y+SIZE*scale*Math.sin(theta),z);
-  });
+  return hexCorners.map(corner=>project(tile.x+scale*corner.x,tile.y+scale*corner.y,z));
 }
 
-const visibleSides=[0,1,2];
-const sideShade=[-14,-25,-9];
+function sideLight(side) {
+  const direction=side*Math.PI/3+Math.PI/6+yaw;
+  return -17-8*Math.sin(direction)+6*Math.cos(direction);
+}
 
 export class Board {
   constructor(elements,companies,callbacks) {
@@ -918,25 +958,10 @@ export class Board {
       const hill=clamp(heightAt(tile.x,tile.y)*.9 + (grain-.5)*.15,0,.86);
       const tiers=Math.floor(hill*7);
       tile.elevation=TRAY.floor+6+tiers*5.3;
-      tile.top=tilePlane(tile,tile.elevation,.965);
-      tile.shoulder=tilePlane(tile,tile.elevation-1.25,.987);
-      tile.base=tilePlane(tile,TRAY.floor+.1,.987);
-      tile.shadow=tile.base.map(({x,y})=>({x:x+3.4,y:y+4.5}));
-      tile.sides=visibleSides.map(side=>{
-        const next=(side+1)%6;
-        return [tile.shoulder[side],tile.shoulder[next],tile.base[next],tile.base[side]];
-      });
-      tile.bounds=bounds([...tile.top,...tile.shoulder,...tile.sides.flat()]);
-      tile.depth=depthAt(tile.x,tile.y);
-      tile.screen=project(tile.x,tile.y,tile.elevation);
     }
-    this.depthOrder=[...this.tiles].sort((a,b)=>a.depth-b.depth || a.x-b.x);
-    this.frontOrder=this.depthOrder.toReversed();
-    this.logoSeats=this.tiles.map(tile=>{
-      if(this.projectedTileAt(tile.screen)===tile) return tile.screen;
-      return tile.top.map(point=>({x:lerp(tile.screen.x,point.x,.7),y:lerp(tile.screen.y,point.y,.7)}))
-        .find(point=>this.projectedTileAt(point)===tile);
-    });
+    this.projectTerrain();
+    this.setDragMode('orbit');
+    this.requestedYaw=yaw;
     this.sites=makeSites(companies,this.tiles);
     this.siteList=[...this.sites.values()];
     this.home=new Map(this.siteList.map(site=>[site.index,site.company.id]));
@@ -981,7 +1006,7 @@ export class Board {
         node.setAttribute('aria-expanded','false');
       }
       elements.eggLayer.append(node);
-      return {node,center,width:spot.width,height:spot.height,offsetY:spot.offsetY??0};
+      return {...spot,node,center,offsetY:spot.offsetY??0};
     }) : [];
     this.labelNodes=new Map();
     this.markerNodes=new Map();
@@ -999,6 +1024,96 @@ export class Board {
       }
       this.draw();
     });
+  }
+
+  projectTerrain() {
+    for(const tile of this.tiles) {
+      tile.top=tilePlane(tile,tile.elevation,.965);
+      tile.shoulder=tilePlane(tile,tile.elevation-1.25,.987);
+      tile.base=tilePlane(tile,TRAY.floor+.1,.987);
+      tile.shadow=tile.base.map(({x,y})=>({x:x+3.4,y:y+4.5}));
+      tile.sides=[];
+      tile.shading=[];
+      for(let side=0;side<6;side++) {
+        const next=(side+1)%6;
+        if(tile.shoulder[side].x<=tile.shoulder[next].x) continue;
+        tile.sides.push([tile.shoulder[side],tile.shoulder[next],tile.base[next],tile.base[side]]);
+        tile.shading.push(sideLight(side));
+      }
+      tile.bounds=bounds([...tile.top,...tile.base,...tile.shoulder]);
+      tile.coverMask=null;
+      tile.depth=depthAt(tile.x,tile.y);
+      tile.screen=project(tile.x,tile.y,tile.elevation);
+    }
+    this.depthOrder=[...this.tiles].sort((a,b)=>a.depth-b.depth || a.x-b.x);
+    this.hitCells=new Map();
+    for(const [order,tile] of this.depthOrder.entries()) {
+      tile.drawOrder=order;
+      const box=tile.bounds;
+      for(let x=Math.floor(box.left/40);x<=Math.floor(box.right/40);x++) {
+        for(let y=Math.floor(box.top/40);y<=Math.floor(box.bottom/40);y++) {
+          const key=x*256+y;
+          if(!this.hitCells.has(key)) this.hitCells.set(key,[]);
+          this.hitCells.get(key).push(tile);
+        }
+      }
+    }
+    this.logoSeats=this.tiles.map(tile=>{
+      if(this.projectedTileAt(tile.screen)===tile) return tile.screen;
+      return tile.top.map(point=>({x:lerp(tile.screen.x,point.x,.7),y:lerp(tile.screen.y,point.y,.7)}))
+        .find(point=>this.projectedTileAt(point)===tile);
+    });
+    for(const site of this.siteList||[]) site.screen=this.tiles[site.index].screen;
+    for(const spot of this.hotspots||[]) Object.assign(spot.center,project(spot.x,spot.y,spot.z??TRAY.floor));
+    this.logoAnchorCache=new WeakMap();
+    if(this.owners) this.logoAnchors=this.anchorsFor(this.owners);
+  }
+
+  setDragMode(mode) {
+    this.dragMode=mode==='pan'?'pan':'orbit';
+    this.elements.stage.dataset.dragMode=this.dragMode;
+  }
+
+  orbitBy(radians) {
+    if(!Number.isFinite(radians)||!radians) return;
+    this.requestedYaw+=radians;
+    if(this.orbitFrame) return;
+    this.orbitFrame=requestAnimationFrame(()=>{
+      this.orbitFrame=null;
+      this.turnTo(this.requestedYaw,true);
+      this.draw();
+      clearTimeout(this.orbitTimer);
+      this.orbitTimer=setTimeout(()=>{
+        this.orbiting=false;
+        sceneArt={tray:createTrayLayer(),area:SCENE};
+        this.terrainRevision++;
+        this.draw();
+      },150);
+    });
+  }
+
+  turnTo(angle,interactive) {
+    cancelAnimationFrame(this.travel);
+    clearTimeout(this.detailTimer);
+    this.detailArt=null;
+    this.detailKey=null;
+    const focus=unprojectFloor(this.camera.x,this.camera.y);
+    const center=unprojectFloor(ORIGIN.x,ORIGIN.y);
+    yaw=angle;
+    sinYaw=Math.sin(angle);
+    cosYaw=Math.cos(angle);
+    trayBounds=sceneBounds();
+    SCENE=sceneArea(trayBounds);
+    ORIGIN=sceneCenter(SCENE);
+    const at=project(focus.x,focus.y,TRAY.floor);
+    const previousCenter=project(center.x,center.y,TRAY.floor);
+    this.camera={x:ORIGIN.x+at.x-previousCenter.x,y:ORIGIN.y+at.y-previousCenter.y,z:this.camera.z};
+    this.orbiting=interactive;
+    const ratio=interactive ? clamp(this.viewport().zoom,.36,.82) : 1.45;
+    sceneArt={tray:createTrayLayer(SCENE,ratio,interactive),area:SCENE};
+    artRevision++;
+    this.projectTerrain();
+    this.terrainRevision++;
   }
 
   layout(scores) {
@@ -1021,7 +1136,14 @@ export class Board {
     return layout;
   }
 
-  setLayout(layout,category,flash=new Set()) {
+  setLayout(layout,category,flash=new Set(),{replay=false}={}) {
+    this.replayTiles=null;
+    if(replay && flash.size && this.owners && !motionReduced.matches) {
+      this.replayTiles=[...flash].filter(index=>this.owners[index]!==layout[index]).map(index=>{
+        const tile=this.tiles[index],next=this.sites.get(layout[index]);
+        return {tile,next,distance:range(tile,next),before:color(this.sites.get(this.owners[index]).color,(hash(index,47)-.5)*9+4)};
+      }).sort((a,b)=>a.distance-b.distance);
+    }
     const dirty=this.owners!==layout || this.category!==category || this.drawnSelection!==this.selected;
     if(this.owners!==layout) this.logoAnchors=this.anchorsFor(layout);
     this.owners=layout;
@@ -1099,22 +1221,25 @@ export class Board {
       const top=tile.top;
       for(const [index,side] of tile.sides.entries()) {
         polygon(ctx,side);
-        ctx.fillStyle=ramp(ctx,side[0],side[3],[[0,color(base,shade+sideShade[index])],[1,color(base,shade+sideShade[index]-15)]]);
+        ctx.fillStyle=this.orbiting ? color(base,shade+tile.shading[index]-6) :
+          ramp(ctx,side[0],side[3],[[0,color(base,shade+tile.shading[index])],[1,color(base,shade+tile.shading[index]-15)]]);
         ctx.fill();
-        ctx.strokeStyle='#614c3b35';
-        ctx.lineWidth=.6;
-        ctx.stroke();
+        if(!this.orbiting) {
+          ctx.strokeStyle='#614c3b35';
+          ctx.lineWidth=.6;
+          ctx.stroke();
+        }
       }
       polygon(ctx,tile.shoulder);
       ctx.fillStyle=color(base,shade-16);
       ctx.fill();
       polygon(ctx,top);
-      ctx.fillStyle=ramp(ctx,top[4],top[1],[[0,color(base,shade+12)],[1,color(base,shade-3)]]);
+      ctx.fillStyle=this.orbiting ? color(base,shade+4) : ramp(ctx,top[4],top[1],[[0,color(base,shade+12)],[1,color(base,shade-3)]]);
       ctx.fill();
       ctx.strokeStyle=color(base,22,.55);
       ctx.lineWidth=.65;
       ctx.stroke();
-      if(this.tileGrain) {
+      if(this.tileGrain && !this.orbiting) {
         ctx.fillStyle=this.tileGrain;
         ctx.globalCompositeOperation='soft-light';
         ctx.globalAlpha=.36;
@@ -1162,6 +1287,58 @@ export class Board {
     this.ctx.setTransform(1,0,0,1,0,0);
     this.ctx.drawImage(frame,0,0);
     this.ctx.restore();
+  }
+
+  drawReplay(ctx,progress) {
+    for(const [order,entry] of this.replayTiles.entries()) {
+      const {tile,next,before}=entry;
+      const phase=clamp((progress-.2*order/Math.max(1,this.replayTiles.length-1))/.8);
+      if(phase===1) continue;
+      const box=tile.bounds;
+      ctx.save();
+      polygon(ctx,tile.top);
+      ctx.clip();
+      const occluders=new Set();
+      for(let x=Math.floor(box.left/40);x<=Math.floor(box.right/40);x++) {
+        for(let y=Math.floor(box.top/40);y<=Math.floor(box.bottom/40);y++) {
+          for(const other of this.hitCells.get(x*256+y)||[]) {
+            if(other.drawOrder>tile.drawOrder && other.bounds.left<box.right && other.bounds.right>box.left &&
+              other.bounds.top<box.bottom && other.bounds.bottom>box.top) occluders.add(other);
+          }
+        }
+      }
+      for(const other of occluders) {
+        if(!other.coverMask) {
+          const mask=new Path2D();
+          mask.rect(SCENE.left,SCENE.top,SCENE.right-SCENE.left,SCENE.bottom-SCENE.top);
+          const outline=[];
+          for(let i=0;i<6;i++) {
+            const prev=other.shoulder[(i+5)%6],here=other.shoulder[i],after=other.shoulder[(i+1)%6];
+            const wasFront=prev.x>here.x,isFront=here.x>after.x;
+            if(wasFront) outline.push(other.base[i]);
+            if(!wasFront || !isFront) outline.push(here);
+            if(isFront && !wasFront) outline.push(other.base[i]);
+          }
+          outline.forEach((p,i)=>i ? mask.lineTo(p.x,p.y) : mask.moveTo(p.x,p.y));
+          mask.closePath();
+          other.coverMask=mask;
+        }
+        ctx.clip(other.coverMask,'evenodd');
+      }
+      if(phase===0) ctx.fillStyle=before;
+      else {
+        const edge=tile.top.reduce((closest,p)=>range(p,next.screen)<range(closest,next.screen)?p:closest);
+        const reach=Math.max(...tile.top.map(p=>range(p,edge)))*1.25;
+        const wave=ctx.createRadialGradient(edge.x,edge.y,0,edge.x,edge.y,reach*phase);
+        wave.addColorStop(0,'transparent');
+        wave.addColorStop(.78,'transparent');
+        wave.addColorStop(.89,color(next.color,72,.92));
+        wave.addColorStop(1,before);
+        ctx.fillStyle=wave;
+      }
+      ctx.fillRect(box.left,box.top,box.right-box.left,box.bottom-box.top);
+      ctx.restore();
+    }
   }
 
   animateFlash() {
@@ -1297,7 +1474,7 @@ export class Board {
 
   backdrop(view,scale) {
     const ratio=scale*view.zoom;
-    if(ratio<=1.55) return sceneArt;
+    if(this.orbiting || ratio<=1.55) return sceneArt;
     const area={
       left:Math.max(SCENE.left,-view.dx/view.zoom),
       top:Math.max(SCENE.top,-view.dy/view.zoom),
@@ -1335,7 +1512,7 @@ export class Board {
     const v=this.viewport();
     if(!v.width || !v.height) return;
     const {canvas}=this.elements;
-    const scale=Math.min(devicePixelRatio,2);
+    const scale=Math.min(devicePixelRatio,this.orbiting?1:2);
     if(canvas.width!==Math.round(v.width*scale) || canvas.height!==Math.round(v.height*scale)) {
       canvas.width=Math.round(v.width*scale);
       canvas.height=Math.round(v.height*scale);
@@ -1349,9 +1526,12 @@ export class Board {
     const art=this.backdrop(v,scale);
     const {left,top,right,bottom}=art.area;
     ctx.drawImage(art.tray.backdrop,left,top,right-left,bottom-top);
-    this.drawTerrain(v,scale);
+    if(this.orbiting) {
+      this.paintTiles(ctx,{left:-v.dx/v.zoom,top:-v.dy/v.zoom,right:(v.width-v.dx)/v.zoom,bottom:(v.height-v.dy)/v.zoom});
+    } else this.drawTerrain(v,scale);
     const opacity=motionReduced.matches ? 0 : Math.max(0,1-(performance.now()-this.flashStart)/770);
-    if(this.pulses.size && opacity>0) {
+    if(this.replayTiles && opacity>0) this.drawReplay(ctx,1-opacity);
+    else if(this.pulses.size && opacity>0) {
       ctx.save();
       for(const index of this.pulses) {
         polygon(ctx,this.tiles[index].top);
@@ -1380,7 +1560,8 @@ export class Board {
       }
     }
     const now=performance.now();
-    for(const {center,paint,started} of this.toys) {
+    for(const {id,center,paint,started} of this.toys) {
+      if(id==='grass' && contains(art.tray.outerRim,center.x,center.y)) continue;
       ctx.save();
       ctx.translate(center.x,center.y);
       paint(ctx,{elapsed:started==null?0:(now-started)/1000,active:started!=null,reduced:motionReduced.matches});
@@ -1401,10 +1582,11 @@ export class Board {
     const inside=(at,padding=14)=>at.x>padding && at.x<v.width-padding && at.y>padding && at.y<v.height-padding &&
       !sceneArt.tray.occlusions.some(face=>contains(face,(at.x-v.dx)/v.zoom,(at.y-v.dy)/v.zoom));
     const toySeats=[];
-    for(const {node,center,width,height,offsetY} of this.hotspots) {
+    for(const {id,node,center,width,height,offsetY} of this.hotspots) {
       const x=v.dx+center.x*v.zoom,y=v.dy+(center.y+offsetY)*v.zoom;
       const w=width*v.zoom,h=height*v.zoom;
-      node.hidden=x+w/2<=0||x-w/2>=v.width||y+h/2<=0||y-h/2>=v.height;
+      const covered=id==='grass' && contains(sceneArt.tray.outerRim,center.x,center.y);
+      node.hidden=covered||x+w/2<=0||x-w/2>=v.width||y+h/2<=0||y-h/2>=v.height;
       if(node.hidden) continue;
       const hitWidth=Math.max(28,w),hitHeight=Math.max(28,h);
       const left=x-hitWidth/2,top=y-hitHeight/2;
@@ -1493,7 +1675,8 @@ export class Board {
 
   projectedTileAt(at) {
     if(sceneArt.tray.occlusions.some(face=>contains(face,at.x,at.y))) return undefined;
-    return this.frontOrder.find(tile=>{
+    const cells=this.hitCells.get(Math.floor(at.x/40)*256+Math.floor(at.y/40));
+    return cells?.findLast(tile=>{
       const {left,top,right,bottom}=tile.bounds;
       return at.x>=left&&at.x<=right&&at.y>=top&&at.y<=bottom&&(
         contains(tile.shoulder,at.x,at.y)||contains(tile.top,at.x,at.y)||tile.sides.some(side=>contains(side,at.x,at.y))
@@ -1516,6 +1699,11 @@ export class Board {
   }
 
   resetView() {
+    cancelAnimationFrame(this.orbitFrame);
+    this.orbitFrame=null;
+    clearTimeout(this.orbitTimer);
+    this.requestedYaw=HOME_YAW;
+    if(yaw!==HOME_YAW || this.orbiting) this.turnTo(HOME_YAW,false);
     return this.travelTo({...ORIGIN,z:MIN_ZOOM},false);
   }
 
@@ -1523,7 +1711,7 @@ export class Board {
     if(!Number.isFinite(factor)||factor<=0) return this.camera.z;
     const current=this.camera;
     const z=clamp(current.z*factor,MIN_ZOOM,MAX_ZOOM);
-    if(z===MIN_ZOOM) return current.z===z ? z : this.resetView();
+
     if(z===current.z && (!anchor || (anchor.x===destination.x&&anchor.y===destination.y))) return z;
     let {x,y}=current;
     if(anchor) {
@@ -1538,7 +1726,7 @@ export class Board {
   travelTo(target,animate=true) {
     cancelAnimationFrame(this.travel);
     const z=clamp(target.z,MIN_ZOOM,MAX_ZOOM);
-    const camera=z===MIN_ZOOM ? {...ORIGIN,z} : {
+    const camera={
       x:clamp(target.x,trayBounds.left+58,trayBounds.right-58),
       y:clamp(target.y,trayBounds.top+52,trayBounds.bottom-56),z
     };
@@ -1563,6 +1751,7 @@ export class Board {
   bind() {
     const {stage}=this.elements;
     let drag=null;
+    let suppressClick=false;
     const touches=new Map();
     let pinch=null;
     let pinchFrame=null;
@@ -1577,26 +1766,30 @@ export class Board {
       this.animateToys();
     };
     const pointer=event=>({x:event.clientX,y:event.clientY});
-    const startDrag=(id,{x,y})=>{
-      drag={id,x,y,camera:this.camera,zoom:this.viewport().zoom,moved:false};
+    const startDrag=(id,{x,y},mode=this.dragMode,button=null,secondary=false)=>{
+      drag={id,x,y,lastX:x,camera:this.camera,zoom:this.viewport().zoom,moved:false,mode,button,secondary};
     };
+    const orbitScale=()=>Math.PI*2/Math.max(510,stage.clientWidth*.83);
     const measurePinch=()=>{
       const [a,b]=touches.values();
       const box=stage.getBoundingClientRect();
       return {
         center:{x:(a.x+b.x)/2-box.left,y:(a.y+b.y)/2-box.top},
-        span:Math.max(8,range(a,b))
+        span:Math.max(8,range(a,b)),angle:Math.atan2(b.y-a.y,b.x-a.x)
       };
     };
     const updatePinch=()=>{
       pinchFrame=null;
       const next=measurePinch();
       const previous=pinch.last;
-      if(!pinch.active && Math.abs(next.span-previous.span)<5 && range(next.center,previous.center)<5) return;
+      const rotation=Math.atan2(Math.sin(next.angle-previous.angle),Math.cos(next.angle-previous.angle));
+      if(!pinch.active && Math.abs(next.span-previous.span)<5 && range(next.center,previous.center)<5 && Math.abs(rotation)<.04) return;
       pinch.active=true;
+      suppressClick=true;
       pinch.last=next;
       stage.classList.add('dragging');
       this.zoomBy(next.span/previous.span,previous.center,next.center);
+      this.orbitBy(rotation);
     };
     document.addEventListener('visibilitychange',onMotionChange);
     motionReduced.addEventListener('change',onMotionChange);
@@ -1606,8 +1799,16 @@ export class Board {
       const id=this.ownerAt(event.clientX-box.left,event.clientY-box.top);
       stage.classList.toggle('on-tile',Boolean(id));
     });
+    stage.addEventListener('contextmenu',event=>event.preventDefault());
+    stage.addEventListener('click',event=>{
+      if(suppressClick && event.detail) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+      }
+    },true);
     stage.addEventListener('pointerdown',event=>{
-      if(event.button!==0) return;
+      if(event.button!==0 && event.button!==2) return;
+      if(!touches.size) suppressClick=false;
       if(event.pointerType==='touch') {
         if(drag&&!touches.size) return;
         touches.set(event.pointerId,pointer(event));
@@ -1625,10 +1826,12 @@ export class Board {
           return;
         }
       } else if(touches.size) return;
-      if(drag||event.target.closest('button')) return;
+      if(drag) return;
       cancelAnimationFrame(this.travel);
-      startDrag(event.pointerId,pointer(event));
-      stage.setPointerCapture(event.pointerId);
+      const button=event.target.closest('button');
+      const secondary=event.button===2;
+      startDrag(event.pointerId,pointer(event),event.shiftKey||secondary?'pan':this.dragMode,button,secondary);
+      if(!button || secondary) stage.setPointerCapture(event.pointerId);
     });
     stage.addEventListener('pointermove',event=>{
       if(touches.has(event.pointerId)) {
@@ -1642,9 +1845,16 @@ export class Board {
       const x=event.clientX-drag.x;
       const y=event.clientY-drag.y;
       if(Math.hypot(x,y)>5) drag.moved=true;
-      if(!drag.moved || drag.camera.z<=MIN_ZOOM) return;
+      if(!drag.moved) return;
+      suppressClick=true;
       stage.classList.add('dragging');
-      this.travelTo({x:drag.camera.x-x/drag.zoom,y:drag.camera.y-y/drag.zoom,z:drag.camera.z},false);
+      if(!stage.hasPointerCapture(event.pointerId)) stage.setPointerCapture(event.pointerId);
+      if(drag.mode==='orbit') {
+        this.orbitBy((event.clientX-drag.lastX)*orbitScale());
+        drag.lastX=event.clientX;
+      } else {
+        this.travelTo({x:drag.camera.x-x/drag.zoom,y:drag.camera.y-y/drag.zoom,z:drag.camera.z},false);
+      }
     });
     const finishPointer=event=>{
       if(event.type==='lostpointercapture' && (event.target!==stage || stage.hasPointerCapture(event.pointerId))) return;
@@ -1673,7 +1883,7 @@ export class Board {
         }
       }
       if(drag?.id!==event.pointerId) return;
-      if(event.type==='pointerup'&&!drag.moved) {
+      if(event.type==='pointerup'&&!drag.moved&&!drag.button&&!drag.secondary) {
         const box=stage.getBoundingClientRect();
         const id=this.ownerAt(event.clientX-box.left,event.clientY-box.top);
         if(id) this.callbacks.pick(id);
@@ -1686,7 +1896,13 @@ export class Board {
     stage.addEventListener('pointercancel',finishPointer);
     stage.addEventListener('lostpointercapture',finishPointer);
     stage.addEventListener('wheel',event=>{
-      if(!event.deltaY || Math.abs(event.deltaX)>Math.abs(event.deltaY)) return;
+      if(!event.ctrlKey && Math.abs(event.deltaX)>Math.abs(event.deltaY)) {
+        event.preventDefault();
+        if(this.dragMode==='orbit') this.orbitBy(-event.deltaX*orbitScale());
+        else this.travelTo({...this.camera,x:this.camera.x+event.deltaX/this.viewport().zoom},false);
+        return;
+      }
+      if(!event.deltaY) return;
       event.preventDefault();
       const box=stage.getBoundingClientRect();
       const units=event.deltaMode===1?16:event.deltaMode===2?stage.clientHeight:1;
@@ -1707,6 +1923,9 @@ export class Board {
       if(offset) {
         event.preventDefault();
         this.travelTo({...this.camera,x:this.camera.x+offset[0],y:this.camera.y+offset[1]});
+      } else if(['q','e'].includes(event.key.toLowerCase())) {
+        event.preventDefault();
+        this.orbitBy((event.key.toLowerCase()==='q'?-1:1)*Math.PI/12);
       } else if(['+','=','-','0'].includes(event.key)) {
         event.preventDefault();
         if(event.key==='0') this.resetView();

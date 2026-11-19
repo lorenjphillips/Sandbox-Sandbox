@@ -4,7 +4,9 @@ const $ = selector => document.querySelector(selector);
 const DAY = 86_400_000;
 const LOOKBACK_DAYS = 180;
 const MARKER_DAYS = 14;
-const HISTORY_MONTHS = 2;
+const HISTORY_MONTHS = 6;
+const BUSY_DAY_MS = 1020;
+const QUIET_DAY_MS = 145;
 const dateValue = date => Date.parse(date + 'T00:00:00Z');
 const isoDate = time => new Date(time).toISOString().slice(0,10);
 
@@ -50,7 +52,8 @@ const elements = {
   stage:$('#stage'),canvas:$('#board-canvas'),labels:$('#map-labels'),markers:$('#marker-layer'),eggLayer:$('#egg-layer'),
   popover:$('#map-popover'),search:$('#map-search'),searchResults:$('#search-results'),
   updates:$('#updates-feed'),historyDate:$('#history-date'),historyDays:$('#history-days'),
-  latestButton:$('#jump-latest'),zoomHint:$('#zoom-hint'),profile:$('#profile')
+  historyPlay:$('#history-play'),playbackNote:$('#playback-note'),latestButton:$('#jump-latest'),
+  zoomHint:$('#zoom-hint'),profile:$('#profile')
 };
 const eggPlayer=$('#egg-player');
 const easterEggs=mountEasterEggPlayer(elements.eggLayer,eggPlayer,clearSelection);
@@ -78,10 +81,17 @@ const events=atlas.events.map((event,index)=>({
 const eventsById=new Map(events.map(event=>[event.id,event]));
 const oldest=subtractMonths(latest,HISTORY_MONTHS);
 const archiveEvents=events.filter(event=>event.time>=oldest && event.time<=latest);
-const datesWithActivity=new Set(archiveEvents.map(event=>event.date));
+const eventsByDay=new Map();
+for(const event of archiveEvents) {
+  const entries=eventsByDay.get(event.time);
+  if(entries) entries.push(event);
+  else eventsByDay.set(event.time,[event]);
+}
 const historyButtons=new Map();
 let historyTabStop=null;
 let currentDate=latest;
+let playingHistory=false;
+let historyTimer=null;
 let category='all';
 let kind='all';
 let focusedEvent=null;
@@ -255,16 +265,17 @@ function clearSelection(render=true) {
 const matchesKind=event=>kind==='all' || event.kind===kind || 'front:'+event.front===kind;
 const matchesCategory=event=>category==='all' || companies.get(event.company).category===category;
 
-function updateBoard(flash=new Set()) {
+function updateBoard(flash=new Set(),replay=false) {
   board.selected=pinnedEvent?.company || (visibleView==='atlas' ? currentProfile?.id : null);
-  board.setLayout(board.layout(scoreOn(currentDate)),'all',flash);
-  const filtered=archiveEvents.filter(event=>currentDate===latest ? event.time>latest-MARKER_DAYS*DAY : event.time===currentDate);
-  const featured=currentDate===latest
+  board.setLayout(board.layout(scoreOn(currentDate)),'all',flash,{replay});
+  const showRecent=currentDate===latest && !playingHistory;
+  const filtered=showRecent ? archiveEvents.filter(event=>event.time>latest-MARKER_DAYS*DAY) : eventsByDay.get(currentDate)||[];
+  const featured=showRecent
     ? Array.from(new Map(filtered.toReversed().map(event=>[event.company,event])).values())
       .sort((a,b)=>b.time-a.time || a.title.localeCompare(b.title))
     : filtered;
   let markerEvents=featured.slice(0,15);
-  const firstPost=currentDate===latest && featured.find(officialPost);
+  const firstPost=showRecent && featured.find(officialPost);
   if(firstPost && !markerEvents.includes(firstPost)) markerEvents.splice(3,0,firstPost);
   markerEvents=markerEvents.slice(0,15);
   if(focusedEvent) {
@@ -312,7 +323,9 @@ function buildHistory() {
   const dates=[];
   for(let time=oldest;time<=latest;time+=DAY) {
     const date=isoDate(time);
-    dates.push(`<button type="button" class="history-day" tabindex="-1" data-history-date="${date}" ${datesWithActivity.has(date) ? 'data-has-events' : ''} aria-label="${formatDate(time,true)}${datesWithActivity.has(date) ? ', has updates' : ''}">${formatDate(time)}</button>`);
+    const busy=eventsByDay.has(time);
+    const monthStart=date.endsWith('-01') && time!==oldest;
+    dates.push(`<button type="button" class="history-day" tabindex="-1" data-history-date="${date}" ${busy ? 'data-has-events' : ''} ${monthStart ? 'data-month-start' : ''} aria-label="${formatDate(time,true)}${busy ? ', has updates' : ''}">${formatDate(time)}</button>`);
   }
   elements.historyDate.min=isoDate(oldest);
   elements.historyDate.max=atlas.asOf;
@@ -340,8 +353,15 @@ function syncLatestButton() {
   elements.latestButton.disabled=currentDate===latest && atRightEdge;
 }
 
-function showSnapshot(next, announce=false) {
+function showSnapshot(next, announce=false, playback=false) {
   if(!Number.isFinite(next) || next<oldest || next>latest) return;
+  const flash=new Set();
+  if(playback) {
+    const prior=board.layout(scoreOn(currentDate));
+    board.layout(scoreOn(next)).forEach((owner,index)=>{
+      if(owner!==prior[index]) flash.add(index);
+    });
+  } else stopHistory();
   historyButtons.get(isoDate(currentDate))?.removeAttribute('aria-current');
   currentDate=next;
   const activeDate=isoDate(currentDate);
@@ -352,13 +372,63 @@ function showSnapshot(next, announce=false) {
   revealHistoryDay(activeButton);
   syncLatestButton();
   clearSelection(false);
-  updateBoard();
+  updateBoard(flash,playback);
   if(elements.profile.open && activeProfileTab==='evidence') renderProfile();
   if(announce) {
-    const count=archiveEvents.filter(event=>event.time===currentDate).length;
+    const count=eventsByDay.get(currentDate)?.length||0;
     const activity=count ? `${count} sourced ${count===1?'update':'updates'}` : 'No sourced updates';
     $('#announcements').textContent=`${formatDate(currentDate,true)}. ${activity} for this day.`;
   }
+  return flash.size;
+}
+
+function setPlaybackButton() {
+  elements.historyPlay.textContent=playingHistory ? 'Pause' : 'Play';
+  elements.historyPlay.setAttribute('aria-label',playingHistory ? 'Pause history' : 'Play history');
+}
+
+function stopHistory() {
+  if(!playingHistory) return;
+  clearTimeout(historyTimer);
+  historyTimer=null;
+  playingHistory=false;
+  elements.playbackNote.hidden=true;
+  setPlaybackButton();
+}
+
+function scheduleHistory(territoryChanged=false) {
+  const entries=eventsByDay.get(currentDate)||[];
+  const lead=entries.reduce((best,entry)=>!best ||
+    Math.abs(signals[entry.kind].points)>Math.abs(signals[best.kind].points) ? entry : best,null);
+  elements.playbackNote.hidden=!lead;
+  if(lead) {
+    const extra=entries.length>1 ? ` +${entries.length-1} more` : '';
+    elements.playbackNote.textContent=`${companies.get(lead.company).name} · ${lead.title}${extra}`;
+  }
+  historyTimer=setTimeout(()=>{
+    if(currentDate===latest) {
+      stopHistory();
+      updateBoard();
+      $('#announcements').textContent=`History ended on ${formatDate(latest,true)}.`;
+      return;
+    }
+    const changed=showSnapshot(currentDate+DAY,false,true);
+    scheduleHistory(changed>0);
+  },lead || territoryChanged ? BUSY_DAY_MS : QUIET_DAY_MS);
+}
+
+function toggleHistory() {
+  if(playingHistory) {
+    stopHistory();
+    updateBoard();
+    $('#announcements').textContent=`History paused on ${formatDate(currentDate,true)}.`;
+    return;
+  }
+  if(currentDate===latest) showSnapshot(oldest);
+  playingHistory=true;
+  setPlaybackButton();
+  scheduleHistory();
+  $('#announcements').textContent=`Playing history from ${formatDate(currentDate,true)}.`;
 }
 
 function playBoardToy(id) {
@@ -530,7 +600,7 @@ function renderMethod() {
     <section class="method-section"><h2>Fronts</h2>
       <ul>${fronts.map(([name,meaning,color])=>`<li style="--signal:${color}"><strong>${escaped(name)}</strong><span class="muted">${escaped(meaning)}</span></li>`).join('')}</ul></section>
     <section class="method-section"><h2>Coverage</h2>
-      <p>The catalog covers ${companies.size} offerings. Some share an owner. The map calendar and Updates cover the preceding two months. The current catalog and home hexes stay fixed in historical views, while flags show the selected day’s sourced activity. Company facts and prices reflect the catalog snapshot.</p>
+      <p>The catalog covers ${companies.size} offerings. Some share an owner. The map calendar and Updates cover six months. Play starts from the selected date, or from the beginning if Latest is selected. The current catalog and home hexes stay fixed in historical views, while territory and flags follow dated sources. Company facts and prices reflect the catalog snapshot.</p>
       <p>Figures identify their scope and source where available. Public prices use each provider’s billing units.</p>
       <p>Snapshot ${formatDate(latest,true)}. ${evidenceLink('https://battleships.dev/','Battleships pricing reference')}.</p></section>`;
 }
@@ -538,6 +608,7 @@ function renderMethod() {
 function route() {
   const requested=location.hash.slice(1).split('?')[0];
   const nextView=['compare','method','updates'].includes(requested) ? requested : 'atlas';
+  if(nextView!=='atlas') stopHistory();
   if(visibleView!==nextView && elements.profile.open) elements.profile.close();
   if(nextView!=='atlas' && easterEggs.isOpen()) easterEggs.close();
   visibleView=nextView;
@@ -590,6 +661,19 @@ eventFilter.addEventListener('change',event=>{
   renderUpdates();
 });
 elements.historyDays.addEventListener('scroll',syncLatestButton,{passive:true});
+elements.historyPlay.addEventListener('click',toggleHistory);
+document.addEventListener('visibilitychange',()=>{
+  if(document.hidden) stopHistory();
+});
+$('#board-controls').addEventListener('click',event=>{
+  const modeButton=event.target.closest('[data-camera-mode]');
+  if(modeButton) {
+    board.setDragMode(modeButton.dataset.cameraMode);
+    for(const button of event.currentTarget.querySelectorAll('[data-camera-mode]')) {
+      button.setAttribute('aria-pressed',String(button===modeButton));
+    }
+  } else if(event.target.closest('#reset-camera')) board.resetView();
+});
 elements.historyDays.addEventListener('click',event=>{
   const date=event.target.closest('[data-history-date]')?.dataset.historyDate;
   if(date) showSnapshot(dateValue(date),true);
