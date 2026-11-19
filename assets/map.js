@@ -1235,18 +1235,18 @@ export class Board {
     return this.travelTo({...ORIGIN,z:MIN_ZOOM},false);
   }
 
-  zoomBy(factor,anchor) {
+  zoomBy(factor,anchor,destination=anchor) {
     if(!Number.isFinite(factor)||factor<=0) return this.camera.z;
     const current=this.camera;
     const z=clamp(current.z*factor,MIN_ZOOM,MAX_ZOOM);
-    if(z===MIN_ZOOM) return this.resetView();
-    if(z===current.z) return z;
+    if(z===MIN_ZOOM) return current.z===z ? z : this.resetView();
+    if(z===current.z && (!anchor || (anchor.x===destination.x&&anchor.y===destination.y))) return z;
     let {x,y}=current;
     if(anchor) {
       const view=this.viewport();
-      const weight=(1-current.z/z)/view.zoom;
-      x+=(anchor.x-view.width/2)*weight;
-      y+=(anchor.y-view.height/2)*weight;
+      const zoom=view.zoom*z/current.z;
+      x+=(anchor.x-view.width/2)/view.zoom-(destination.x-view.width/2)/zoom;
+      y+=(anchor.y-view.height/2)/view.zoom-(destination.y-view.height/2)/zoom;
     }
     return this.travelTo({x,y,z},false);
   }
@@ -1279,6 +1279,9 @@ export class Board {
   bind() {
     const {stage}=this.elements;
     let drag=null;
+    const touches=new Map();
+    let pinch=null;
+    let pinchFrame=null;
     let wheelDelta=0;
     let wheelAnchor;
     let wheelFrame;
@@ -1286,6 +1289,28 @@ export class Board {
     const onMotionChange=()=>{
       if(document.hidden||motionReduced.matches) this.stopActivity();
       else this.scheduleActivity();
+    };
+    const pointer=event=>({x:event.clientX,y:event.clientY});
+    const startDrag=(id,{x,y})=>{
+      drag={id,x,y,camera:this.camera,zoom:this.viewport().zoom,moved:false};
+    };
+    const measurePinch=()=>{
+      const [a,b]=touches.values();
+      const box=stage.getBoundingClientRect();
+      return {
+        center:{x:(a.x+b.x)/2-box.left,y:(a.y+b.y)/2-box.top},
+        span:Math.max(8,range(a,b))
+      };
+    };
+    const updatePinch=()=>{
+      pinchFrame=null;
+      const next=measurePinch();
+      const previous=pinch.last;
+      if(!pinch.active && Math.abs(next.span-previous.span)<5 && range(next.center,previous.center)<5) return;
+      pinch.active=true;
+      pinch.last=next;
+      stage.classList.add('dragging');
+      this.zoomBy(next.span/previous.span,previous.center,next.center);
     };
     document.addEventListener('visibilitychange',onMotionChange);
     motionReduced.addEventListener('change',onMotionChange);
@@ -1296,12 +1321,37 @@ export class Board {
       stage.classList.toggle('on-tile',Boolean(id));
     });
     stage.addEventListener('pointerdown',event=>{
-      if(drag||event.target.closest('button') || event.button!==0) return;
+      if(event.button!==0) return;
+      if(event.pointerType==='touch') {
+        if(drag&&!touches.size) return;
+        touches.set(event.pointerId,pointer(event));
+        if(touches.size>=2) {
+          event.preventDefault();
+          if(pinch?.last) {
+            stage.setPointerCapture(event.pointerId);
+            return;
+          }
+          for(const id of touches.keys()) stage.setPointerCapture(id);
+          cancelAnimationFrame(this.travel);
+          drag=null;
+          stage.classList.remove('dragging');
+          pinch={last:measurePinch(),active:false};
+          return;
+        }
+      } else if(touches.size) return;
+      if(drag||event.target.closest('button')) return;
       cancelAnimationFrame(this.travel);
-      drag={id:event.pointerId,x:event.clientX,y:event.clientY,camera:this.camera,zoom:this.viewport().zoom,moved:false};
+      startDrag(event.pointerId,pointer(event));
       stage.setPointerCapture(event.pointerId);
     });
     stage.addEventListener('pointermove',event=>{
+      if(touches.has(event.pointerId)) {
+        touches.set(event.pointerId,pointer(event));
+        if(pinch?.last) {
+          if(pinchFrame===null) pinchFrame=requestAnimationFrame(updatePinch);
+          return;
+        }
+      }
       if(!drag||drag.id!==event.pointerId) return;
       const x=event.clientX-drag.x;
       const y=event.clientY-drag.y;
@@ -1310,9 +1360,34 @@ export class Board {
       stage.classList.add('dragging');
       this.travelTo({x:drag.camera.x-x/drag.zoom,y:drag.camera.y-y/drag.zoom,z:drag.camera.z},false);
     });
-    stage.addEventListener('pointerup',event=>{
+    const finishPointer=event=>{
+      if(event.type==='lostpointercapture' && (event.target!==stage || stage.hasPointerCapture(event.pointerId))) return;
+      if(touches.has(event.pointerId)) {
+        if(pinchFrame!==null) {
+          cancelAnimationFrame(pinchFrame);
+          pinchFrame=null;
+          if(event.type==='pointerup') updatePinch();
+        }
+        touches.delete(event.pointerId);
+        if(pinch) {
+          if(touches.size>=2) {
+            pinch.last=measurePinch();
+          } else {
+            stage.classList.remove('dragging');
+            const remaining=touches.entries().next().value;
+            if(remaining) {
+              pinch.last=null;
+              startDrag(...remaining);
+            } else {
+              pinch=null;
+              drag=null;
+            }
+          }
+          return;
+        }
+      }
       if(drag?.id!==event.pointerId) return;
-      if(!drag.moved) {
+      if(event.type==='pointerup'&&!drag.moved) {
         const box=stage.getBoundingClientRect();
         const id=this.ownerAt(event.clientX-box.left,event.clientY-box.top);
         if(id) this.callbacks.pick(id);
@@ -1320,11 +1395,10 @@ export class Board {
       }
       drag=null;
       stage.classList.remove('dragging');
-    });
-    stage.addEventListener('pointercancel',()=>{
-      drag=null;
-      stage.classList.remove('dragging');
-    });
+    };
+    stage.addEventListener('pointerup',finishPointer);
+    stage.addEventListener('pointercancel',finishPointer);
+    stage.addEventListener('lostpointercapture',finishPointer);
     stage.addEventListener('wheel',event=>{
       if(!event.deltaY || Math.abs(event.deltaX)>Math.abs(event.deltaY)) return;
       event.preventDefault();

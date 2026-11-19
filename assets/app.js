@@ -1,4 +1,4 @@
-import { Board, TERRITORY_WEIGHT, MIN_ZOOM, MAX_ZOOM } from './map.js';
+import { Board, TERRITORY_WEIGHT } from './map.js';
 const $ = selector => document.querySelector(selector);
 const DAY = 86_400_000;
 const LOOKBACK_DAYS = 180;
@@ -49,7 +49,7 @@ const elements = {
   stage:$('#stage'),canvas:$('#board-canvas'),labels:$('#map-labels'),markers:$('#marker-layer'),
   popover:$('#map-popover'),search:$('#map-search'),searchResults:$('#search-results'),
   updates:$('#updates-feed'),historyDate:$('#history-date'),historyDays:$('#history-days'),
-  latestButton:$('#jump-latest'),zoomIn:$('#zoom-in'),zoomOut:$('#zoom-out'),profile:$('#profile')
+  latestButton:$('#jump-latest'),zoomHint:$('#zoom-hint'),profile:$('#profile')
 };
 
 let atlas;
@@ -86,6 +86,7 @@ let hoveredEvent=null;
 let pinnedEvent=null;
 let hidePopoverTimer=null;
 let visibleView='atlas';
+let zoomHintShown=false;
 let compared=new Set();
 let currentProfile=null;
 let activeProfileTab='overview';
@@ -109,11 +110,7 @@ const board = new Board(elements,atlas.companies,{
   clear:clearSelection,
   eventButton:makeEventButton,
   eventAnchor:event=>eventMovement(event).anchor,
-  placed:()=>{
-    placePopover();
-    elements.zoomOut.disabled=board.camera.z<=MIN_ZOOM;
-    elements.zoomIn.disabled=board.camera.z>=MAX_ZOOM;
-  }
+  placed:placePopover
 });
 
 function scoreOn(date) {
@@ -532,6 +529,11 @@ function route() {
     updateBoard();
     revealHistoryDay(historyButtons.get(isoDate(currentDate)));
     syncLatestButton();
+    if(!zoomHintShown) {
+      zoomHintShown=true;
+      elements.zoomHint.hidden=false;
+      window.setTimeout(()=>{elements.zoomHint.hidden=true;},1350);
+    }
   });
   if(visibleView==='compare') renderDirectory();
   if(visibleView==='updates') renderUpdates();
@@ -595,8 +597,6 @@ elements.latestButton.addEventListener('click',()=>{
   showSnapshot(latest,true);
   historyButtons.get(atlas.asOf).focus({preventScroll:true});
 });
-elements.zoomIn.addEventListener('click',()=>board.zoomBy(1.36));
-elements.zoomOut.addEventListener('click',()=>board.zoomBy(1/1.36));
 
 document.querySelector('.category-filter')?.addEventListener('click',event=>{
   const next=event.target.closest('[data-category]')?.dataset.category;
