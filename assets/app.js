@@ -111,6 +111,7 @@ const eventToys={launch:'rocket',funding:'coins',partnership:'blocks',adoption:'
 const board = new Board(elements,atlas.companies,{
   pick:openProfile,
   clear:clearSelection,
+  playToy:playBoardToy,
   eventButton:makeEventButton,
   eventAnchor:event=>eventMovement(event).anchor,
   placed:placePopover
@@ -358,6 +359,22 @@ function showSnapshot(next, announce=false) {
     const activity=count ? `${count} sourced ${count===1?'update':'updates'}` : 'No sourced updates';
     $('#announcements').textContent=`${formatDate(currentDate,true)}. ${activity} for this day.`;
   }
+}
+
+function playBoardToy(id) {
+  if(id==='hourglass' && currentDate>oldest) {
+    showSnapshot(currentDate-DAY,true);
+    return;
+  }
+  const notes={
+    sandbox:'The lid opens to reveal a tiny sandbox and shovel.',
+    hourglass:'First day in the archive',
+    scarab:'The scarab scurries away and leaves tracks in the sand.',
+    grass:'Touch grass ✓'
+  };
+  const note=notes[id];
+  $('#announcements').textContent=note;
+  if(id==='grass' || id==='hourglass') return note;
 }
 
 function matchingCompanies(query, categoryName='all') {

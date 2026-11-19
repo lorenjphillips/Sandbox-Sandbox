@@ -1,3 +1,5 @@
+import { paintSandboxToy, paintHourglassToy, paintScarabToy, paintGrassToy } from './toy-art.js';
+
 export const WIDTH = 1100;
 export const HEIGHT = 640;
 export const TERRITORY_WEIGHT = 216;
@@ -42,6 +44,7 @@ export const MIN_ZOOM = 1;
 export const MAX_ZOOM = 4.25;
 const AMBIENT_INTERVAL = 7600;
 const AMBIENT_DURATION = 940;
+const TOY_DURATION = 4200;
 
 function hash(x, y) {
   let value = (Math.imul(x, 196613) ^ Math.imul(y, 263167)) >>> 0;
@@ -633,6 +636,13 @@ const EGGS=[
   {id:'radio',label:'Play the buried cassette radio',x:837,y:560,width:43,height:33,paint:cassetteRadio}
 ];
 
+const PLAY_TOYS=[
+  {id:'sandbox',label:'Open the miniature sandbox',x:325,y:625,width:48,height:26,offsetY:-5,paint:paintSandboxToy},
+  {id:'hourglass',label:'Flip the hourglass and go back one day',x:167,y:16,width:25,height:35,offsetY:-14,paint:paintHourglassToy},
+  {id:'scarab',label:'Disturb the buried scarab',x:478,y:619,width:25,height:20,offsetY:-3,paint:paintScarabToy},
+  {id:'grass',label:'Touch grass',x:548,y:769,z:TRAY.base,width:31,height:25,offsetY:-6,paint:paintGrassToy}
+];
+
 const MOUNDS=[
   [154,120,77,93,31],[327,38,124,53,28],[906,104,78,128,40],
   [107,413,71,142,25],[303,618,115,70,31],[590,632,154,53,36],
@@ -953,16 +963,25 @@ export class Board {
         return byPosition.get(col+','+row)?.index;
       }));
     }
-    this.eggNodes=elements.eggLayer ? EGGS.map(egg=>{
+    this.toys=[];
+    this.hotspots=elements.eggLayer ? [...EGGS,...PLAY_TOYS].map(spot=>{
       const node=document.createElement('button');
       node.type='button';
       node.className='egg-hotspot';
-      node.dataset.egg=egg.id;
-      node.setAttribute('aria-label',egg.label);
-      node.setAttribute('aria-controls','egg-player');
-      node.setAttribute('aria-expanded','false');
+      node.setAttribute('aria-label',spot.label);
+      const center=project(spot.x,spot.y,spot.z??TRAY.floor);
+      if(PLAY_TOYS.includes(spot)) {
+        const toy={id:spot.id,node,center,paint:spot.paint};
+        this.toys.push(toy);
+        node.dataset.toy=spot.id;
+        node.addEventListener('click',()=>this.playToy(toy));
+      } else {
+        node.dataset.egg=spot.id;
+        node.setAttribute('aria-controls','egg-player');
+        node.setAttribute('aria-expanded','false');
+      }
       elements.eggLayer.append(node);
-      return {node,center:project(egg.x,egg.y,TRAY.floor),width:egg.width,height:egg.height};
+      return {node,center,width:spot.width,height:spot.height,offsetY:spot.offsetY??0};
     }) : [];
     this.labelNodes=new Map();
     this.markerNodes=new Map();
@@ -970,6 +989,7 @@ export class Board {
     new ResizeObserver(()=>{
       this.draw();
       this.scheduleActivity();
+      this.animateToys();
     }).observe(elements.stage);
     assetsReady.then(()=>{
       if(sandTexture) {
@@ -1156,6 +1176,31 @@ export class Board {
     this.flashFrame=requestAnimationFrame(tick);
   }
 
+  playToy(toy) {
+    toy.started=performance.now();
+    const note=this.callbacks.playToy(toy.id);
+    if(note) toy.node.dataset.note=note;
+    else delete toy.node.dataset.note;
+    clearTimeout(toy.timer);
+    toy.timer=setTimeout(()=>{
+      toy.started=null;
+      delete toy.node.dataset.note;
+      this.draw(false);
+    },TOY_DURATION);
+    this.draw(false);
+    this.animateToys();
+  }
+
+  animateToys() {
+    if(this.toyFrame || motionReduced.matches || document.hidden || !this.elements.stage.clientWidth ||
+      !this.toys.some(toy=>toy.started!=null)) return;
+    this.toyFrame=requestAnimationFrame(()=>{
+      this.toyFrame=null;
+      this.draw(false);
+      this.animateToys();
+    });
+  }
+
   setActivityTiles(indices) {
     this.activityTiles=[...new Set(indices)].filter(index=>Number.isInteger(index)&&this.tiles[index]);
     if(!this.activityTiles.length) this.stopActivity();
@@ -1334,6 +1379,13 @@ export class Board {
         ctx.stroke();
       }
     }
+    const now=performance.now();
+    for(const {center,paint,started} of this.toys) {
+      ctx.save();
+      ctx.translate(center.x,center.y);
+      paint(ctx,{elapsed:started==null?0:(now-started)/1000,active:started!=null,reduced:motionReduced.matches});
+      ctx.restore();
+    }
     ctx.drawImage(art.tray.foreground,left,top,right-left,bottom-top);
     ctx.restore();
     if(updatePositions) {
@@ -1348,16 +1400,19 @@ export class Board {
     const screen=(entry)=>({x:v.dx+entry.screen.x*v.zoom,y:v.dy+entry.screen.y*v.zoom});
     const inside=(at,padding=14)=>at.x>padding && at.x<v.width-padding && at.y>padding && at.y<v.height-padding &&
       !sceneArt.tray.occlusions.some(face=>contains(face,(at.x-v.dx)/v.zoom,(at.y-v.dy)/v.zoom));
-    for(const {node,center,width,height} of this.eggNodes) {
-      const x=v.dx+center.x*v.zoom,y=v.dy+center.y*v.zoom;
+    const toySeats=[];
+    for(const {node,center,width,height,offsetY} of this.hotspots) {
+      const x=v.dx+center.x*v.zoom,y=v.dy+(center.y+offsetY)*v.zoom;
       const w=width*v.zoom,h=height*v.zoom;
       node.hidden=x+w/2<=0||x-w/2>=v.width||y+h/2<=0||y-h/2>=v.height;
       if(node.hidden) continue;
       const hitWidth=Math.max(28,w),hitHeight=Math.max(28,h);
+      const left=x-hitWidth/2,top=y-hitHeight/2;
       node.style.width=hitWidth+'px';
       node.style.height=hitHeight+'px';
-      node.style.left=(x-hitWidth/2)+'px';
-      node.style.top=(y-hitHeight/2)+'px';
+      node.style.left=left+'px';
+      node.style.top=top+'px';
+      if(node.dataset.toy) toySeats.push({left,top,right:left+hitWidth,bottom:top+hitHeight});
     }
     const occupied=[];
     const compact=v.width<650;
@@ -1406,6 +1461,8 @@ export class Board {
 
     const flagSeats=[];
     const candidates=[[20,-13],[-18,12],[24,11],[-27,-8],[2,20],[0,-25],[28,18],[-29,-19]];
+    const clearsToys=({x,y})=>toySeats.every(toy=>
+      x+15<toy.left || x-15>toy.right || y+7<toy.top || y-29>toy.bottom);
     for(const {node,event} of this.markerNodes.values()) {
       const site=this.sites.get(event.company);
       const origin=screen(site);
@@ -1414,10 +1471,11 @@ export class Board {
       const positions=currentAnchor ? [screen(currentAnchor)] : [];
       positions.push(...candidates.map(([x,y])=>({x:origin.x+x,y:origin.y+y})));
       const focused=node.classList.contains('is-selected');
-      const at=positions.find(p=>inside(p,16) &&
+      const fallback={x:origin.x+20,y:origin.y-15};
+      const at=positions.find(p=>inside(p,16) && clearsToys(p) &&
         !occupied.some(label=>range(label,p)<label.radius+8) &&
         !flagSeats.some(seat=>range(seat,p)<(compact?18:25))) ||
-        (focused&&inside(origin) ? {x:origin.x+20,y:origin.y-15} : null);
+        (focused && inside(origin) && clearsToys(fallback) ? fallback : null);
       node.hidden=!at;
       if(at) {
         node.style.left=at.x+'px';
@@ -1515,6 +1573,8 @@ export class Board {
     const onMotionChange=()=>{
       if(document.hidden||motionReduced.matches) this.stopActivity();
       else this.scheduleActivity();
+      this.draw(false);
+      this.animateToys();
     };
     const pointer=event=>({x:event.clientX,y:event.clientY});
     const startDrag=(id,{x,y})=>{
