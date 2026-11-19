@@ -1,7 +1,8 @@
 import { paintSandboxToy, paintHourglassToy, paintScarabToy, paintGrassToy } from './toy-art.js';
+import { drawBucketModel, drawTruckModel } from './board-models.js';
+import { WIDTH, HEIGHT, TRAY, RIM, BED, HOME_YAW, HOME_PITCH, MIN_PITCH, MAX_PITCH, orthographic } from './geometry.js';
 
-export const WIDTH = 1100;
-export const HEIGHT = 640;
+export { WIDTH, HEIGHT };
 export const TERRITORY_WEIGHT = 216;
 
 const SIZE = 15;
@@ -120,29 +121,9 @@ function makeSites(companies,tiles) {
 }
 
 
-const TRAY = {lip:31,floor:-10,base:-38};
-const OUTLINE = [[156,-104],[944,-104],[1208,320],[944,744],[156,744],[-108,320]];
-const BED = OUTLINE.map(([x,y])=>[lerp(WIDTH/2,x,.915),lerp(HEIGHT/2,y,.915)]);
-const RIM = OUTLINE.map(([x,y])=>[lerp(WIDTH/2,x,.97),lerp(HEIGHT/2,y,.97)]);
-const BED_POINTS = BED.map(([x,y])=>({x,y}));
-const HOME_YAW = .128;
-let yaw = HOME_YAW;
-let sinYaw = Math.sin(yaw);
-let cosYaw = Math.cos(yaw);
-
-function depthAt(x,y) {
-  return (x-WIDTH/2)*sinYaw + (y-HEIGHT/2)*cosYaw;
-}
-
-function project(x,y,z=0) {
-  const depth=depthAt(x,y);
-  const across=(x-WIDTH/2)*cosYaw - (y-HEIGHT/2)*sinYaw;
-  const perspective=1+depth/2400;
-  return {
-    x:WIDTH/2+across*perspective,
-    y:HEIGHT/2+depth*.64-z*.94*perspective
-  };
-}
+const BED_POINTS=BED.map(([x,y])=>({x,y}));
+let viewAxes=orthographic(HOME_YAW,HOME_PITCH);
+const project=(x,y,z)=>viewAxes.project(x,y,z);
 
 function bounds(points) {
   return {
@@ -152,26 +133,18 @@ function bounds(points) {
 }
 
 function sceneBounds() {
-  return bounds([TRAY.lip,TRAY.base].flatMap(z=>OUTLINE.map(([x,y])=>project(x,y,z))));
+  return bounds([TRAY.lip,TRAY.base].flatMap(z=>RIM.map(([x,y])=>project(x,y,z))));
 }
 
 function sceneArea(box) {
   return {left:box.left-88,top:box.top-48,right:box.right+92,bottom:box.bottom+70};
 }
 
-function sceneCenter(area) {
-  return {x:(area.left+area.right)/2,y:(area.top+area.bottom)/2};
-}
-
-function unprojectFloor(x,y) {
-  const depth=(y-HEIGHT/2+TRAY.floor*.94)/(.64-TRAY.floor*.94/2400);
-  const across=(x-WIDTH/2)/(1+depth/2400);
-  return {x:WIDTH/2+across*cosYaw+depth*sinYaw,y:HEIGHT/2-across*sinYaw+depth*cosYaw};
-}
-
 let trayBounds=sceneBounds();
 let SCENE=sceneArea(trayBounds);
-let ORIGIN=sceneCenter(SCENE);
+const FRAME_WIDTH=2*(TRAY.radius+76);
+const FRAME_HEIGHT=2*(TRAY.radius*Math.sin(MAX_PITCH)+(TRAY.lip-TRAY.floor)*Math.cos(MAX_PITCH)+23);
+const ORIGIN=project(WIDTH/2,HEIGHT/2,TRAY.floor);
 
 function fitsTray(x,y) {
   for(let i=0;i<6;i++) {
@@ -243,23 +216,17 @@ function woodBoard(ctx,corners,styles,strip) {
   polygon(ctx,[a,b,c,d]);
   ctx.fillStyle=ramp(ctx,middle(a,b),middle(c,d),styles);
   ctx.fill();
-  if(!woodTexture || range(a,b)<.001) return;
-  const length=range(a,b);
-  const along={x:(b.x-a.x)/length,y:(b.y-a.y)/length};
-  const normal={x:-along.y,y:along.x};
-  const span=(p,axis)=>(p.x-a.x)*axis.x+(p.y-a.y)*axis.y;
-  const ends=[a,b,c,d].map(p=>span(p,along));
-  const edges=[a,b,c,d].map(p=>span(p,normal));
-  const left=Math.min(...ends)-1,right=Math.max(...ends)+1;
-  const top=Math.min(...edges)-1,bottom=Math.max(...edges)+1;
+  if(!woodTexture) return;
+  const across=middle(a,b),inset=middle(c,d);
+  const ux=b.x-a.x,uy=b.y-a.y,vx=inset.x-across.x,vy=inset.y-across.y;
+  if(Math.abs(ux*vy-uy*vx)<.01) return;
   const stripHeight=woodTexture.height/8;
   ctx.save();
   ctx.clip();
-  ctx.transform(along.x,along.y,normal.x,normal.y,a.x,a.y);
+  ctx.transform(ux,uy,vx,vy,a.x,a.y);
   ctx.globalCompositeOperation='soft-light';
   ctx.globalAlpha=.60;
-  ctx.drawImage(woodTexture,0,strip*stripHeight,woodTexture.width,stripHeight,
-    left,top,right-left,bottom-top);
+  ctx.drawImage(woodTexture,0,strip*stripHeight,woodTexture.width,stripHeight,0,0,1,1);
   ctx.restore();
 }
 
@@ -267,7 +234,7 @@ function screw(ctx,x,y) {
   const at=project(x,y,TRAY.lip);
   ctx.save();
   ctx.translate(at.x,at.y);
-  ctx.scale(1,.66);
+  ctx.transform(viewAxes.cosine,viewAxes.ground*viewAxes.sine,-viewAxes.sine,viewAxes.ground*viewAxes.cosine,0,0);
   ellipse(ctx,.2,.5,2.7,2.7,'#edcfaa9e');
   ellipse(ctx,0,0,2.35,2.35,'#684d3c');
   ellipse(ctx,-.1,.2,1.8,1.8,'#a38a70');
@@ -281,9 +248,9 @@ function screw(ctx,x,y) {
 }
 
 function rotateGroundProp(ctx) {
-  const delta=yaw-HOME_YAW;
-  const sine=Math.sin(delta),cosine=Math.cos(delta);
-  ctx.transform(cosine,.64*sine,-sine/.64,cosine,0,0);
+  const delta=viewAxes.yaw-HOME_YAW;
+  const sine=Math.sin(delta),cosine=Math.cos(delta),homeGround=Math.sin(HOME_PITCH);
+  ctx.transform(cosine,viewAxes.ground*sine,-sine/homeGround,viewAxes.ground*cosine/homeGround,0,0);
 }
 
 function sandRakeLines(ctx,x,y,angle,length,count) {
@@ -390,43 +357,6 @@ function toyShadow(ctx,x,y,rx,ry) {
   ctx.restore();
 }
 
-function bucket(ctx,x,y) {
-  const at=project(x,y,TRAY.floor+2);
-  ctx.save();
-  ctx.translate(at.x,at.y);
-  toyShadow(ctx,0,8,22,7);
-  ctx.beginPath();
-  ctx.moveTo(-29,-39);
-  ctx.lineTo(-20,5);
-  ctx.quadraticCurveTo(0,18,21,5);
-  ctx.lineTo(29,-39);
-  ctx.closePath();
-  ctx.fillStyle=ramp(ctx,{x:-31,y:-34},{x:28,y:3},[[0,'#b93d32'],[.30,'#f19370'],[.58,'#e06951'],[1,'#a1352d']]);
-  ctx.fill();
-  ctx.strokeStyle='#8331279a';
-  ctx.lineWidth=1.5;
-  ctx.stroke();
-  ellipse(ctx,0,-39,31,12,'#f69c77');
-  ellipse(ctx,0,-39,26,8.4,ramp(ctx,{x:0,y:-48},{x:5,y:-32},[[0,'#82342a'],[1,'#bb5142']]));
-  ctx.beginPath();
-  ctx.ellipse(-1,-36,23,4.8,0,0,Math.PI);
-  ctx.fillStyle='#e2ba81';
-  ctx.fill();
-  ctx.beginPath();
-  ctx.moveTo(-28,-38);
-  ctx.bezierCurveTo(-42,-86,16,-91,28,-39);
-  ctx.strokeStyle='#963a31';
-  ctx.lineWidth=6.3;
-  ctx.lineCap='round';
-  ctx.stroke();
-  ctx.strokeStyle='#ffb089';
-  ctx.lineWidth=2;
-  ctx.stroke();
-  ellipse(ctx,-27,-35,4,3.6,'#cf6148');
-  ellipse(ctx,27,-35,4,3.6,'#b14537');
-  ctx.restore();
-}
-
 function rake(ctx,x,y) {
   const at=project(x,y,TRAY.floor+2);
   ctx.save();
@@ -460,41 +390,6 @@ function rake(ctx,x,y) {
   ctx.strokeStyle='#b7dce3';
   ctx.lineWidth=1.4;
   ctx.stroke();
-  ctx.restore();
-}
-
-function truck(ctx,x,y) {
-  const at=project(x,y,TRAY.floor+4);
-  ctx.save();
-  ctx.translate(at.x,at.y);
-  ctx.rotate(-.11);
-  toyShadow(ctx,0,9,41,9);
-  for(const [px,py] of [[-18,-1],[28,-1],[-30,6],[19,7]]) {
-    ellipse(ctx,px,py,9.5,9.5,'#413a35');
-    ellipse(ctx,px,py,7,7,'#262c2b');
-    ellipse(ctx,px,py,3.2,3.2,'#c0a36b');
-  }
-  const parts=[
-    [[[-40,-1],[-28,-13],[32,-13],[36,-1]],'#765739'],
-    [[[-40,-16],[-33,-34],[-10,-37],[2,-26],[1,-2],[-38,-2]],'#e59738'],
-    [[[-40,-16],[-34,-24],[-14,-24],[-12,-10],[-38,-10]],'#f6c461'],
-    [[[-29,-31],[-13,-33],[-9,-24],[-31,-23]],'#5f8a91'],
-    [[[-6,-27],[31,-28],[39,-20],[33,-7],[-3,-7]],'#c97434'],
-    [[[-7,-29],[4,-34],[32,-35],[39,-24],[-2,-21]],'#f8b64f'],
-    [[[-2,-28],[7,-31],[29,-32],[34,-26],[2,-24]],'#85572d'],
-    [[[-28,-33],[-11,-35],[-7,-30],[-23,-28]],'#ffcd67']
-  ];
-  for(const [vertices,fill] of parts) {
-    polygon(ctx,vertices.map(([x,y])=>({x,y})));
-    ctx.fillStyle=fill;
-    ctx.fill();
-    ctx.strokeStyle='#754b2c83';
-    ctx.lineWidth=.9;
-    ctx.stroke();
-  }
-  ellipse(ctx,-36,-12,2,2,'#ffe4a1');
-  ellipse(ctx,-29,6,3.15,3.15,'#cdaa62');
-  ellipse(ctx,19,7,3.15,3.15,'#cdaa62');
   ctx.restore();
 }
 
@@ -666,7 +561,7 @@ const PLAY_TOYS=[
   {id:'sandbox',label:'Open the miniature sandbox',x:325,y:625,width:48,height:26,offsetY:-5,paint:paintSandboxToy},
   {id:'hourglass',label:'Flip the hourglass and go back one day',x:167,y:16,width:25,height:35,offsetY:-14,paint:paintHourglassToy},
   {id:'scarab',label:'Disturb the buried scarab',x:478,y:619,width:25,height:20,offsetY:-3,paint:paintScarabToy},
-  {id:'grass',label:'Touch grass',x:548,y:769,z:TRAY.base,width:31,height:25,offsetY:-6,paint:paintGrassToy}
+  {id:'grass',label:'Touch grass',x:548,y:RIM[3][1]+27,z:TRAY.base,width:31,height:25,offsetY:-6,paint:paintGrassToy}
 ];
 
 const MOUNDS=[
@@ -687,7 +582,7 @@ function sandLight(x,y) {
   return (.56*slopeX+.48*slopeY+.67)/Math.hypot(slopeX,slopeY,1)-.67;
 }
 
-const SAND_AREA={left:-125,top:-116,right:1225,bottom:756};
+const SAND_AREA=bounds(RIM.map(([x,y])=>({x,y})));
 
 function createSandMaterial(texture) {
   const {canvas,ctx}=sceneLayer(1.5,SAND_AREA);
@@ -748,21 +643,12 @@ function createSandMaterial(texture) {
 
 function drawSand(ctx) {
   const {left,top,right,bottom}=SAND_AREA;
-  const horizon=HEIGHT/2-TRAY.floor*.94;
-  const tilt=.64-TRAY.floor*.94/2400;
-  const edge=720;
-  const step=80;
-  for(let depth=-edge;depth<edge;depth+=step) {
-    const spread=1+(depth+step/2)/2400;
-    ctx.save();
-    ctx.beginPath();
-    ctx.rect(SCENE.left,horizon+depth*tilt,SCENE.right-SCENE.left,step*tilt+1);
-    ctx.clip();
-    ctx.translate(WIDTH/2,horizon);
-    ctx.transform(cosYaw*spread,sinYaw*tilt,-sinYaw*spread,cosYaw*tilt,0,0);
-    ctx.drawImage(sandMaterial,left-WIDTH/2,top-HEIGHT/2,right-left,bottom-top);
-    ctx.restore();
-  }
+  const center=project(WIDTH/2,HEIGHT/2,TRAY.floor);
+  const {cosine,sine,ground}=viewAxes;
+  ctx.save();
+  ctx.transform(cosine,sine*ground,-sine,cosine*ground,center.x,center.y);
+  ctx.drawImage(sandMaterial,left-WIDTH/2,top-HEIGHT/2,right-left,bottom-top);
+  ctx.restore();
 }
 
 function sceneLayer(ratio=1.45,area=SCENE) {
@@ -777,26 +663,43 @@ function sceneLayer(ratio=1.45,area=SCENE) {
 }
 
 function grassAtFoot(ctx,a,b,index) {
-  const length=range(a,b);
+  const [ax,ay,az]=a,[bx,by]=b;
+  const length=Math.hypot(bx-ax,by-ay);
   const colors=['#687645','#788451','#586c41','#92945d','#586641','#928966'];
   for(let k=0;k<length/4;k++) {
     if(noise(k/6,index+2)+hash(k,index+48)*.46<.77) continue;
     const t=(k+hash(k,index+12))*4/length;
-    const x=lerp(a.x,b.x,t), y=lerp(a.y,b.y,t)+1.8;
+    const x=lerp(ax,bx,t)+(by-ay)*1.5/length;
+    const y=lerp(ay,by,t)-(bx-ax)*1.5/length;
     for(let j=0;j<4;j++) {
       const seed=k*4+j;
+      const dx=(hash(seed,27)-.5)*6,dy=(hash(seed,81)-.5)*4;
       const lean=(hash(seed,94)-.53)*7;
-      const h=1.6+hash(seed,index+33)*5.8;
-      const root=x+(hash(seed,27)-.5)*6;
+      const height=1.6+hash(seed,index+33)*5.8;
+      const root=project(x+dx,y+dy,az);
+      const tip=project(x+dx+lean,y+dy+lean*.3,az+height);
       ctx.beginPath();
-      ctx.moveTo(root-.45,y);
-      ctx.quadraticCurveTo(root+lean*.23,y-h*.6,root+lean,y-h);
-      ctx.quadraticCurveTo(root+lean*.26+.6,y-h*.56,root+.65,y);
+      ctx.moveTo(root.x-.45,root.y);
+      ctx.quadraticCurveTo(lerp(root.x,tip.x,.23),lerp(root.y,tip.y,.6),tip.x,tip.y);
+      ctx.lineTo(root.x+.65,root.y);
       ctx.fillStyle=colors[Math.floor(hash(seed,index+41)*colors.length)];
       ctx.fill();
     }
   }
 }
+
+const sandBanks=BED.map(([x,y],i)=>{
+  const [bx,by]=BED[(i+1)%BED.length];
+  const steps=Math.ceil(Math.hypot(bx-x,by-y)/9);
+  const ridge=[],toe=[];
+  for(let step=0;step<=steps;step++) {
+    const px=lerp(x,bx,step/steps),py=lerp(y,by,step/steps);
+    const bank=noise(px/65+9,py/65+4)*9+noise(px/18,py/18)*2;
+    ridge.push([px,py,TRAY.floor+bank]);
+    toe.push([lerp(px,WIDTH/2,.054),lerp(py,HEIGHT/2,.054),TRAY.floor]);
+  }
+  return {ridge,toe};
+});
 
 function createTrayLayer(area=SCENE,ratio=1.45,interactive=false) {
   const {canvas,ctx}=sceneLayer(ratio,area);
@@ -807,15 +710,7 @@ function createTrayLayer(area=SCENE,ratio=1.45,interactive=false) {
   const inner=BED.map(([x,y])=>[x,y,lip]);
   const sand=BED.map(([x,y])=>[x,y,floor]);
   const foot=RIM.map(([x,y])=>[x,y,base]);
-  const sandEdges=sand.map(([x,y],i)=>{
-    const [bx,by]=sand[(i+1)%sand.length];
-    const steps=Math.ceil(Math.hypot(bx-x,by-y)/9);
-    return Array.from({length:steps+1},(_,step)=>{
-      const px=lerp(x,bx,step/steps),py=lerp(y,by,step/steps);
-      const bank=noise(px/65+9,py/65+4)*9+noise(px/18,py/18)*2;
-      return project(px,py,floor+bank);
-    });
-  });
+  const banks=sandBanks.map(({ridge,toe})=>({ridge:ridge.map(point),toe:toe.map(point)}));
   const outerRim=outer.map(point);
   const shownFromFront=outerRim.map((a,i)=>a.x>outerRim[(i+1)%outerRim.length].x);
 
@@ -823,8 +718,8 @@ function createTrayLayer(area=SCENE,ratio=1.45,interactive=false) {
   const shadowScale=ctx.getTransform().a;
   for(const [dx,dy,blur,shade] of [[12,15,19,'#28251991'],[2.4,3.6,3,'#1e241cb3']]) {
     ctx.shadowColor=shade;
-    ctx.shadowOffsetX=dx*shadowScale;
-    ctx.shadowOffsetY=dy*shadowScale;
+    ctx.shadowOffsetX=(dx*viewAxes.cosine-dy*viewAxes.sine)*shadowScale;
+    ctx.shadowOffsetY=(dx*viewAxes.sine+dy*viewAxes.cosine)*viewAxes.ground*shadowScale;
     ctx.shadowBlur=blur*shadowScale;
     worldShape(ctx,foot);
     ctx.fillStyle='#433f2b';
@@ -839,20 +734,14 @@ function createTrayLayer(area=SCENE,ratio=1.45,interactive=false) {
     woodBoard(ctx,face,[[0,'#ad8063'],[.18,'#966d53'],[.85,'#89664e'],[1,'#735642']],(i+4)%8);
   }
 
-  polygon(ctx,sandEdges.flat());
+  polygon(ctx,banks.flatMap(bank=>bank.ridge));
   ctx.save();
   ctx.clip();
   drawSand(ctx);
-  for(const [i,edge] of sandEdges.entries()) {
-    const start=edge[0],end=edge.at(-1);
-    const length=range(start,end);
-    const depth=shownFromFront[i]?6:(i===1?16:25);
-    const dx=(start.y-end.y)*depth/length;
-    const dy=(end.x-start.x)*depth/length;
-    const innerEdge=edge.map(p=>({x:p.x+dx,y:p.y+dy})).reverse();
-    const middle=edge[Math.floor(edge.length/2)];
-    polygon(ctx,edge.concat(innerEdge));
-    ctx.fillStyle=ramp(ctx,middle,{x:middle.x+dx,y:middle.y+dy},[[0,'#5d493964'],[.22,'#6655423b'],[1,'#76604800']]);
+  for(const {ridge,toe} of banks) {
+    const middle=Math.floor(ridge.length/2);
+    polygon(ctx,[...ridge,...toe.slice().reverse()]);
+    ctx.fillStyle=ramp(ctx,ridge[middle],toe[middle],[[0,'#5d493964'],[.22,'#6655423b'],[1,'#76604800']]);
     ctx.fill();
   }
   ctx.restore();
@@ -894,19 +783,8 @@ function createTrayLayer(area=SCENE,ratio=1.45,interactive=false) {
     if(shownFromFront[i]) occlusions.push(rail.map(point));
   }
   for(const [i,a] of foot.entries()) {
-    if(!interactive && shownFromFront[i]) grassAtFoot(near,point(a),point(foot[(i+1)%foot.length]),i);
+    if(!interactive && shownFromFront[i]) grassAtFoot(near,a,foot[(i+1)%foot.length],i);
   }
-  for(const egg of EGGS) {
-    const at=project(egg.x,egg.y,TRAY.floor);
-    ctx.save();
-    ctx.translate(at.x,at.y);
-    egg.paint(ctx);
-    ctx.restore();
-  }
-  shovel(ctx,TOYS.shovel.x,TOYS.shovel.y+32);
-  bucket(ctx,TOYS.bucket.x,TOYS.bucket.y+31);
-  rake(ctx,TOYS.rake.x,TOYS.rake.y);
-  truck(ctx,TOYS.truck.x,TOYS.truck.y+5);
   return {backdrop:canvas,foreground,occlusions,outerRim};
 }
 
@@ -943,7 +821,7 @@ function tilePlane(tile,z,scale) {
 }
 
 function sideLight(side) {
-  const direction=side*Math.PI/3+Math.PI/6+yaw;
+  const direction=side*Math.PI/3+Math.PI/6;
   return -17-8*Math.sin(direction)+6*Math.cos(direction);
 }
 
@@ -960,8 +838,8 @@ export class Board {
       tile.elevation=TRAY.floor+6+tiers*5.3;
     }
     this.projectTerrain();
-    this.setDragMode('orbit');
-    this.requestedYaw=yaw;
+    this.requestedYaw=viewAxes.yaw;
+    this.requestedPitch=viewAxes.pitch;
     this.sites=makeSites(companies,this.tiles);
     this.siteList=[...this.sites.values()];
     this.home=new Map(this.siteList.map(site=>[site.index,site.company.id]));
@@ -976,6 +854,7 @@ export class Board {
     this.terrainFrame=document.createElement('canvas');
     this.terrainContext=this.terrainFrame.getContext('2d');
     this.terrainRevision=0;
+    this.lastActiveToys=[];
     this.neighbors=new Map();
     const byPosition=new Map(this.tiles.map(tile=>[tile.column+','+tile.row,tile]));
     for(const tile of this.tiles) {
@@ -988,26 +867,33 @@ export class Board {
         return byPosition.get(col+','+row)?.index;
       }));
     }
-    this.toys=[];
-    this.hotspots=elements.eggLayer ? [...EGGS,...PLAY_TOYS].map(spot=>{
+    this.props=[
+      {x:TOYS.shovel.x,y:TOYS.shovel.y+32,extent:180,paintWorld:shovel},
+      {x:TOYS.bucket.x,y:TOYS.bucket.y+31,extent:110,paintWorld:drawBucketModel},
+      {x:TOYS.rake.x,y:TOYS.rake.y,extent:95,paintWorld:rake},
+      {x:TOYS.truck.x,y:TOYS.truck.y+5,extent:90,paintWorld:drawTruckModel},
+      ...EGGS.map(egg=>({...egg,flat:true})),
+      ...PLAY_TOYS.map(toy=>({...toy,playable:true}))
+    ];
+    this.toys=this.props.filter(prop=>prop.playable);
+    this.hotspots=this.props.filter(prop=>prop.id && elements.eggLayer);
+    for(const spot of this.hotspots) {
       const node=document.createElement('button');
       node.type='button';
       node.className='egg-hotspot';
       node.setAttribute('aria-label',spot.label);
-      const center=project(spot.x,spot.y,spot.z??TRAY.floor);
-      if(PLAY_TOYS.includes(spot)) {
-        const toy={id:spot.id,node,center,paint:spot.paint};
-        this.toys.push(toy);
+      if(spot.playable) {
         node.dataset.toy=spot.id;
-        node.addEventListener('click',()=>this.playToy(toy));
+        node.addEventListener('click',()=>this.playToy(spot));
       } else {
         node.dataset.egg=spot.id;
         node.setAttribute('aria-controls','egg-player');
         node.setAttribute('aria-expanded','false');
       }
+      spot.node=node;
       elements.eggLayer.append(node);
-      return {...spot,node,center,offsetY:spot.offsetY??0};
-    }) : [];
+    }
+    this.projectProps();
     this.labelNodes=new Map();
     this.markerNodes=new Map();
     this.bind();
@@ -1017,21 +903,19 @@ export class Board {
       this.animateToys();
     }).observe(elements.stage);
     assetsReady.then(()=>{
-      if(sandTexture) {
-        this.tileGrain=this.terrainContext.createPattern(sandTexture,'repeat');
-        this.tileGrain.setTransform(new DOMMatrix().scale(.24,.155));
-        this.terrainRevision++;
-      }
+      this.tileGrain=new Map();
+      this.terrainRevision++;
       this.draw();
     });
   }
 
   projectTerrain() {
+    this.tileGrain=new Map();
     for(const tile of this.tiles) {
       tile.top=tilePlane(tile,tile.elevation,.965);
       tile.shoulder=tilePlane(tile,tile.elevation-1.25,.987);
       tile.base=tilePlane(tile,TRAY.floor+.1,.987);
-      tile.shadow=tile.base.map(({x,y})=>({x:x+3.4,y:y+4.5}));
+      tile.shadow=tilePlane({x:tile.x+3.4,y:tile.y+5.9},TRAY.floor,.987);
       tile.sides=[];
       tile.shading=[];
       for(let side=0;side<6;side++) {
@@ -1042,7 +926,7 @@ export class Board {
       }
       tile.bounds=bounds([...tile.top,...tile.base,...tile.shoulder]);
       tile.coverMask=null;
-      tile.depth=depthAt(tile.x,tile.y);
+      tile.depth=viewAxes.depth(tile.x,tile.y);
       tile.screen=project(tile.x,tile.y,tile.elevation);
     }
     this.depthOrder=[...this.tiles].sort((a,b)=>a.depth-b.depth || a.x-b.x);
@@ -1064,23 +948,45 @@ export class Board {
         .find(point=>this.projectedTileAt(point)===tile);
     });
     for(const site of this.siteList||[]) site.screen=this.tiles[site.index].screen;
-    for(const spot of this.hotspots||[]) Object.assign(spot.center,project(spot.x,spot.y,spot.z??TRAY.floor));
+    if(this.props) this.projectProps();
     this.logoAnchorCache=new WeakMap();
     if(this.owners) this.logoAnchors=this.anchorsFor(this.owners);
   }
 
-  setDragMode(mode) {
-    this.dragMode=mode==='pan'?'pan':'orbit';
-    this.elements.stage.dataset.dragMode=this.dragMode;
+  projectProps() {
+    for(const prop of this.props) {
+      const center=project(prop.x,prop.y,prop.z??TRAY.floor);
+      const extent=prop.extent??Math.max(prop.width,prop.height)*1.7;
+      prop.center=center;
+      prop.depth=viewAxes.depth(prop.x,prop.y);
+      prop.bounds={left:center.x-extent,top:center.y-extent,right:center.x+extent,bottom:center.y+extent};
+      prop.covered=prop.id==='grass' && contains(sceneArt.tray.outerRim,center.x,center.y);
+    }
+    this.paintOrder=[...this.depthOrder,...this.props].sort((a,b)=>a.depth-b.depth);
   }
 
-  orbitBy(radians) {
-    if(!Number.isFinite(radians)||!radians) return;
+  paintProp(ctx,prop,now) {
+    if(prop.covered) return;
+    ctx.save();
+    if(prop.paintWorld) prop.paintWorld(ctx,prop.x,prop.y,TRAY.floor,viewAxes);
+    else {
+      ctx.translate(prop.center.x,prop.center.y);
+      if(prop.flat) rotateGroundProp(ctx);
+      prop.paint(ctx,{elapsed:prop.started==null?0:(now-prop.started)/1000,active:prop.started!=null,reduced:motionReduced.matches});
+    }
+    ctx.restore();
+  }
+
+  orbitBy(radians,tilt=0) {
+    if(!Number.isFinite(radians)||!Number.isFinite(tilt)) return;
+    const nextPitch=clamp(this.requestedPitch+tilt,MIN_PITCH,MAX_PITCH);
+    if(!radians && nextPitch===this.requestedPitch) return;
     this.requestedYaw+=radians;
+    this.requestedPitch=nextPitch;
     if(this.orbitFrame) return;
     this.orbitFrame=requestAnimationFrame(()=>{
       this.orbitFrame=null;
-      this.turnTo(this.requestedYaw,true);
+      this.turnTo(this.requestedYaw,this.requestedPitch,true);
       this.draw();
       clearTimeout(this.orbitTimer);
       this.orbitTimer=setTimeout(()=>{
@@ -1092,22 +998,16 @@ export class Board {
     });
   }
 
-  turnTo(angle,interactive) {
+  turnTo(angle,pitch,interactive) {
     cancelAnimationFrame(this.travel);
     clearTimeout(this.detailTimer);
     this.detailArt=null;
     this.detailKey=null;
-    const focus=unprojectFloor(this.camera.x,this.camera.y);
-    const center=unprojectFloor(ORIGIN.x,ORIGIN.y);
-    yaw=angle;
-    sinYaw=Math.sin(angle);
-    cosYaw=Math.cos(angle);
+    const focus=viewAxes.unproject(this.camera.x,this.camera.y,TRAY.floor);
+    viewAxes=orthographic(angle,pitch);
     trayBounds=sceneBounds();
     SCENE=sceneArea(trayBounds);
-    ORIGIN=sceneCenter(SCENE);
-    const at=project(focus.x,focus.y,TRAY.floor);
-    const previousCenter=project(center.x,center.y,TRAY.floor);
-    this.camera={x:ORIGIN.x+at.x-previousCenter.x,y:ORIGIN.y+at.y-previousCenter.y,z:this.camera.z};
+    this.camera={...project(focus.x,focus.y,TRAY.floor),z:this.camera.z};
     this.orbiting=interactive;
     const ratio=interactive ? clamp(this.viewport().zoom,.36,.82) : 1.45;
     sceneArt={tray:createTrayLayer(SCENE,ratio,interactive),area:SCENE};
@@ -1202,16 +1102,33 @@ export class Board {
     return anchors;
   }
 
+  grainAt(z) {
+    if(!this.tileGrain.has(z)) {
+      const pattern=this.terrainContext.createPattern(sandTexture,'repeat');
+      const origin=project(0,0,z);
+      const {cosine,sine,ground}=viewAxes;
+      pattern.setTransform(new DOMMatrix([.24*cosine,.24*sine*ground,-.24*sine,.24*cosine*ground,origin.x,origin.y]));
+      this.tileGrain.set(z,pattern);
+    }
+    return this.tileGrain.get(z);
+  }
+
   paintTiles(ctx,area) {
     if(!this.owners) return;
-    const included=this.depthOrder.filter(({bounds})=>bounds.left<area.right+5&&bounds.right>area.left-5&&bounds.top<area.bottom+6&&bounds.bottom>area.top-6);
+    const included=this.paintOrder.filter(({bounds})=>bounds.left<area.right+5&&bounds.right>area.left-5&&bounds.top<area.bottom+6&&bounds.bottom>area.top-6);
     ctx.lineJoin='round';
     ctx.fillStyle='#75441f26';
     for(const tile of included) {
+      if(!tile.shadow) continue;
       polygon(ctx,tile.shadow);
       ctx.fill();
     }
+    const now=performance.now();
     for(const tile of included) {
+      if(tile.paint||tile.paintWorld) {
+        this.paintProp(ctx,tile,now);
+        continue;
+      }
       const owner=this.owners[tile.index];
       const site=this.sites.get(owner);
       const active=this.selected===owner;
@@ -1239,8 +1156,8 @@ export class Board {
       ctx.strokeStyle=color(base,22,.55);
       ctx.lineWidth=.65;
       ctx.stroke();
-      if(this.tileGrain && !this.orbiting) {
-        ctx.fillStyle=this.tileGrain;
+      if(sandTexture && !this.orbiting) {
+        ctx.fillStyle=this.grainAt(tile.elevation);
         ctx.globalCompositeOperation='soft-light';
         ctx.globalAlpha=.36;
         ctx.fill();
@@ -1271,17 +1188,31 @@ export class Board {
     const frame=this.terrainFrame;
     const pixelWidth=Math.round(width*scale),pixelHeight=Math.round(height*scale);
     const key=[pixelWidth,pixelHeight,zoom,dx,dy,this.terrainRevision].join('/');
-    if(this.terrainKey!==key) {
+    const ctx=this.terrainContext;
+    const active=this.toys.filter(toy=>toy.started!=null);
+    const viewportArea={left:-dx/zoom,top:-dy/zoom,right:(width-dx)/zoom,bottom:(height-dy)/zoom};
+    const reset=this.terrainKey!==key;
+    if(reset) {
       this.terrainKey=key;
       if(frame.width!==pixelWidth||frame.height!==pixelHeight) {
         frame.width=pixelWidth;
         frame.height=pixelHeight;
       }
-      const ctx=this.terrainContext;
+    }
+    const areas=reset?[viewportArea]:[...new Set([...active,...this.lastActiveToys])].map(toy=>toy.bounds);
+    this.lastActiveToys=active;
+    for(const area of areas) {
+      const left=Math.floor((dx+area.left*zoom)*scale),top=Math.floor((dy+area.top*zoom)*scale);
+      const right=Math.ceil((dx+area.right*zoom)*scale),bottom=Math.ceil((dy+area.bottom*zoom)*scale);
+      ctx.save();
       ctx.setTransform(1,0,0,1,0,0);
-      ctx.clearRect(0,0,pixelWidth,pixelHeight);
+      ctx.beginPath();
+      ctx.rect(left,top,right-left,bottom-top);
+      ctx.clip();
+      ctx.clearRect(left,top,right-left,bottom-top);
       ctx.setTransform(zoom*scale,0,0,zoom*scale,dx*scale,dy*scale);
-      this.paintTiles(ctx,{left:-dx/zoom,top:-dy/zoom,right:(width-dx)/zoom,bottom:(height-dy)/zoom});
+      this.paintTiles(ctx,area);
+      ctx.restore();
     }
     this.ctx.save();
     this.ctx.setTransform(1,0,0,1,0,0);
@@ -1466,9 +1397,9 @@ export class Board {
   viewport() {
     const width=this.elements.stage.clientWidth;
     const height=this.elements.stage.clientHeight;
-    const fill=width<670 ? 1.056 : 1.015;
-    const fit=Math.min(width/(SCENE.right-SCENE.left),height/(SCENE.bottom-SCENE.top));
-    const zoom=fit*fill*this.camera.z;
+    const horizontalFill=width<670 ? 1.056 : 1.015;
+    const fit=Math.min(width/FRAME_WIDTH*horizontalFill,height/FRAME_HEIGHT*1.015);
+    const zoom=fit*this.camera.z;
     return {width,height,zoom,dx:width/2-this.camera.x*zoom,dy:height/2-this.camera.y*zoom};
   }
 
@@ -1559,18 +1490,14 @@ export class Board {
         ctx.stroke();
       }
     }
-    const now=performance.now();
-    for(const {id,center,paint,started} of this.toys) {
-      if(id==='grass' && contains(art.tray.outerRim,center.x,center.y)) continue;
-      ctx.save();
-      ctx.translate(center.x,center.y);
-      paint(ctx,{elapsed:started==null?0:(now-started)/1000,active:started!=null,reduced:motionReduced.matches});
-      ctx.restore();
-    }
     ctx.drawImage(art.tray.foreground,left,top,right-left,bottom-top);
     ctx.restore();
     if(updatePositions) {
-      this.elements.stage.classList.toggle('is-zoomed',this.camera.z>MIN_ZOOM+.01);
+      const zoomed=this.camera.z>MIN_ZOOM+.001;
+      const turned=Math.abs(Math.sin((viewAxes.yaw-HOME_YAW)/2))>.001 || Math.abs(viewAxes.pitch-HOME_PITCH)>.001;
+      const panned=range(this.camera,ORIGIN)*v.zoom>1;
+      this.elements.stage.classList.toggle('is-zoomed',zoomed);
+      this.elements.stage.classList.toggle('view-adjusted',zoomed||turned||panned);
       this.placeTokens(v);
       this.callbacks.placed?.();
     }
@@ -1582,11 +1509,16 @@ export class Board {
     const inside=(at,padding=14)=>at.x>padding && at.x<v.width-padding && at.y>padding && at.y<v.height-padding &&
       !sceneArt.tray.occlusions.some(face=>contains(face,(at.x-v.dx)/v.zoom,(at.y-v.dy)/v.zoom));
     const toySeats=[];
-    for(const {id,node,center,width,height,offsetY} of this.hotspots) {
+    for(const {node,center,width,height,offsetY=0,covered,depth,flat} of this.hotspots) {
       const x=v.dx+center.x*v.zoom,y=v.dy+(center.y+offsetY)*v.zoom;
-      const w=width*v.zoom,h=height*v.zoom;
-      const covered=id==='grass' && contains(sceneArt.tray.outerRim,center.x,center.y);
-      node.hidden=covered||x+w/2<=0||x-w/2>=v.width||y+h/2<=0||y-h/2>=v.height;
+      const turn=flat?viewAxes.yaw-HOME_YAW:0;
+      const sin=Math.abs(Math.sin(turn)),cos=Math.abs(Math.cos(turn));
+      const w=(width*cos+height*sin/Math.sin(HOME_PITCH))*v.zoom;
+      const h=(flat?viewAxes.ground*(width*sin+height*cos/Math.sin(HOME_PITCH)):height)*v.zoom;
+      const hit={x:center.x,y:center.y+offsetY};
+      const walled=sceneArt.tray.occlusions.some(face=>contains(face,hit.x,hit.y));
+      const terrain=this.projectedTileAt(hit);
+      node.hidden=covered||walled||(terrain && terrain.depth>depth)||x+w/2<=0||x-w/2>=v.width||y+h/2<=0||y-h/2>=v.height;
       if(node.hidden) continue;
       const hitWidth=Math.max(28,w),hitHeight=Math.max(28,h);
       const left=x-hitWidth/2,top=y-hitHeight/2;
@@ -1703,7 +1635,8 @@ export class Board {
     this.orbitFrame=null;
     clearTimeout(this.orbitTimer);
     this.requestedYaw=HOME_YAW;
-    if(yaw!==HOME_YAW || this.orbiting) this.turnTo(HOME_YAW,false);
+    this.requestedPitch=HOME_PITCH;
+    if(viewAxes.yaw!==HOME_YAW || viewAxes.pitch!==HOME_PITCH || this.orbiting) this.turnTo(HOME_YAW,HOME_PITCH,false);
     return this.travelTo({...ORIGIN,z:MIN_ZOOM},false);
   }
 
@@ -1766,8 +1699,8 @@ export class Board {
       this.animateToys();
     };
     const pointer=event=>({x:event.clientX,y:event.clientY});
-    const startDrag=(id,{x,y},mode=this.dragMode,button=null,secondary=false)=>{
-      drag={id,x,y,lastX:x,camera:this.camera,zoom:this.viewport().zoom,moved:false,mode,button,secondary};
+    const startDrag=(id,{x,y},mode='orbit',button=null,secondary=false)=>{
+      drag={id,x,y,lastX:x,lastY:y,camera:this.camera,zoom:this.viewport().zoom,moved:false,mode,button,secondary};
     };
     const orbitScale=()=>Math.PI*2/Math.max(510,stage.clientWidth*.83);
     const measurePinch=()=>{
@@ -1775,21 +1708,19 @@ export class Board {
       const box=stage.getBoundingClientRect();
       return {
         center:{x:(a.x+b.x)/2-box.left,y:(a.y+b.y)/2-box.top},
-        span:Math.max(8,range(a,b)),angle:Math.atan2(b.y-a.y,b.x-a.x)
+        span:Math.max(8,range(a,b))
       };
     };
     const updatePinch=()=>{
       pinchFrame=null;
       const next=measurePinch();
       const previous=pinch.last;
-      const rotation=Math.atan2(Math.sin(next.angle-previous.angle),Math.cos(next.angle-previous.angle));
-      if(!pinch.active && Math.abs(next.span-previous.span)<5 && range(next.center,previous.center)<5 && Math.abs(rotation)<.04) return;
+      if(!pinch.active && Math.abs(next.span-previous.span)<5 && range(next.center,previous.center)<5) return;
       pinch.active=true;
       suppressClick=true;
       pinch.last=next;
       stage.classList.add('dragging');
       this.zoomBy(next.span/previous.span,previous.center,next.center);
-      this.orbitBy(rotation);
     };
     document.addEventListener('visibilitychange',onMotionChange);
     motionReduced.addEventListener('change',onMotionChange);
@@ -1807,7 +1738,7 @@ export class Board {
       }
     },true);
     stage.addEventListener('pointerdown',event=>{
-      if(event.button!==0 && event.button!==2) return;
+      if(![0,1,2].includes(event.button)) return;
       if(!touches.size) suppressClick=false;
       if(event.pointerType==='touch') {
         if(drag&&!touches.size) return;
@@ -1829,8 +1760,10 @@ export class Board {
       if(drag) return;
       cancelAnimationFrame(this.travel);
       const button=event.target.closest('button');
-      const secondary=event.button===2;
-      startDrag(event.pointerId,pointer(event),event.shiftKey||secondary?'pan':this.dragMode,button,secondary);
+      const secondary=event.button!==0;
+      const pan=event.shiftKey || event.button===1 || (event.ctrlKey && event.button===2);
+      if(secondary) event.preventDefault();
+      startDrag(event.pointerId,pointer(event),pan?'pan':'orbit',button,secondary);
       if(!button || secondary) stage.setPointerCapture(event.pointerId);
     });
     stage.addEventListener('pointermove',event=>{
@@ -1850,8 +1783,10 @@ export class Board {
       stage.classList.add('dragging');
       if(!stage.hasPointerCapture(event.pointerId)) stage.setPointerCapture(event.pointerId);
       if(drag.mode==='orbit') {
-        this.orbitBy((event.clientX-drag.lastX)*orbitScale());
+        const tiltScale=Math.PI/(2*Math.max(280,stage.clientHeight));
+        this.orbitBy((event.clientX-drag.lastX)*orbitScale(),(event.clientY-drag.lastY)*tiltScale);
         drag.lastX=event.clientX;
+        drag.lastY=event.clientY;
       } else {
         this.travelTo({x:drag.camera.x-x/drag.zoom,y:drag.camera.y-y/drag.zoom,z:drag.camera.z},false);
       }
@@ -1898,8 +1833,7 @@ export class Board {
     stage.addEventListener('wheel',event=>{
       if(!event.ctrlKey && Math.abs(event.deltaX)>Math.abs(event.deltaY)) {
         event.preventDefault();
-        if(this.dragMode==='orbit') this.orbitBy(-event.deltaX*orbitScale());
-        else this.travelTo({...this.camera,x:this.camera.x+event.deltaX/this.viewport().zoom},false);
+        this.orbitBy(-event.deltaX*orbitScale());
         return;
       }
       if(!event.deltaY) return;
@@ -1926,6 +1860,9 @@ export class Board {
       } else if(['q','e'].includes(event.key.toLowerCase())) {
         event.preventDefault();
         this.orbitBy((event.key.toLowerCase()==='q'?-1:1)*Math.PI/12);
+      } else if(['w','s'].includes(event.key.toLowerCase())) {
+        event.preventDefault();
+        this.orbitBy(0,(event.key.toLowerCase()==='w'?1:-1)*Math.PI/36);
       } else if(['+','=','-','0'].includes(event.key)) {
         event.preventDefault();
         if(event.key==='0') this.resetView();

@@ -236,37 +236,29 @@ body:has(#atlas-view[hidden]) .map-tools { display: none; }
 }
 .stage.on-tile { cursor: pointer; }
 .stage.dragging { cursor: grabbing; }
-.board-controls {
+.reset-camera {
+  display: none;
   position: absolute;
   top: 12px;
   right: var(--gutter);
   z-index: 8;
-  display: flex;
-  align-items: center;
-  gap: 2px;
-  padding: 3px;
+  min-height: 38px;
+  padding: 4px 10px;
   border: 1px solid #bda17d;
   border-radius: 6px;
   background: var(--paper);
   box-shadow: 0 3px 10px #231d1640;
-}
-.board-controls button {
-  min-height: 32px;
-  padding: 3px 9px;
-  border: 0;
-  border-radius: 3px;
-  background: transparent;
-  color: var(--muted);
+  color: var(--ink);
   font-size: 13px;
 }
-.board-controls button:hover { background: var(--page); color: var(--ink); }
-.board-controls button[aria-pressed=true] { background: #ebdac0; color: var(--ink); font-weight: 700; }
+.stage.view-adjusted + .reset-camera { display: block; }
+.reset-camera:hover { background: var(--page); }
 .playback-note {
   position: absolute;
   top: 12px;
   left: var(--gutter);
   z-index: 8;
-  max-width: min(370px, calc(100% - 230px));
+  max-width: min(370px, calc(100% - 182px));
   padding: 6px 12px;
   border: 1px solid #bda17d;
   border-radius: 5px;

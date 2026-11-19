@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { readFile, readdir } from 'node:fs/promises';
+import { BED, RIM, TRAY, HOME_PITCH, MIN_PITCH, MAX_PITCH, orthographic } from '../assets/geometry.js';
 
 const root = new URL('../', import.meta.url);
 const readJson = async path => JSON.parse(await readFile(new URL(path, root), 'utf8'));
@@ -59,3 +60,36 @@ for (const event of atlas.events) {
   if (event.relatedCompany) assert(providers.has(event.relatedCompany) && event.relatedCompany !== event.company, 'Invalid shared rollout: ' + key);
 }
 console.log(atlas.companies.length + ' provider profiles and logos, ' + atlas.events.length + ' sourced signals, all 45 reference offerings.');
+
+const near = (actual, expected) => assert(Math.abs(actual - expected) < 1e-8, actual + ' differs from ' + expected);
+for (let i = 0; i < RIM.length; i++) {
+  const [x, y] = RIM[i];
+  const [bx, by] = RIM[(i + 1) % RIM.length];
+  const [ix, iy] = BED[i];
+  const length = Math.hypot(bx - x, by - y);
+  near(length, TRAY.radius);
+  near(Math.abs((bx - x) * (iy - y) - (by - y) * (ix - x)) / length, TRAY.wall);
+}
+
+for (const pitch of [MIN_PITCH, HOME_PITCH, MAX_PITCH]) {
+  for (let step = 0; step < 24; step++) {
+    const yaw = step * Math.PI / 12;
+    const {project, unproject} = orthographic(yaw, pitch);
+    for (const [x, y] of RIM) {
+      const floor = project(x, y, TRAY.floor);
+      const lip = project(x, y, TRAY.lip);
+      near(floor.x, lip.x);
+      near(floor.y - lip.y, (TRAY.lip - TRAY.floor) * Math.cos(pitch));
+      const right = project(x + 15 * Math.cos(yaw), y - 15 * Math.sin(yaw), TRAY.floor);
+      const forward = project(x + 15 * Math.sin(yaw), y + 15 * Math.cos(yaw), TRAY.floor);
+      near(right.x - floor.x, 15);
+      near(right.y, floor.y);
+      near(forward.x, floor.x);
+      near(forward.y - floor.y, 15 * Math.sin(pitch));
+      const fromScreen = unproject(lip.x, lip.y, TRAY.lip);
+      near(fromScreen.x, x);
+      near(fromScreen.y, y);
+    }
+  }
+}
+console.log('Regular tray, uniform wall thickness and orthographic projection verified at 72 camera angles.');

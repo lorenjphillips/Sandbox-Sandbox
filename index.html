@@ -49,17 +49,13 @@
       </div>
 
       <div class="board">
-        <div id="stage" class="stage" aria-label="Interactive sandbox provider map" aria-description="Drag to orbit. Choose Pan to move the board, or hold Shift while dragging. Scroll or pinch to zoom. When the map is focused, Q and E rotate it, arrow keys pan, plus and minus zoom, and zero resets the view.">
+        <div id="stage" class="stage" aria-label="Interactive sandbox provider map" aria-description="Drag to rotate and tilt. Shift-drag, middle-drag, or drag with two fingers to pan. Scroll or pinch to zoom. When the map is focused, Q and E rotate, W and S tilt, arrow keys pan, plus and minus zoom, and zero resets the view.">
           <canvas id="board-canvas" aria-hidden="true"></canvas>
           <div id="map-labels" class="map-labels"></div>
           <div id="marker-layer" class="marker-layer"></div>
           <div id="egg-layer" class="egg-layer"></div>
         </div>
-        <div class="board-controls" id="board-controls" role="group" aria-label="Sandbox view">
-          <button type="button" data-camera-mode="orbit" aria-pressed="true">Orbit</button>
-          <button type="button" data-camera-mode="pan" aria-pressed="false">Pan</button>
-          <button type="button" id="reset-camera" aria-label="Reset sandbox view">Reset</button>
-        </div>
+        <button type="button" class="reset-camera" id="reset-camera" aria-keyshortcuts="0">Reset view</button>
         <p class="playback-note" id="playback-note" hidden></p>
         <div class="zoom-hint" id="zoom-hint" aria-hidden="true" hidden>
           <span class="zoom-hint-mouse">Scroll to zoom</span>
