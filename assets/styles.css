@@ -773,6 +773,12 @@ td .provider-link { color: var(--ink); font-weight: 700; font-size: 14px; paddin
   letter-spacing: 0;
 }
 
+@media (550px < width <= 830px) {
+  body:has(.egg-player:not([hidden])):has(.profile[open]) :is(.egg-player, .profile) {
+    max-width: calc(50vw - max(20px, env(safe-area-inset-left) + 6px, env(safe-area-inset-right) + 6px));
+  }
+}
+
 @media (max-width: 760px) {
   .topbar-inner { min-height: 50px; }
   .topbar nav a { font-size: 13px; }
@@ -792,6 +798,14 @@ td .provider-link { color: var(--ink); font-weight: 700; font-size: 14px; paddin
   .search-box input { padding-block: 3px; }
   .history-controls { flex-direction: column; align-items: stretch; gap: 3px; }
   .history-jump { align-self: flex-end; font-size: 12px; }
+  .egg-player {
+    --clip-top: max(clamp(46px, 10dvh, 84px), env(safe-area-inset-top));
+    top: var(--clip-top);
+    bottom: auto;
+    max-height: calc(55dvh - var(--clip-top));
+    overscroll-behavior: contain;
+  }
+  body:has(.egg-player:not([hidden])) .profile { max-height: 36dvh; }
 }
 
 @media (max-width: 440px) {

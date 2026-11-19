@@ -52,10 +52,8 @@ const elements = {
   updates:$('#updates-feed'),historyDate:$('#history-date'),historyDays:$('#history-days'),
   latestButton:$('#jump-latest'),zoomHint:$('#zoom-hint'),profile:$('#profile')
 };
-const easterEggs=mountEasterEggPlayer(elements.eggLayer,$('#egg-player'),()=>{
-  if(elements.profile.open) elements.profile.close();
-  clearSelection();
-});
+const eggPlayer=$('#egg-player');
+const easterEggs=mountEasterEggPlayer(elements.eggLayer,eggPlayer,clearSelection);
 
 let atlas;
 try {
@@ -434,7 +432,6 @@ function renderDirectory() {
 
 function openProfile(id) {
   if(!companies.has(id)) return;
-  if(easterEggs.isOpen()) easterEggs.close();
   elements.searchResults.hidden=true;
   elements.search.value='';
   clearSelection(false);
@@ -656,8 +653,8 @@ document.addEventListener('keydown',event=>{
     }
   }
   if(event.key==='Escape' && elements.searchResults.hidden) {
-    if(easterEggs.isOpen()) easterEggs.close(true);
-    else if(elements.profile.open) elements.profile.close();
+    if(elements.profile.open && !eggPlayer.contains(event.target)) elements.profile.close();
+    else if(easterEggs.isOpen()) easterEggs.close(true);
     else clearSelection();
   }
 });
