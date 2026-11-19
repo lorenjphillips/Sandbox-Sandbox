@@ -1108,13 +1108,6 @@ export class Board {
     const v=this.viewport();
     if(!v.width || !v.height) return;
     const {canvas}=this.elements;
-    const lawnView=[v.dx,v.dy,v.zoom].join('/');
-    if(this.lawnView!==lawnView) {
-      this.lawnView=lawnView;
-      const lawn=document.documentElement.style;
-      lawn.setProperty('--lawn-size',v.zoom*1060+'px '+v.zoom*700+'px');
-      lawn.setProperty('--lawn-origin',v.dx+'px '+v.dy+'px');
-    }
     const scale=Math.min(devicePixelRatio,2);
     if(canvas.width!==Math.round(v.width*scale) || canvas.height!==Math.round(v.height*scale)) {
       canvas.width=Math.round(v.width*scale);

@@ -47,9 +47,9 @@ html:has(#atlas-view:not([hidden])) {
     radial-gradient(ellipse at 16% 19%, #fff0ae24, transparent 52%),
     linear-gradient(117deg, #bbb77412, transparent 51%, #21342332),
     url(grass.jpg);
-  background-position: center, center, var(--lawn-origin, center top);
+  background-position: center, center, center top;
   background-repeat: no-repeat, no-repeat, repeat;
-  background-size: auto, auto, var(--lawn-size, min(900px, 100vw) auto);
+  background-size: auto, auto, min(1060px, 74vw) min(700px, 49vw);
 }
 body:has(#atlas-view:not([hidden])) {
   display: flex;
