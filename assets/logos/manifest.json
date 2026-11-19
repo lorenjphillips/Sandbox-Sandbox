@@ -11,6 +11,10 @@
     "file": "akamai.png",
     "source": "https://www.akamai.com/favicon.ico"
   },
+  "alibaba": {
+    "file": "alibaba.png",
+    "source": "https://img.alicdn.com/tfs/TB1ugg7M9zqK1RjSZPxXXc4tVXa-32-32.png"
+  },
   "alien": {
     "file": "alien.png",
     "source": "https://www.alien.dev/icons/alien-192.png"
@@ -94,6 +98,10 @@
   "e2b": {
     "file": "e2b.png",
     "source": "https://e2b.dev/icon2.png?icon2.2h_70q4cu8mj-.png"
+  },
+  "eclipse-enclave": {
+    "file": "eclipse-enclave.png",
+    "source": "https://enclave.eclipse.dev/assets/favicon.png"
   },
   "exe": {
     "file": "exe.png",
@@ -230,6 +238,14 @@
   "tangle": {
     "file": "tangle.png",
     "source": "https://docs.tangle.tools/favicon-v1.svg"
+  },
+  "tembo": {
+    "file": "tembo.png",
+    "source": "https://www.tembo.io/apple-touch-icon.png"
+  },
+  "tencent": {
+    "file": "tencent.png",
+    "source": "https://cubesandbox.com/favicon.svg"
   },
   "tensorlake": {
     "file": "tensorlake.png",

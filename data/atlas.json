@@ -1,5 +1,5 @@
 {
-  "asOf": "2026-11-18",
+  "asOf": "2026-11-19",
   "companies": [
     {
       "id": "e2b",
@@ -437,7 +437,8 @@
         "Checkpoint and restore",
         "Sprites Connectors",
         "Fly Machines",
-        "Managed Postgres"
+        "Managed Postgres",
+        "Sprites Fly6PN private networking"
       ],
       "strengths": [
         "Checkpoints capture the complete writable filesystem.",
@@ -500,6 +501,10 @@
         {
           "label": "Parent founding and valuation record",
           "url": "https://forgeglobal.com/flyio_ipo/"
+        },
+        {
+          "label": "Sprites Fly6PN private networking",
+          "url": "https://fly.io/changelog/introducing-sprites-fly6pn-connect-your-sprite-to-your-fly/"
         }
       ]
     },
@@ -744,6 +749,10 @@
         {
           "label": "Seed announcement",
           "url": "https://runloop.ai/media/runloop-raises-7m-seed-round-to-bring-enterprise-grade-infrastructure-to-ai-coding-agents"
+        },
+        {
+          "label": "Removal from the OpenAI Agents SDK",
+          "url": "https://github.com/openai/openai-agents-python/releases/tag/v0.25.0"
         }
       ],
       "status": "Winding down"
@@ -924,22 +933,21 @@
       "name": "Together AI",
       "provider": "Together AI",
       "category": "Cloud platforms",
-      "description": "AI cloud with persistent VM code sandboxes and a separately priced short-session Python interpreter.",
+      "description": "AI cloud with persistent VM-based code sandboxes alongside inference and training products.",
       "products": [
         "Together Code Sandbox",
-        "Together Code Interpreter",
         "Inference",
         "Dedicated endpoints",
         "Training and fine-tuning",
         "GPU clusters"
       ],
       "strengths": [
-        "Offers a full development environment and an interpreter API.",
+        "Persistent VM sandboxes can use custom Docker images.",
         "Sandbox service sits alongside Together AI’s model inference and training platform."
       ],
       "tradeoffs": [
-        "Code Interpreter is positioned for Python execution and billed by session.",
-        "Persistent VM sandboxes have separate compute rates; inference and model charges are separate."
+        "Code Sandbox requires account enablement. Compute and storage are billed separately.",
+        "Inference and model charges are separate."
       ],
       "founded": "2022",
       "founders": [
@@ -971,11 +979,6 @@
           "detail": "Charged alongside vCPU."
         },
         {
-          "label": "Code Interpreter",
-          "value": "$0.03/session",
-          "detail": "Up to 60 minutes per session."
-        },
-        {
           "label": "Shared filesystem",
           "value": "$0.16/GiB-mo",
           "detail": "Separate platform filesystem charge."
@@ -1001,6 +1004,14 @@
         {
           "label": "Revenue estimate",
           "url": "https://sacra.com/c/together-ai/"
+        },
+        {
+          "label": "Active Code Sandbox documentation",
+          "url": "https://docs.together.ai/docs/together-code-sandbox"
+        },
+        {
+          "label": "Code Interpreter retirement",
+          "url": "https://docs.together.ai/docs/sdk-v3-migration-guide#removed-apis-and-parameters"
         }
       ]
     },
@@ -1294,20 +1305,24 @@
     },
     {
       "id": "azure",
-      "name": "Azure Dynamic Sessions",
+      "name": "Azure Container Apps Sandboxes",
       "provider": "Microsoft Azure",
       "category": "Cloud platforms",
-      "description": "Prewarmed, strongly isolated Azure Container Apps environments for code and custom images.",
+      "description": "Azure offers on-demand microVM sandboxes and separate prewarmed Dynamic Sessions pools for interpreters and custom containers.",
       "products": [
+        "Container Apps Sandboxes (GA)",
+        "Dynamic Sessions",
         "Python Code Interpreter",
         "JavaScript Code Interpreter",
         "Custom container sessions"
       ],
       "strengths": [
+        "On-demand microVMs support memory and disk snapshots, persistent volumes, virtual networks and egress rules.",
         "Prewarmed session pools reduce provisioning latency.",
         "A hosted interpreter and custom container images support different setup needs."
       ],
       "tradeoffs": [
+        "Sandboxes and Dynamic Sessions have different regional and billing rules.",
         "Region and supported pool types determine availability.",
         "Custom pools include idle or prewarmed instances in billing."
       ],
@@ -1321,6 +1336,11 @@
       "revenue": "Azure revenue exceeded $100B in FY2026 (Microsoft-reported); $331.8B Microsoft consolidated.",
       "valuation": null,
       "pricing": [
+        {
+          "label": "Container Apps Sandboxes",
+          "value": "Regional vCPU + GiB rates",
+          "detail": "Allocated CPU and memory are metered per second while running. Stopped sandboxes do not incur compute charges."
+        },
         {
           "label": "Hosted code interpreter",
           "value": "Regional per session-hour",
@@ -1352,6 +1372,22 @@
         {
           "label": "Microsoft founding",
           "url": "https://news.microsoft.com/microsoft-50/"
+        },
+        {
+          "label": "Container Apps Sandboxes overview",
+          "url": "https://learn.microsoft.com/en-us/azure/container-apps/sandboxes-overview"
+        },
+        {
+          "label": "Sandbox metering",
+          "url": "https://sandboxes.azure.com/docs/sandboxes/cost"
+        },
+        {
+          "label": "Container Apps Sandboxes general availability",
+          "url": "https://techcommunity.microsoft.com/blog/appsonazureblog/azure-container-apps-sandboxes-now-generally-available/4559125"
+        },
+        {
+          "label": "Foundry Hosted Agents sandbox controls",
+          "url": "https://devblogs.microsoft.com/foundry/hosted-agents-foundry-agent-service-ignite-2026/"
         }
       ]
     },
@@ -1635,6 +1671,11 @@
           "label": "Cloud billing",
           "value": "Per second",
           "detail": "No recurring subscription fee. Inference is billed by your model provider."
+        },
+        {
+          "label": "New account promotion",
+          "value": "$250 in cloud compute credit",
+          "detail": "For eligible new Agentic Platform accounts through January 31, 2027 at 11:59 p.m. PT. Card required. Credit expires six months after redemption."
         }
       ],
       "sources": [
@@ -1657,6 +1698,10 @@
         {
           "label": "Official cloud size rate card",
           "url": "https://www.docker.com/products/docker-sandboxes/"
+        },
+        {
+          "label": "Cloud account promotion terms",
+          "url": "https://www.docker.com/c/sbx-promo/"
         }
       ]
     },
@@ -2185,6 +2230,11 @@
           "label": "Starts over allowance",
           "value": "$0.03–$0.07 each",
           "detail": "Monthly plan includes a fixed daily allowance for sandbox starts."
+        },
+        {
+          "label": "Saved snapshots",
+          "value": "$0.056/day each",
+          "detail": "Applies to saved disk snapshots."
         }
       ],
       "sources": [
@@ -2226,7 +2276,7 @@
         "Persistent computer state supports workflows across sessions."
       ],
       "tradeoffs": [
-        "Developer access is request-based on the product site. Public sandbox rates were not verified."
+        "API access requires approval. A running computer is billed even when it is idle."
       ],
       "founded": null,
       "founders": [
@@ -2239,9 +2289,14 @@
       "valuation": null,
       "pricing": [
         {
-          "label": "Developer access",
-          "value": "Request access",
-          "detail": "Public list prices were not verified."
+          "label": "Running computer",
+          "value": "$0.003/min",
+          "detail": "About $0.18/hour, including idle time. Paused and stopped computers do not incur compute charges."
+        },
+        {
+          "label": "Browser egress",
+          "value": "$4/GB",
+          "detail": "Measured through the selected exit region."
         }
       ],
       "sources": [
@@ -2260,6 +2315,10 @@
         {
           "label": "Parent company founders",
           "url": "https://www.prnewswire.com/news-releases/pine-ai-empowering-consumers-with-autonomous-ai-for-customer-service-challenges-302341834.html"
+        },
+        {
+          "label": "Developer API pricing",
+          "url": "https://console.pinecomputer.io/docs/overview#usage-and-credits"
         }
       ],
       "status": "Request access"
@@ -2510,9 +2569,14 @@
           "detail": "Metered while retained."
         },
         {
+          "label": "Linux sandbox VM",
+          "value": "2.5× standard compute",
+          "detail": "Uses a separate Linux kernel. Disk is priced at the standard rate."
+        },
+        {
           "label": "Trial",
-          "value": "$5 credit",
-          "detail": "Additional credits are available through the startup program."
+          "value": "$5 starter credit",
+          "detail": "A card is required. Additional credits are available through the startup program."
         }
       ],
       "sources": [
@@ -2523,6 +2587,10 @@
         {
           "label": "Founders and accelerator",
           "url": "https://www.ycombinator.com/companies/agent-37"
+        },
+        {
+          "label": "Sandbox VM rates and starter credit",
+          "url": "https://www.agent37.com/pricing"
         }
       ]
     },
@@ -3454,16 +3522,26 @@
         "Supported isolation is determined by the target infrastructure. Kubernetes deployments require setup with a compatible sandbox RuntimeClass."
       ],
       "founded": null,
-      "founders": [],
-      "funding": null,
-      "investors": [],
+      "founders": [
+        "Alon Gubkin"
+      ],
+      "funding": "$5M seed, company-reported Jun 2026",
+      "investors": [
+        "Basis Set",
+        "Jibe Ventures"
+      ],
       "revenue": null,
       "valuation": null,
       "pricing": [
         {
-          "label": "Availability",
-          "value": "Contact vendor",
-          "detail": "A standalone public rate card was not verified. Customer cloud infrastructure may bill separately."
+          "label": "Deployment management",
+          "value": "$125–$450 per deployment/mo",
+          "detail": "Preview marginal rates: units 1–5 $450 each, 6–15 $300, 16–25 $200 and 26–29 $125."
+        },
+        {
+          "label": "Sandbox infrastructure",
+          "value": "Billed by your cloud",
+          "detail": "Example listed by Alien for AWS us-east-1: $0.0000276944/vCPU-sec plus $0.0000036667/GB-sec."
         }
       ],
       "sources": [
@@ -3474,6 +3552,18 @@
         {
           "label": "Runtime and infrastructure changes",
           "url": "https://www.alien.dev/changelog"
+        },
+        {
+          "label": "Seed investor announcement",
+          "url": "https://www.linkedin.com/posts/basis-set_news-announcing-aliens-5m-seed-some-products-activity-7472332493866811392-VGk4"
+        },
+        {
+          "label": "Management pricing",
+          "url": "https://www.alien.dev/pricing"
+        },
+        {
+          "label": "Cloud infrastructure pricing",
+          "url": "https://www.alien.dev/docs/infrastructure/sandbox/pricing"
         }
       ]
     },
@@ -3610,9 +3700,15 @@
       "description": "Managed agent sandboxes with usage-based CPU, state preservation and an expanded application infrastructure platform.",
       "products": [
         "Runtime Sandboxes",
-        "Functions and Jobs",
         "CI/CD",
-        "Databases and storage"
+        "Apps",
+        "Functions",
+        "Containers",
+        "Jobs",
+        "Browsers",
+        "Desktops",
+        "Notebooks",
+        "Dev Environments"
       ],
       "strengths": [
         "Bills primarily on busy CPU time and supports pausing memory state. Sandboxes support multiple SDK languages."
@@ -3651,6 +3747,10 @@
         {
           "label": "Current pricing",
           "url": "https://withruntime.com/pricing"
+        },
+        {
+          "label": "Runtime Cloud launch and API v2",
+          "url": "https://withruntime.com/changelog"
         }
       ]
     },
@@ -3850,8 +3950,10 @@
       ],
       "founded": null,
       "founders": [],
-      "funding": null,
-      "investors": [],
+      "funding": "$15M in backing from Insight Partners, company-reported Nov 2026",
+      "investors": [
+        "Insight Partners"
+      ],
       "revenue": null,
       "valuation": null,
       "pricing": [
@@ -3879,6 +3981,10 @@
         {
           "label": "Product and plan pricing",
           "url": "https://islo.dev/pricing/"
+        },
+        {
+          "label": "Enterprise Software Factory launch and funding",
+          "url": "https://islo.dev/blog/launching-islo-enterprise-software-factories/"
         }
       ]
     },
@@ -4433,9 +4539,343 @@
         }
       ],
       "status": "Open source · self-hosted"
+    },
+    {
+      "id": "eclipse-enclave",
+      "name": "Eclipse Enclave",
+      "provider": "Eclipse Foundation",
+      "category": "Developer tools",
+      "description": "A self-hosted, MIT-licensed sandbox for coding agents. EclipseSource originated the project and contributed it to the Eclipse Foundation.",
+      "products": [
+        "Enclave CLI",
+        "Agent session containers",
+        "Network policy gateway",
+        "Session control center"
+      ],
+      "strengths": [
+        "Run Claude Code, Codex or OpenCode in isolated Docker sessions with per-session network rules.",
+        "Separate Git worktrees let agents work in parallel. Sessions can resume with their configuration and history."
+      ],
+      "tradeoffs": [
+        "Teams operate their own host and containers and pay for any model usage.",
+        "Current isolation is container-based. Additional backends such as microVMs are described as future work."
+      ],
+      "founded": "2026 (Eclipse Enclave project)",
+      "founders": [],
+      "funding": "Open-source project hosted by a nonprofit foundation",
+      "investors": [],
+      "revenue": null,
+      "valuation": null,
+      "pricing": [
+        {
+          "label": "Enclave software",
+          "value": "Free / MIT license",
+          "detail": "Host compute, storage and any agent subscriptions are separate."
+        }
+      ],
+      "sources": [
+        {
+          "label": "November 19 announcement",
+          "url": "https://newsroom.eclipse.org/news/announcements/eclipse-foundation-launches-eclipse-enclave-10-bringing-security-and-choice"
+        },
+        {
+          "label": "Project governance and release listing",
+          "url": "https://projects.eclipse.org/projects/ecd.enclave"
+        },
+        {
+          "label": "Source code and installation",
+          "url": "https://github.com/eclipse-enclave/enclave"
+        }
+      ],
+      "status": "Open source · self-hosted"
+    },
+    {
+      "id": "alibaba",
+      "name": "Alibaba Agent Sandbox",
+      "provider": "Alibaba Cloud",
+      "category": "Cloud platforms",
+      "description": "A managed sandbox for code, browser and desktop workloads, with standalone Flash and Kubernetes-based Container editions.",
+      "products": [
+        "Agent Sandbox Flash Edition",
+        "Agent Sandbox Container Edition",
+        "E2B-compatible API",
+        "Snapshots and template cache"
+      ],
+      "strengths": [
+        "MicroVM isolation, snapshots and hibernation are available. Flash supports light hibernation.",
+        "Flash is available in mainland China, Hong Kong, Singapore, Malaysia and two U.S. regions."
+      ],
+      "tradeoffs": [
+        "Container Edition has a different region list and requires an eligible Kubernetes cluster.",
+        "Billing varies by region, resource class and sandbox state."
+      ],
+      "founded": "September 2009 (Alibaba Cloud)",
+      "founders": [
+        "Wang Jian (Alibaba Cloud)"
+      ],
+      "funding": "Cloud business of public parent Alibaba Group (NYSE: BABA; HKEX: 9988)",
+      "investors": [],
+      "revenue": "RMB 60.973B (US$9.094B) AI Cloud and Compute Services segment revenue for the quarter ended Sep 2026, reported Nov 19. Sandbox revenue undisclosed.",
+      "valuation": null,
+      "pricing": [
+        {
+          "label": "Default compute · international",
+          "value": "$0.017856/vCPU-hr",
+          "detail": "Hong Kong and regions outside China. Memory $0.008928/GiB-hr. Compute is metered per second."
+        },
+        {
+          "label": "Default compute · mainland China",
+          "value": "$0.01224/vCPU-hr",
+          "detail": "Memory $0.006012/GiB-hr. Economy and Performance resource classes use separate rates."
+        },
+        {
+          "label": "Disk and cache",
+          "value": "$0.00025308–$0.00031896/GiB-hr",
+          "detail": "Rates vary by geography. An active sandbox has 15 GiB of included disk. Snapshots and cached custom templates use separate billable capacity rules."
+        }
+      ],
+      "sources": [
+        {
+          "label": "Edition overview",
+          "url": "https://www.alibabacloud.com/help/en/agent-sandbox/product-overview/agent-sandbox-overview"
+        },
+        {
+          "label": "Pricing and resource states",
+          "url": "https://www.alibabacloud.com/help/en/agent-sandbox/product-overview/billing-overview"
+        },
+        {
+          "label": "Available regions",
+          "url": "https://www.alibabacloud.com/help/en/agent-sandbox/product-overview/open-service-area"
+        },
+        {
+          "label": "General availability",
+          "url": "https://www.alibabacloud.com/en/news/product/general-availability-ga-o7e?_p_lc=1"
+        },
+        {
+          "label": "Alibaba Cloud history",
+          "url": "https://www.alibabagroup.com/en-US/document-1491556654565556224"
+        },
+        {
+          "label": "Founder interview",
+          "url": "https://www.youtube.com/watch?v=jNYTr0afkcw"
+        },
+        {
+          "label": "September 2026 quarterly results",
+          "url": "https://data.alibabagroup.com/ecms-files/1532295521/e676aff4-e76d-489b-960a-47b9cf36485d/Alibaba%20Group%20Announces%20September%20Quarter%202026%20Results%20and%20Interim%20Results%20for%20the%20Six%20Months%20Ended%20September%2030%2C%202026.pdf"
+        }
+      ]
+    },
+    {
+      "id": "tencent",
+      "name": "Tencent Agent Sandbox",
+      "provider": "Tencent Cloud",
+      "category": "Cloud platforms",
+      "description": "Tencent Cloud’s hosted Agent Runtime offers sandbox execution. Tencent also maintains the separately self-hosted CubeSandbox microVM software.",
+      "products": [
+        "Agent Sandbox in Agent Runtime",
+        "Managed code and desktop sandboxes",
+        "CubeSandbox",
+        "Templates and snapshots"
+      ],
+      "strengths": [
+        "Hosted sandboxes accept E2B-style SDK calls and support custom images.",
+        "CubeSandbox offers KVM isolation and filesystem-only snapshots for self-hosted deployments."
+      ],
+      "tradeoffs": [
+        "Hosted rates below are from the China site and are in CNY.",
+        "Self-hosting needs compatible virtualization infrastructure and operational support."
+      ],
+      "founded": "2013 (Tencent Cloud public launch)",
+      "founders": [],
+      "funding": "Cloud business of public parent Tencent Holdings (HKEX: 0700)",
+      "investors": [],
+      "revenue": "RMB 207.3B Tencent Holdings consolidated Q3 2026 revenue, reported Nov 18. Sandbox revenue undisclosed.",
+      "valuation": null,
+      "pricing": [
+        {
+          "label": "Hosted CPU and memory",
+          "value": "¥0.000081/core-sec",
+          "detail": "Memory ¥0.000025/GiB-sec. Compute is metered while running."
+        },
+        {
+          "label": "Hosted disk",
+          "value": "¥0.0021/GiB-hr",
+          "detail": "15 GiB included while running. Paused capacity is billable without that allowance."
+        },
+        {
+          "label": "CubeSandbox software",
+          "value": "Free / Apache 2.0",
+          "detail": "Self-hosted infrastructure is priced separately."
+        }
+      ],
+      "sources": [
+        {
+          "label": "Managed sandbox FAQ",
+          "url": "https://cloud.tencent.cn/document/product/1814/123828"
+        },
+        {
+          "label": "China-site pricing",
+          "url": "https://cloud.tencent.cn/document/product/1814/133249"
+        },
+        {
+          "label": "CubeSandbox open-source runtime",
+          "url": "https://github.com/TencentCloud/CubeSandbox"
+        },
+        {
+          "label": "CubeSandbox 0.8.0",
+          "url": "https://github.com/TencentCloud/CubeSandbox/releases/tag/v0.8.0"
+        },
+        {
+          "label": "Tencent company history",
+          "url": "https://www.tencent.com/who-we-are/our-story/"
+        },
+        {
+          "label": "Tencent Q3 2026 results",
+          "url": "https://www.tencent.com/wp-content/uploads/2026/11/Tencent-Announces-2026-Third-Quarter-Results.pdf"
+        }
+      ]
+    },
+    {
+      "id": "tembo",
+      "name": "Tembo",
+      "provider": "Tembo",
+      "category": "Developer tools",
+      "description": "Cloud coding agents with configurable sandboxes for their sessions, plus an API that exposes sandbox resources.",
+      "products": [
+        "Tembo Computer",
+        "Hosted coding agents",
+        "Automations",
+        "Tembo API, SDK and MCP",
+        "Self-hosted VM connections"
+      ],
+      "strengths": [
+        "Sandbox sizes can adjust during a session without a restart.",
+        "Project settings control CPU and memory limits and disk size."
+      ],
+      "tradeoffs": [
+        "Sandbox resources are part of Tembo’s coding-agent platform.",
+        "Keeping a sandbox alive continues to accrue compute charges."
+      ],
+      "founded": "2022",
+      "founders": [
+        "Ry Walker",
+        "Darren Baldwin Jr.",
+        "Benjamin Akar",
+        "Connor Paton"
+      ],
+      "funding": "$20M reported by Tembo, including a $14M Series A",
+      "investors": [
+        "GreatPoint Ventures",
+        "Venrock",
+        "Grand Ventures",
+        "Wireframe Ventures",
+        "Defined Capital",
+        "Cintrifuse Capital"
+      ],
+      "revenue": null,
+      "valuation": null,
+      "pricing": [
+        {
+          "label": "Free trial",
+          "value": "$0 for 7 days",
+          "detail": "Trials use the Max plan with a trial usage allowance."
+        },
+        {
+          "label": "Pro",
+          "value": "$60/mo",
+          "detail": "Includes $90 in usage credits."
+        },
+        {
+          "label": "Max",
+          "value": "$200/mo",
+          "detail": "Includes $400 in usage credits."
+        },
+        {
+          "label": "Enterprise",
+          "value": "Custom",
+          "detail": "Custom usage allowances, seat counts and inference configuration."
+        },
+        {
+          "label": "Sandbox compute",
+          "value": "$0.0378/vCPU-hr",
+          "detail": "Memory $0.0130/GiB-hr and allocated disk $0.0001/GB-hr. Metered per second."
+        }
+      ],
+      "sources": [
+        {
+          "label": "Plan and compute pricing",
+          "url": "https://www.tembo.io/pricing"
+        },
+        {
+          "label": "November sandbox sizing update",
+          "url": "https://www.tembo.io/changelog/automatic-sandbox-sizing"
+        },
+        {
+          "label": "Public sandbox API resources",
+          "url": "https://www.tembo.io/changelog/public-api-resources-planning-mode-and-computer-preview-audio"
+        },
+        {
+          "label": "Founders and funding",
+          "url": "https://www.tembo.io/about"
+        },
+        {
+          "label": "Founding record",
+          "url": "https://tembo.io/soc2.pdf"
+        }
+      ]
     }
   ],
   "events": [
+    {
+      "company": "depot",
+      "date": "2026-11-19",
+      "kind": "feature",
+      "title": "Depot adds sandbox usage reporting",
+      "summary": "The Usage page now shows daily Sandbox API runs and vCPU minutes, and CSV exports include those figures.",
+      "url": "https://depot.dev/changelog/2026-11-19-sandbox-usage-page",
+      "source": "Depot changelog",
+      "front": "Workflow"
+    },
+    {
+      "company": "eclipse-enclave",
+      "date": "2026-11-19",
+      "kind": "launch",
+      "title": "Eclipse Foundation announces Enclave 1.0",
+      "summary": "The Foundation announced version 1.0 of its MIT-licensed runtime for parallel coding agents with isolated containers and network policies. The project registry lists October 31 as the release date.",
+      "url": "https://newsroom.eclipse.org/news/announcements/eclipse-foundation-launches-eclipse-enclave-10-bringing-security-and-choice",
+      "source": "Eclipse Foundation",
+      "front": "Execution"
+    },
+    {
+      "company": "machine0",
+      "date": "2026-11-19",
+      "kind": "feature",
+      "title": "machine0 aligns image imports with VM regions",
+      "summary": "New disk imports use the same default region as new VMs. New versions of existing images stay in the image’s region.",
+      "url": "https://machine0.io/changelog",
+      "source": "machine0 changelog · v1.0.205",
+      "front": "State"
+    },
+    {
+      "company": "opensandbox",
+      "date": "2026-11-19",
+      "kind": "feature",
+      "title": "OpenSandbox extends snapshots to native S3 sandboxes",
+      "summary": "Release candidate 1.3.0-rc.2 adds root-filesystem-only snapshots for native S3 sandboxes and makes successful batch exits terminal. SDK and CLI packages remain on the stable release cadence.",
+      "url": "https://github.com/opensandbox-group/OpenSandbox/releases/tag/release-1.3.0-rc.2",
+      "source": "OpenSandbox release notes",
+      "front": "State"
+    },
+    {
+      "company": "tembo",
+      "date": "2026-11-19",
+      "kind": "feature",
+      "title": "Tembo adds automatic sandbox sizing",
+      "summary": "Sandboxes adjust allocated CPU and memory during an active coding session within project limits. The default minimum is 2 vCPU and 4 GiB, and compute is metered per second.",
+      "url": "https://www.tembo.io/changelog/automatic-sandbox-sizing",
+      "source": "Tembo changelog",
+      "front": "Execution"
+    },
     {
       "company": "vercel",
       "date": "2026-11-18",
@@ -4483,13 +4923,34 @@
       "source": "DigitalOcean release notes"
     },
     {
+      "company": "sprites",
+      "date": "2026-11-18",
+      "kind": "feature",
+      "title": "Sprites reach Fly private networks",
+      "summary": "Sprites Fly6PN connects a Sprite to an organization’s private Fly network over WireGuard and resolves its private DNS names.",
+      "url": "https://fly.io/changelog/introducing-sprites-fly6pn-connect-your-sprite-to-your-fly/",
+      "source": "Fly.io changelog",
+      "front": "Network"
+    },
+    {
+      "company": "azure",
+      "date": "2026-11-18",
+      "kind": "feature",
+      "title": "Foundry Hosted Agents add sandbox egress enforcement",
+      "summary": "Microsoft announced general availability of enforceable outbound network rules and execution resilience for hosted agents in Foundry Agent Service.",
+      "url": "https://devblogs.microsoft.com/foundry/hosted-agents-foundry-agent-service-ignite-2026/",
+      "source": "Microsoft Foundry announcement",
+      "front": "Network"
+    },
+    {
       "company": "machine0",
       "date": "2026-11-17",
       "kind": "feature",
-      "title": "machine0 exposes skipped image rebuilds",
-      "summary": "A new Last Rebuild status explains skipped Git-tracked rebuilds in the dashboard, CLI, SDK and MCP.",
+      "title": "machine0 boot-tests tracked image rebuilds",
+      "summary": "Tracked images build on their current version. machine0 boots each new snapshot before promoting it, retains the previous version for rollback, and shows skipped rebuilds in its tools.",
       "url": "https://machine0.io/changelog",
-      "source": "machine0 changelog"
+      "source": "machine0 changelog",
+      "front": "State"
     },
     {
       "company": "instabox",
@@ -4517,6 +4978,46 @@
       "summary": "Buddy added automatic sandbox snapshots on a schedule, with retention policies to manage old copies.",
       "url": "https://buddy.works/blog/changelog/changelog-november-17-2026",
       "source": "Buddy release notes"
+    },
+    {
+      "company": "blaxel",
+      "date": "2026-11-17",
+      "kind": "feature",
+      "title": "Blaxel SDKs can update sandbox environment variables",
+      "summary": "The SDKs can add or remove environment variables on an existing sandbox without replacing other variables or their secret flags.",
+      "url": "https://docs.blaxel.ai/changelog",
+      "source": "Blaxel changelog",
+      "front": "Workflow"
+    },
+    {
+      "company": "instabox",
+      "date": "2026-11-17",
+      "kind": "feature",
+      "title": "InstaBox ties new snapshots to their source size",
+      "summary": "Computers created from new snapshots use the source machine size. Older snapshots can still be used with a different machine size.",
+      "url": "https://instabox.sh/changelog/snapshots-keep-their-size.md",
+      "source": "InstaBox changelog",
+      "front": "State"
+    },
+    {
+      "company": "islo",
+      "date": "2026-11-17",
+      "kind": "launch",
+      "title": "Islo launches enterprise software factories",
+      "summary": "Islo announced configurable engineering workflows, persistent isolated Machines and evaluation tools, with $15M in backing from Insight Partners.",
+      "url": "https://islo.dev/blog/launching-islo-enterprise-software-factories/",
+      "source": "Islo launch announcement",
+      "front": "Workflow"
+    },
+    {
+      "company": "openshell",
+      "date": "2026-11-17",
+      "kind": "feature",
+      "title": "OpenShell tightens private-network access",
+      "summary": "Version 0.1.9 requires explicit policy permissions for private IP addresses and improves reconnect handling for long-running sandboxes.",
+      "url": "https://github.com/NVIDIA/OpenShell/releases/tag/v0.1.9",
+      "source": "NVIDIA OpenShell release notes",
+      "front": "Network"
     },
     {
       "company": "vercel",
@@ -4584,6 +5085,16 @@
       "front": "Network"
     },
     {
+      "company": "runtime",
+      "date": "2026-11-16",
+      "kind": "launch",
+      "title": "Runtime moves customers onto its own cloud",
+      "summary": "Runtime says all customers now run on its cloud. The v2 API covers sandbox lifecycle, private port connections, code execution and computer use, with v1 compatibility.",
+      "url": "https://withruntime.com/changelog",
+      "source": "Runtime Cloud changelog",
+      "front": "Execution"
+    },
+    {
       "company": "instabox",
       "date": "2026-11-15",
       "kind": "feature",
@@ -4591,6 +5102,16 @@
       "summary": "The provider reports new boxes can start in seconds from a matching-size snapshot made from the current agent-browser template.",
       "url": "https://instabox.sh/changelog/snapshot-create-optimization",
       "source": "InstaBox changelog"
+    },
+    {
+      "company": "alibaba",
+      "date": "2026-11-15",
+      "kind": "feature",
+      "title": "Alibaba begins charging for custom template prewarming",
+      "summary": "Alibaba applies regional disk rates to storage occupied by prewarmed custom templates. Official templates are exempt by default.",
+      "url": "https://www.alibabacloud.com/help/en/agent-sandbox/product-overview/billing-overview",
+      "source": "Alibaba Cloud billing documentation",
+      "front": "Workflow"
     },
     {
       "company": "prized",
@@ -4711,6 +5232,36 @@
       "source": "AWS What's New"
     },
     {
+      "company": "exe",
+      "date": "2026-11-12",
+      "kind": "feature",
+      "title": "exe.dev adds VM backup and restore",
+      "summary": "Users can incrementally back up VM disks to their S3 bucket and restore them using an open format.",
+      "url": "https://blog.exe.dev/backup-restore",
+      "source": "exe.dev announcement",
+      "front": "State"
+    },
+    {
+      "company": "sprites",
+      "date": "2026-11-12",
+      "kind": "feature",
+      "title": "Sprites add Nebius, Box and Nscale connectors",
+      "summary": "The new connectors support Nebius compute jobs, Box file access and Nscale inference from Sprites.",
+      "url": "https://fly.io/changelog/more-sprites-connectors-nebius-box-and-nscale/",
+      "source": "Fly.io changelog",
+      "front": "Workflow"
+    },
+    {
+      "company": "tencent",
+      "date": "2026-11-12",
+      "kind": "feature",
+      "title": "CubeSandbox adds filesystem-only snapshots",
+      "summary": "Tencent’s self-hosted release 0.8.0 also adds restart policies and a preview JuiceFS-backed store for resuming sandboxes on a different node.",
+      "url": "https://github.com/TencentCloud/CubeSandbox/releases/tag/v0.8.0",
+      "source": "Tencent Cloud CubeSandbox release notes",
+      "front": "State"
+    },
+    {
       "company": "spheron",
       "date": "2026-11-11",
       "kind": "feature",
@@ -4747,6 +5298,16 @@
       "source": "AWS announcement"
     },
     {
+      "company": "exe",
+      "date": "2026-11-11",
+      "kind": "feature",
+      "title": "exe.dev adds time-limited integration approvals",
+      "summary": "Teams can require human approval before a VM accesses an integration and grant access for a set interval without giving the VM the underlying credentials.",
+      "url": "https://blog.exe.dev/step-up-integrations",
+      "source": "exe.dev announcement",
+      "front": "Network"
+    },
+    {
       "company": "tensorlake",
       "date": "2026-11-10",
       "kind": "adoption",
@@ -4781,6 +5342,16 @@
       "summary": "The published rate card introduced separate compute, memory, snapshot, volume and image storage meters. Sandbox promo remained active until November 16.",
       "url": "https://www.usagepricing.com/blueprint/activity/baseten-2026-11-10-sandboxes-pricing-launch",
       "source": "UsagePricing price capture"
+    },
+    {
+      "company": "browserbase",
+      "date": "2026-11-10",
+      "kind": "feature",
+      "title": "Browserbase adds dashboard secrets for Functions",
+      "summary": "Developers can store encrypted credentials in the dashboard and use them at runtime in Browserbase Functions.",
+      "url": "https://www.browserbase.com/changelog/secrets-in-dashboard",
+      "source": "Browserbase changelog",
+      "front": "Network"
     },
     {
       "company": "vercel",
@@ -4828,6 +5399,16 @@
       "source": "E2B product updates"
     },
     {
+      "company": "sprites",
+      "date": "2026-11-09",
+      "kind": "feature",
+      "title": "Sprites connect to Stripe Link",
+      "summary": "The integration lets a Sprite request a single-purchase virtual card. The wallet owner approves the request in Link.",
+      "url": "https://fly.io/changelog/link-agent-wallet/",
+      "source": "Fly.io changelog",
+      "front": "Workflow"
+    },
+    {
       "company": "maritime",
       "date": "2026-11-07",
       "kind": "partnership",
@@ -4871,6 +5452,16 @@
       "summary": "Render announced isolated Linux environments in Oregon with autosuspend, active CPU billing, and support for custom images.",
       "url": "https://render.com/blog/introducing-render-sandboxes",
       "source": "Render product announcement"
+    },
+    {
+      "company": "depot",
+      "date": "2026-11-04",
+      "kind": "feature",
+      "title": "Depot adds Arm sandboxes and custom images",
+      "summary": "Managed Agents runs can use Arm64 or x86-64, boot from a custom sandbox image and run Amp threads.",
+      "url": "https://depot.dev/changelog/2026-11-04-managed-agents-arm64-sandbox-images",
+      "source": "Depot changelog",
+      "front": "Execution"
     },
     {
       "company": "e2b",
@@ -4936,6 +5527,26 @@
       "source": "Akamai newsroom"
     },
     {
+      "company": "modal",
+      "date": "2026-10-27",
+      "kind": "feature",
+      "title": "Modal adds beta exit snapshots",
+      "summary": "Automatic filesystem snapshots preserve workspace files on exit, including idle or lifetime expiry and out-of-memory stops.",
+      "url": "https://modal.com/changelog/exit-snapshots-resume-sandbox-preserve-state",
+      "source": "Modal changelog",
+      "front": "State"
+    },
+    {
+      "company": "digitalocean",
+      "date": "2026-10-26",
+      "kind": "feature",
+      "title": "Harness Runtime supports standalone sandboxes",
+      "summary": "Teams can boot a general-purpose sandbox without a managed harness and use the API or doctl to run commands, manage files and forward ports.",
+      "url": "https://docs.digitalocean.com/release-notes/agent-harness-runtime/#26-october",
+      "source": "DigitalOcean release notes",
+      "front": "Execution"
+    },
+    {
       "company": "opensandbox",
       "date": "2026-10-22",
       "kind": "partnership",
@@ -4952,6 +5563,16 @@
       "summary": "AWS added Hong Kong, Malaysia, Thailand, and Spain as regions for Lambda MicroVMs.",
       "url": "https://aws.amazon.com/about-aws/whats-new/2026/10/lambda-microvms-4-additional-regions/",
       "source": "AWS announcement"
+    },
+    {
+      "company": "together",
+      "date": "2026-10-22",
+      "kind": "retirement",
+      "title": "Together AI retires its Code Interpreter API",
+      "summary": "SDK 3.0 removes the Python and TypeScript interpreter methods and the linked API. Together’s separate Code Sandbox remains available with account enablement.",
+      "url": "https://docs.together.ai/docs/sdk-v3-migration-guide#removed-apis-and-parameters",
+      "source": "Together AI SDK migration guide",
+      "front": "Workflow"
     },
     {
       "company": "openshell",
@@ -5181,6 +5802,16 @@
       "source": "Docker launch announcement"
     },
     {
+      "company": "azure",
+      "date": "2026-09-23",
+      "kind": "launch",
+      "title": "Azure Container Apps Sandboxes reach general availability",
+      "summary": "Azure announced on-demand microVMs with suspend and resume, persistent volumes, network controls and SDKs. Dynamic Sessions remains a separate Container Apps offering.",
+      "url": "https://techcommunity.microsoft.com/blog/appsonazureblog/azure-container-apps-sandboxes-now-generally-available/4559125",
+      "source": "Microsoft Azure announcement",
+      "front": "Execution"
+    },
+    {
       "company": "blaxel",
       "date": "2026-09-22",
       "kind": "adoption",
@@ -5188,6 +5819,16 @@
       "summary": "A Blaxel case study reports that Sapiom created 2.5 million sandboxes in its first three months.",
       "url": "https://blaxel.ai/blog/sapiom-runs-millions-sandboxes",
       "source": "Blaxel customer case study"
+    },
+    {
+      "company": "alibaba",
+      "date": "2026-09-22",
+      "kind": "launch",
+      "title": "Alibaba Cloud announces Agent Sandbox general availability",
+      "summary": "Alibaba announced the availability of isolated microVM execution with hibernation, cloning and compatibility with E2B and Kubernetes APIs.",
+      "url": "https://www.alibabacloud.com/en/news/product/general-availability-ga-o7e?_p_lc=1",
+      "source": "Alibaba Cloud release announcement",
+      "front": "Execution"
     },
     {
       "company": "railway",
