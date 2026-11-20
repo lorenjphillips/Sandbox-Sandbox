@@ -1,7 +1,9 @@
 import { paintHourglassToy, paintScarabToy, paintGrassToy } from './toy-art.js';
 import { drawBucketModel, drawTruckModel } from './board-models.js';
 import { eggModels } from './egg-models.js';
+import { createLawnPlane } from './lawn-plane.js';
 import { drawNestedSandboxModel, nestedSandboxHitPoints } from './nested-sandbox-model.js';
+import { drawShovelModel } from './shovel-model.js';
 import { WIDTH, HEIGHT, TRAY, RIM, BED, HOME_YAW, HOME_PITCH, MIN_PITCH, MAX_PITCH, orthographic } from './geometry.js';
 
 export { WIDTH, HEIGHT };
@@ -280,64 +282,6 @@ function sandRakeLines(ctx,x,y,angle,length,count) {
     ctx.stroke();
     ctx.translate(0,-1.3);
   }
-  ctx.restore();
-}
-
-function shovel(ctx,x,y) {
-  const at=project(x,y,TRAY.floor+4);
-  ctx.save();
-  ctx.translate(at.x,at.y);
-  rotateGroundProp(ctx);
-  ctx.rotate(1.21);
-  ctx.scale(1.10,.85);
-  ctx.shadowColor='#76452578';
-  ctx.shadowBlur=9;
-  ctx.shadowOffsetY=7;
-  ctx.beginPath();
-  ctx.roundRect(-7,-94,14,78,5);
-  ctx.fillStyle='#8f6241';
-  ctx.fill();
-  ctx.shadowColor='transparent';
-  ctx.fillStyle=ramp(ctx,{x:-7,y:0},{x:7,y:0},[[0,'#975934'],[.36,'#dd9b5f'],[.73,'#d58c52'],[1,'#a8683e']]);
-  ctx.fill();
-  ctx.beginPath();
-  ctx.moveTo(-8,-93);
-  ctx.bezierCurveTo(-25,-94,-30,-112,-17,-118);
-  ctx.lineTo(18,-117);
-  ctx.bezierCurveTo(30,-112,24,-93,8,-92);
-  ctx.lineTo(8,-101);
-  ctx.bezierCurveTo(15,-103,17,-108,11,-109);
-  ctx.lineTo(-11,-109);
-  ctx.bezierCurveTo(-18,-108,-15,-103,-8,-101);
-  ctx.closePath();
-  ctx.fillStyle='#326560';
-  ctx.fill();
-  ctx.lineWidth=2.2;
-  ctx.strokeStyle='#b6d0a98b';
-  ctx.stroke();
-
-  ctx.beginPath();
-  ctx.moveTo(-13,-29);
-  ctx.bezierCurveTo(-24,-25,-30,-6,-32,12);
-  ctx.bezierCurveTo(-28,30,28,30,32,12);
-  ctx.bezierCurveTo(28,-7,24,-25,12,-29);
-  ctx.closePath();
-  ctx.shadowColor='#76452581';
-  ctx.shadowBlur=10;
-  ctx.shadowOffsetY=8;
-  ctx.fillStyle=ramp(ctx,{x:-30,y:-28},{x:32,y:24},[[0,'#719887'],[.55,'#527e74'],[1,'#2d635e']]);
-  ctx.fill();
-  ctx.shadowColor='transparent';
-  ctx.strokeStyle='#a1b9a3';
-  ctx.lineWidth=2;
-  ctx.stroke();
-  ctx.beginPath();
-  ctx.moveTo(-22,5);
-  ctx.bezierCurveTo(-17,-12,17,-12,22,5);
-  ctx.quadraticCurveTo(14,21,0,20);
-  ctx.quadraticCurveTo(-13,20,-22,5);
-  ctx.fillStyle='#2d5b575c';
-  ctx.fill();
   ctx.restore();
 }
 
@@ -676,6 +620,7 @@ export class Board {
     this.elements=elements;
     this.callbacks=callbacks;
     this.ctx=elements.canvas.getContext('2d');
+    this.lawn=createLawnPlane(elements.lawn,()=>this.draw(false));
     this.tiles=tilesOnLand();
     for(const tile of this.tiles) {
       const grain=noise(tile.x/174+5,tile.y/141+3);
@@ -714,7 +659,7 @@ export class Board {
       }));
     }
     this.props=[
-      {x:TOYS.shovel.x,y:TOYS.shovel.y+32,extent:180,paintWorld:shovel},
+      {x:805,y:44,extent:180,paintWorld:drawShovelModel},
       {x:TOYS.bucket.x,y:TOYS.bucket.y+31,extent:110,paintWorld:drawBucketModel},
       {x:TOYS.rake.x,y:TOYS.rake.y,extent:95,paintWorld:rake},
       {x:TOYS.truck.x,y:TOYS.truck.y+5,extent:90,paintWorld:drawTruckModel},
@@ -1297,6 +1242,7 @@ export class Board {
     if(!v.width || !v.height) return;
     const {canvas}=this.elements;
     const scale=Math.min(devicePixelRatio,this.orbiting?1:2);
+    this.lawn.draw(v,viewAxes,scale);
     if(canvas.width!==Math.round(v.width*scale) || canvas.height!==Math.round(v.height*scale)) {
       canvas.width=Math.round(v.width*scale);
       canvas.height=Math.round(v.height*scale);
@@ -1520,8 +1466,8 @@ export class Board {
     let drag=null;
     let suppressClick=false;
     const touches=new Map();
-    let pinch=null;
-    let pinchFrame=null;
+    let touchGesture=null;
+    let gestureFrame=null;
     let wheelDelta=0;
     let wheelAnchor;
     let wheelFrame;
@@ -1537,24 +1483,34 @@ export class Board {
       drag={id,x,y,lastX:x,lastY:y,moved:false,button,secondary};
     };
     const orbitScale=()=>Math.PI*2/Math.max(510,stage.clientWidth*.83);
-    const measurePinch=()=>{
+    const tiltScale=()=>Math.PI/(2*Math.max(280,stage.clientHeight));
+    const measureTouchPair=()=>{
       const [a,b]=touches.values();
       const box=stage.getBoundingClientRect();
       return {
         center:{x:(a.x+b.x)/2-box.left,y:(a.y+b.y)/2-box.top},
-        span:Math.max(8,range(a,b))
+        span:Math.max(8,range(a,b)),
+        a,b
       };
     };
-    const updatePinch=()=>{
-      pinchFrame=null;
-      const next=measurePinch();
-      const previous=pinch.last;
-      if(!pinch.active && Math.abs(next.span-previous.span)<5 && range(next.center,previous.center)<5) return;
-      pinch.active=true;
-      suppressClick=true;
-      pinch.last=next;
+    const updateTouchGesture=()=>{
+      gestureFrame=null;
+      const next=measureTouchPair();
+      const previous=touchGesture.last;
+      const dx=next.center.x-previous.center.x,dy=next.center.y-previous.center.y;
+      if(!touchGesture.mode) {
+        const first=range(next.a,previous.a),second=range(next.b,previous.b);
+        if(Math.min(first,second)<3 && Math.max(first,second)<18) return;
+        const travel=Math.hypot(dx,dy);
+        const spread=Math.abs(next.span-previous.span);
+        if(spread>=Math.max(6,previous.span*.04) && spread>=travel*.8) touchGesture.mode='zoom';
+        else if(travel>=7 && spread<travel*.8) touchGesture.mode=Math.abs(dy)>Math.abs(dx)*1.35 ? 'tilt' : 'move';
+        else return;
+      }
+      touchGesture.last=next;
       stage.classList.add('dragging');
-      this.zoomBy(next.span/previous.span,previous.center,next.center);
+      if(touchGesture.mode==='tilt') this.orbitBy(0,dy*tiltScale());
+      else this.zoomBy(touchGesture.mode==='zoom' ? next.span/previous.span : 1,previous.center,next.center);
     };
     document.addEventListener('visibilitychange',onMotionChange);
     motionReduced.addEventListener('change',onMotionChange);
@@ -1580,14 +1536,15 @@ export class Board {
         touches.set(event.pointerId,pointer(event));
         if(touches.size>=2) {
           event.preventDefault();
-          if(pinch?.last) {
+          suppressClick=true;
+          if(touchGesture?.last) {
             stage.setPointerCapture(event.pointerId);
             return;
           }
           for(const id of touches.keys()) stage.setPointerCapture(id);
           drag=null;
           stage.classList.remove('dragging');
-          pinch={last:measurePinch(),active:false};
+          touchGesture={last:measureTouchPair(),mode:null};
           return;
         }
       } else if(touches.size) return;
@@ -1602,8 +1559,8 @@ export class Board {
     stage.addEventListener('pointermove',event=>{
       if(touches.has(event.pointerId)) {
         touches.set(event.pointerId,pointer(event));
-        if(pinch?.last) {
-          if(pinchFrame===null) pinchFrame=requestAnimationFrame(updatePinch);
+        if(touchGesture?.last) {
+          if(gestureFrame===null) gestureFrame=requestAnimationFrame(updateTouchGesture);
           return;
         }
       }
@@ -1620,8 +1577,7 @@ export class Board {
         const {zoom}=this.viewport();
         this.setCamera({x:this.camera.x-dx/zoom,y:this.camera.y-dy/zoom,z:this.camera.z});
       } else {
-        const tiltScale=Math.PI/(2*Math.max(280,stage.clientHeight));
-        this.orbitBy(dx*orbitScale(),dy*tiltScale);
+        this.orbitBy(dx*orbitScale(),dy*tiltScale());
       }
       drag.lastX=event.clientX;
       drag.lastY=event.clientY;
@@ -1629,23 +1585,23 @@ export class Board {
     const finishPointer=event=>{
       if(event.type==='lostpointercapture' && (event.target!==stage || stage.hasPointerCapture(event.pointerId))) return;
       if(touches.has(event.pointerId)) {
-        if(pinchFrame!==null) {
-          cancelAnimationFrame(pinchFrame);
-          pinchFrame=null;
-          if(event.type==='pointerup') updatePinch();
+        if(gestureFrame!==null) {
+          cancelAnimationFrame(gestureFrame);
+          gestureFrame=null;
+          if(event.type==='pointerup') updateTouchGesture();
         }
         touches.delete(event.pointerId);
-        if(pinch) {
+        if(touchGesture) {
           if(touches.size>=2) {
-            pinch.last=measurePinch();
+            touchGesture={last:measureTouchPair(),mode:null};
           } else {
             stage.classList.remove('dragging');
             const remaining=touches.entries().next().value;
             if(remaining) {
-              pinch.last=null;
+              touchGesture.last=null;
               startDrag(...remaining);
             } else {
-              pinch=null;
+              touchGesture=null;
               drag=null;
             }
           }

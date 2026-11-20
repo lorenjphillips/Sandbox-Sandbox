@@ -49,7 +49,7 @@ function findFront(event) {
 }
 
 const elements = {
-  stage:$('#stage'),canvas:$('#board-canvas'),labels:$('#map-labels'),markers:$('#marker-layer'),eggLayer:$('#egg-layer'),
+  stage:$('#stage'),canvas:$('#board-canvas'),lawn:$('#lawn-canvas'),labels:$('#map-labels'),markers:$('#marker-layer'),eggLayer:$('#egg-layer'),
   popover:$('#map-popover'),search:$('#map-search'),searchResults:$('#search-results'),
   updates:$('#updates-feed'),historyDate:$('#history-date'),historyDays:$('#history-days'),
   historyPlay:$('#history-play'),playbackNote:$('#playback-note'),latestButton:$('#jump-latest'),
@@ -594,7 +594,7 @@ function renderMethod() {
   $('#method-content').innerHTML=`
     <section class="method-section"><h2>Map controls</h2>
       <p>Drag to turn the sandbox around its center. Scroll or pinch to zoom into a spot.</p>
-      <p>Once zoomed in, drag with two fingers on a touchscreen or click and drag with two fingers on a trackpad. A right-button drag works with a mouse. Zoom back out to recenter.</p></section>
+      <p>On touch, slide two fingers up or down to tilt. Once zoomed in, slide two fingers sideways or diagonally to move. With a mouse, right-drag when zoomed in. Use a two-finger click-drag on a trackpad. Zoom back out to recenter.</p></section>
     <section class="method-section"><h2>Territory</h2>
       <p>Each offering has a fixed home hex. Every other land hex goes to the offering with the lowest squared distance to its home, reduced by ${TERRITORY_WEIGHT} per score point. Scores use events from the preceding ${LOOKBACK_DAYS} days and are capped between −5 and +18 for the geometry.</p>
       <p>Territory size reflects catalog activity. A flag shows the event even if the boundary stays in place. The net hex change shown on a flag combines all scored events for that offering on the same day. Shared rollouts can link to a second profile and earn points once.</p></section>

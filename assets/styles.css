@@ -29,7 +29,7 @@
   --accent: #8d4c26;
   --scroll-thumb: #90704f;
   --scroll-track: #efe5d5;
-  --meadow: #2e4524;
+  --meadow: #51673d;
   --gutter: clamp(16px, 4vw, 64px);
   --sans: "DM Sans", system-ui, sans-serif;
   --serif: Fraunces, Georgia, serif;
@@ -54,16 +54,7 @@
 [hidden] { display: none !important; }
 html { min-width: 320px; }
 body { margin: 0; min-height: 100svh; background: radial-gradient(ellipse at 45% 26%, #fcf5e7 0%, transparent 69%); }
-html:has(#atlas-view:not([hidden])) {
-  background-color: var(--meadow);
-  background-image:
-    radial-gradient(ellipse at 16% 19%, #fff0ae24, transparent 52%),
-    linear-gradient(117deg, #bbb77412, transparent 51%, #21342332),
-    url(grass.jpg);
-  background-position: center, center, center top;
-  background-repeat: no-repeat, no-repeat, repeat;
-  background-size: auto, auto, min(1060px, 74vw) min(700px, 49vw);
-}
+html:has(#atlas-view:not([hidden])) { background: var(--meadow); }
 body:has(#atlas-view:not([hidden]), #compare-view:not([hidden])) {
   display: flex;
   flex-direction: column;
@@ -147,10 +138,10 @@ a { color: inherit; }
   flex: 1;
   flex-direction: column;
   width: 100%;
+  max-width: none;
   padding-bottom: 0;
 }
 .shell:has(#compare-view:not([hidden])) {
-  max-width: none;
   min-height: 0;
   padding-inline: 0;
 }
@@ -275,6 +266,7 @@ body:has(#atlas-view[hidden]) .map-tools { display: none; }
   width: 100%;
   height: 100%;
 }
+#lawn-canvas { pointer-events: none; }
 .map-labels, .marker-layer, .egg-layer { pointer-events: none; }
 .egg-hotspot {
   position: absolute;
@@ -526,6 +518,8 @@ body:has(#atlas-view[hidden]) .map-tools { display: none; }
   display: flex;
   gap: 12px;
   align-items: center;
+  width: min(100%, calc(1560px - 2 * var(--gutter)));
+  margin-inline: auto;
   padding: 4px 0;
   border-bottom: 1px solid var(--rule);
   color: var(--muted);
