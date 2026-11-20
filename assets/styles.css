@@ -401,11 +401,11 @@ body:has(#atlas-view[hidden]) .map-tools { display: none; }
   opacity: 0;
 }
 .map-token:not([data-label])::after { display: none; }
-.map-token:hover, .map-token:focus-visible {
+.stage:not(.camera-moving) .map-token:hover, .map-token:focus-visible {
   transform: translate(-50%, -63%) rotate(0);
   z-index: 6;
 }
-.map-token:hover::after, .map-token:focus-visible::after { opacity: 1; }
+.stage:not(.camera-moving) .map-token:hover::after, .map-token:focus-visible::after { opacity: 1; }
 .map-token.is-selected { outline: 2px solid #814725; outline-offset: 2px; z-index: 4; }
 
 .event-token {
@@ -710,6 +710,8 @@ td .provider-link { color: var(--ink); font-weight: 700; font-size: 14px; paddin
 }
 .compare-tray table { min-width: 490px; }
 .compare-tray th:first-child { width: 117px; }
+.compare-provider-heading { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 8px; }
+.compare-provider-heading button { min-height: 28px; margin-block: -4px; padding-inline: 3px; }
 .compare-tray ul, .compare-tray ol { padding-left: 16px; margin: 0; }
 .method-grid { max-width: 760px; color: var(--body); }
 .method-section { padding: 16px 0 19px; border-top: 1px solid var(--rule); }

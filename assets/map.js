@@ -3,6 +3,7 @@ import { drawBucketModel, drawTruckModel } from './board-models.js';
 import { eggModels } from './egg-models.js';
 import { createLawnPlane } from './lawn-plane.js';
 import { drawNestedSandboxModel, nestedSandboxHitPoints } from './nested-sandbox-model.js';
+import { drawRakeModel } from './rake-model.js';
 import { drawShovelModel } from './shovel-model.js';
 import { WIDTH, HEIGHT, TRAY, RIM, BED, HOME_YAW, HOME_PITCH, MIN_PITCH, MAX_PITCH, orthographic } from './geometry.js';
 
@@ -250,12 +251,6 @@ function screw(ctx,x,y) {
   ctx.restore();
 }
 
-function rotateGroundProp(ctx) {
-  const delta=viewAxes.yaw-HOME_YAW;
-  const sine=Math.sin(delta),cosine=Math.cos(delta),homeGround=Math.sin(HOME_PITCH);
-  ctx.transform(cosine,viewAxes.ground*sine,-sine/homeGround,viewAxes.ground*cosine/homeGround,0,0);
-}
-
 function sandRakeLines(ctx,x,y,angle,length,count) {
   const at={x,y};
   ctx.save();
@@ -290,52 +285,6 @@ function ellipse(ctx,x,y,rx,ry,fill) {
   ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);
   ctx.fillStyle=fill;
   ctx.fill();
-}
-
-function toyShadow(ctx,x,y,rx,ry) {
-  ctx.save();
-  ctx.shadowColor='#5a391d81';
-  ctx.shadowBlur=12;
-  ctx.shadowOffsetX=7;
-  ctx.shadowOffsetY=6;
-  ellipse(ctx,x,y,rx,ry,'#85522469');
-  ctx.restore();
-}
-
-function rake(ctx,x,y) {
-  const at=project(x,y,TRAY.floor+2);
-  ctx.save();
-  ctx.translate(at.x,at.y);
-  rotateGroundProp(ctx);
-  ctx.rotate(.20);
-  toyShadow(ctx,5,7,54,6);
-  ctx.lineCap='round';
-  ctx.beginPath();
-  ctx.moveTo(-54,-2);
-  ctx.lineTo(40,-2);
-  ctx.lineWidth=10;
-  ctx.strokeStyle=ramp(ctx,{x:-20,y:-8},{x:-19,y:4},[[0,'#f3ca88'],[.52,'#c08653'],[1,'#7d4a30']]);
-  ctx.stroke();
-  ctx.beginPath();
-  ctx.roundRect(-59,-8,22,13,4);
-  ctx.fillStyle='#3c6e8a';
-  ctx.fill();
-  ctx.fillStyle=ramp(ctx,{x:38,y:-15},{x:59,y:16},[[0,'#7ab7ca'],[.55,'#4f8fa8'],[1,'#2d617d']]);
-  ctx.beginPath();
-  ctx.roundRect(28,-14,29,23,4);
-  ctx.fill();
-  for(let i=0;i<5;i++) {
-    ctx.beginPath();
-    ctx.roundRect(30+i*5.4,4,3.5,11,1.5);
-    ctx.fill();
-  }
-  ctx.beginPath();
-  ctx.moveTo(34,-11);
-  ctx.lineTo(51,-11);
-  ctx.strokeStyle='#b7dce3';
-  ctx.lineWidth=1.4;
-  ctx.stroke();
-  ctx.restore();
 }
 
 const EGGS=[
@@ -661,7 +610,7 @@ export class Board {
     this.props=[
       {x:805,y:44,extent:180,paintWorld:drawShovelModel},
       {x:TOYS.bucket.x,y:TOYS.bucket.y+31,extent:110,paintWorld:drawBucketModel},
-      {x:TOYS.rake.x,y:TOYS.rake.y,extent:95,paintWorld:rake},
+      {x:TOYS.rake.x,y:TOYS.rake.y,extent:95,paintWorld:drawRakeModel},
       {x:TOYS.truck.x,y:TOYS.truck.y+5,extent:90,paintWorld:drawTruckModel},
       ...EGGS.map(egg=>({...egg})),
       ...PLAY_TOYS.map(toy=>({...toy,playable:true}))
@@ -733,15 +682,8 @@ export class Board {
         }
       }
     }
-    this.logoSeats=this.tiles.map(tile=>{
-      if(this.projectedTileAt(tile.screen)===tile) return tile.screen;
-      return tile.top.map(point=>({x:lerp(tile.screen.x,point.x,.7),y:lerp(tile.screen.y,point.y,.7)}))
-        .find(point=>this.projectedTileAt(point)===tile);
-    });
     for(const site of this.siteList||[]) site.screen=this.tiles[site.index].screen;
     if(this.props) this.projectProps();
-    this.logoAnchorCache=new WeakMap();
-    if(this.owners) this.logoAnchors=this.anchorsFor(this.owners);
   }
 
   projectProps() {
@@ -782,6 +724,7 @@ export class Board {
     this.orbitFrame=requestAnimationFrame(()=>{
       this.orbitFrame=null;
       this.turnTo(this.requestedYaw,this.requestedPitch,true);
+      this.deferLabelLayout();
       this.draw();
       clearTimeout(this.orbitTimer);
       this.orbitTimer=setTimeout(()=>{
@@ -871,7 +814,7 @@ export class Board {
       const centroid={x:0,y:0};
       for(let cursor=0;cursor<component.length;cursor++) {
         const index=component[cursor];
-        const {x,y}=this.tiles[index].screen;
+        const {x,y}=this.tiles[index];
         centroid.x+=x;
         centroid.y+=y;
         for(const neighbor of this.neighbors.get(index)) {
@@ -886,15 +829,14 @@ export class Board {
       let seat;
       let nearest=Infinity;
       for(const index of component) {
-        const point=this.logoSeats[index];
-        if(!point) continue;
-        const distance=range(point,centroid);
+        const candidate=this.tiles[index];
+        const distance=range(candidate,centroid);
         if(distance<nearest) {
-          seat=point;
+          seat=candidate;
           nearest=distance;
         }
       }
-      if(seat) anchors.set(owner,{screen:seat,size:component.length});
+      anchors.set(owner,{tile:seat,size:component.length});
     }
     this.logoAnchorCache.set(layout,anchors);
     return anchors;
@@ -1326,19 +1268,22 @@ export class Board {
     }
     const occupied=[];
     const compact=v.width<650;
+    const moving=Boolean(this.labelSettleTimer);
     const sites=[...this.siteList].sort((a,b)=>this.sitePriority(a)-this.sitePriority(b));
     for(const site of sites) {
       const id=site.company.id;
       const key=KEY_IDS.includes(id);
       const selected=this.selected===id;
       const anchor=this.logoAnchors.get(id);
-      const at=anchor && screen(anchor);
+      const at=anchor && screen(anchor.tile);
       const radius=compact?(key?13:10):(key?17:13);
+      let node=this.labelNodes.get(id);
       const mayShow=at && inside(at) && (this.category==='all'||this.category===site.company.category)
         && (selected||key||!compact||this.camera.z>1.32);
-      const overlaps=mayShow && occupied.some(seat=>range(seat,at)<seat.radius+radius+2);
-      let node=this.labelNodes.get(id);
-      if(mayShow && (!overlaps||selected)) {
+      const clearance=node && !node.hidden ? 0 : 4;
+      const overlaps=mayShow && !moving && occupied.some(seat=>range(seat,at)<seat.radius+radius+clearance);
+      const show=moving && !selected ? at && node && !node.hidden : mayShow && (!overlaps||selected);
+      if(show) {
         if(!node) {
           node=document.createElement('button');
           node.type='button';
@@ -1426,10 +1371,13 @@ export class Board {
     cancelAnimationFrame(this.orbitFrame);
     this.orbitFrame=null;
     clearTimeout(this.orbitTimer);
+    clearTimeout(this.labelSettleTimer);
+    this.labelSettleTimer=null;
+    this.elements.stage.classList.remove('camera-moving');
     this.requestedYaw=HOME_YAW;
     this.requestedPitch=HOME_PITCH;
     if(viewAxes.yaw!==HOME_YAW || viewAxes.pitch!==HOME_PITCH || this.orbiting) this.turnTo(HOME_YAW,HOME_PITCH,false);
-    this.setCamera({...trayCenter(),z:MIN_ZOOM});
+    this.setCamera({...trayCenter(),z:MIN_ZOOM},false);
   }
 
   zoomBy(factor,anchor,destination=anchor) {
@@ -1449,7 +1397,18 @@ export class Board {
     return z;
   }
 
-  setCamera({x,y,z}) {
+  deferLabelLayout() {
+    clearTimeout(this.labelSettleTimer);
+    this.elements.stage.classList.add('camera-moving');
+    this.labelSettleTimer=setTimeout(()=>{
+      this.labelSettleTimer=null;
+      this.elements.stage.classList.remove('camera-moving');
+      this.placeTokens(this.viewport());
+      this.callbacks.placed?.();
+    },180);
+  }
+
+  setCamera({x,y,z},moving=true) {
     const center=trayCenter();
     const reach=TRAY.radius*(1-MIN_ZOOM/z);
     const rise=reach*Math.sin(MAX_PITCH);
@@ -1458,6 +1417,7 @@ export class Board {
       y:clamp(y,center.y-rise,center.y+rise),
       z
     };
+    if(moving) this.deferLabelLayout();
     this.draw();
   }
 

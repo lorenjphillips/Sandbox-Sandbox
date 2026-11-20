@@ -472,6 +472,13 @@ function compareToggle(id) {
     return;
   }
   try {localStorage.setItem('sandbox-atlas-compare',JSON.stringify([...compared]));} catch {}
+  const [view,query]=location.hash.split('?');
+  const params=new URLSearchParams(query);
+  if(view==='#compare' && params.has('providers')) {
+    if(compared.size) params.set('providers',[...compared].join(','));
+    else params.delete('providers');
+    history.replaceState(history.state,'',params.size ? view+'?'+params : view);
+  }
   renderDirectory();
   if(elements.profile.open) updateCompareButton();
 }
@@ -513,7 +520,10 @@ function renderDirectory() {
     ['Valuation',c=>escaped(c.valuation||moneyUnknown)]
   ];
   $('#compare-tray').innerHTML=selected.length ? `<div class="compare-tray">
-    <table aria-label="Comparison"><thead><tr><th scope="col">Measure</th>${selected.map(c=>`<th scope="col">${escaped(c.name)}</th>`).join('')}</tr></thead>
+    <table aria-label="Comparison"><thead><tr><th scope="col">Measure</th>${selected.map(c=>`<th scope="col"><div class="compare-provider-heading">
+      <span>${escaped(c.name)}</span>
+      <button type="button" class="compare-pick" data-compare-id="${c.id}" aria-label="Remove ${escaped(c.name)} from comparison">Remove</button>
+    </div></th>`).join('')}</tr></thead>
     <tbody>${rows.map(([label,getValue])=>`<tr><th scope="row">${label}</th>${selected.map(c=>`<td>${getValue(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>` : '';
 }
 
@@ -762,11 +772,14 @@ $('#directory-search').addEventListener('input',renderDirectory);
 $('#directory-category').addEventListener('change',renderDirectory);
 $('#compare-view').addEventListener('click',event=>{
   const profileId=event.target.closest('[data-open-profile]')?.dataset.openProfile;
-  const compareId=event.target.closest('[data-compare-id]')?.dataset.compareId;
+  const action=event.target.closest('[data-compare-id]');
   if(profileId) openProfile(profileId);
-  if(compareId) {
+  if(action) {
+    const {compareId}=action.dataset;
+    const fromHeader=Boolean(action.closest('#compare-tray'));
     compareToggle(compareId);
-    document.querySelector('#directory-table [data-compare-id="'+compareId+'"]')?.focus({preventScroll:true});
+    const next=fromHeader ? $('#compare-tray [data-compare-id]') : null;
+    (next || $('#directory-table [data-compare-id="'+compareId+'"]') || $('#directory-search')).focus({preventScroll:true});
   }
 });
 elements.profile.addEventListener('click',event=>{
