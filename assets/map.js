@@ -1094,7 +1094,7 @@ export class Board {
 
   playToy(toy) {
     toy.started=performance.now();
-    const note=this.callbacks.playToy(toy.id);
+    const note=this.callbacks.playToy(toy.id,toy.node);
     if(note) toy.node.dataset.note=note;
     else delete toy.node.dataset.note;
     clearTimeout(toy.timer);

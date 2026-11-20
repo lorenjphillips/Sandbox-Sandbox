@@ -58,11 +58,11 @@ const elements = {
   zoomHint:$('#zoom-hint'),profile:$('#profile')
 };
 const eggPlayer=$('#egg-player');
-const achievements=mountAchievements($('#achievement-toggle'),$('#achievements-panel'),$('#achievement-announcement'));
-const easterEggs=mountEasterEggPlayer(elements.eggLayer,eggPlayer,id=>{
+const achievements=mountAchievements($('#achievement-toggle'),$('#achievements-panel'),$('#achievement-announcement'),elements.stage);
+const easterEggs=mountEasterEggPlayer(elements.eggLayer,eggPlayer,(id,origin)=>{
   pauseHistory();
   clearSelection();
-  achievements.unlock(id);
+  achievements.unlock(id,origin);
 });
 
 let atlas;
@@ -562,9 +562,9 @@ function toggleHistory() {
   $('#announcements').textContent=`Playing history from ${formatDate(currentDate,true)}.`;
 }
 
-function playBoardToy(id) {
+function playBoardToy(id,origin) {
   pauseHistory();
-  achievements.unlock(id);
+  achievements.unlock(id,origin);
   if(id==='hourglass' && currentDate>oldest) {
     showSnapshot(currentDate-DAY,true);
     return;

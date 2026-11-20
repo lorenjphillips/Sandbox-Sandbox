@@ -27,7 +27,7 @@ export function mountEasterEggPlayer(layer,panel,onOpen) {
     const trigger=event.target.closest('button[data-egg]');
     if(!trigger || !Object.hasOwn(clips,trigger.dataset.egg)) return;
     const clip=clips[trigger.dataset.egg];
-    onOpen(trigger.dataset.egg);
+    onOpen(trigger.dataset.egg,trigger);
     close();
     active=trigger;
     active.setAttribute('aria-expanded','true');
