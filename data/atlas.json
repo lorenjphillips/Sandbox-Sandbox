@@ -4856,7 +4856,8 @@
       "summary": "The Foundation announced version 1.0 of its MIT-licensed runtime for parallel coding agents with isolated containers and network policies. The project registry lists October 31 as the release date.",
       "url": "https://newsroom.eclipse.org/news/announcements/eclipse-foundation-launches-eclipse-enclave-10-bringing-security-and-choice",
       "source": "Eclipse Foundation",
-      "front": "Execution"
+      "front": "Execution",
+      "tweetUrl": "https://x.com/EclipseFdn/status/2123374587748491689"
     },
     {
       "company": "machine0",
@@ -4886,7 +4887,18 @@
       "summary": "Sandboxes adjust allocated CPU and memory during an active coding session within project limits. The default minimum is 2 vCPU and 4 GiB, and compute is metered per second.",
       "url": "https://www.tembo.io/changelog/automatic-sandbox-sizing",
       "source": "Tembo changelog",
-      "front": "Execution"
+      "front": "Execution",
+      "tweetUrl": "https://x.com/tembo/status/2123446213752307721"
+    },
+    {
+      "company": "modal",
+      "date": "2026-11-19",
+      "kind": "adoption",
+      "title": "Abundant uses Modal Sandboxes for RL rollouts",
+      "summary": "Modal reports that Abundant uses Sandboxes and Functions for reinforcement-learning rollout environments and has created more than 75,000 rollouts.",
+      "url": "https://modal.com/blog/abundant-efficient-rollout-architecture-with-modal-sandboxes",
+      "source": "Modal customer case study",
+      "tweetUrl": "https://x.com/modal/status/2123520368589582591"
     },
     {
       "company": "vercel",
@@ -4990,7 +5002,8 @@
       "title": "InstaBox adds H100 GPU machines",
       "summary": "The new H100 option is available through the GPU Linux machine flow on paid plans.",
       "url": "https://instabox.sh/changelog/h100",
-      "source": "InstaBox changelog"
+      "source": "InstaBox changelog",
+      "tweetUrl": "https://x.com/hanghuang_/status/2122748686467809767"
     },
     {
       "company": "buddy",
@@ -5042,13 +5055,55 @@
       "front": "Network"
     },
     {
+      "company": "e2b",
+      "date": "2026-11-17",
+      "kind": "adoption",
+      "title": "Amp uses E2B for its hosted Orbs",
+      "summary": "In a customer story, E2B described how Amp uses its sandboxes for default hosted Orbs, the temporary remote machines where Amp agents work on repositories. Amp also supports self-hosted Orbs.",
+      "url": "https://ampcode.com/docs/orbs/customizing#mount-external-storage",
+      "source": "Amp documentation",
+      "tweetUrl": "https://x.com/e2b/status/2122714117316423688"
+    },
+    {
+      "company": "daytona",
+      "date": "2026-11-17",
+      "kind": "launch",
+      "title": "Daytona rolls out dedicated macOS sandboxes",
+      "summary": "Daytona announced macOS VMs on Apple silicon with a dedicated Mac mini reserved for each organization. Its CEO listed M4, M4 Pro, and M5 Pro hardware.",
+      "url": "https://www.daytona.io/dotfiles/macos-sandboxes",
+      "source": "Daytona launch announcement",
+      "tweetUrl": "https://x.com/ivanburazin/status/2122721729512628713"
+    },
+    {
+      "company": "depot",
+      "date": "2026-11-17",
+      "kind": "feature",
+      "title": "Depot expands shared MCP connections for Managed Agents",
+      "summary": "Teams can reuse MCP server connections across supported agents. Depot sends requests through its proxy so upstream credentials stay outside the sandbox.",
+      "url": "https://depot.dev/blog/mcp-in-managed-agents",
+      "source": "Depot product announcement",
+      "front": "Network",
+      "tweetUrl": "https://x.com/depotdev/status/2122752598663102829"
+    },
+    {
+      "company": "e2b",
+      "date": "2026-11-17",
+      "kind": "adoption",
+      "title": "E2B reports three billion sandbox starts",
+      "summary": "E2B said it has reached three billion cumulative sandbox starts, up from the two billion it reported in October.",
+      "url": "https://x.com/e2b/status/2122824854693175568",
+      "source": "E2B announcement on X",
+      "tweetUrl": "https://x.com/e2b/status/2122824854693175568"
+    },
+    {
       "company": "vercel",
       "date": "2026-11-16",
       "kind": "feature",
       "title": "Python SDK reaches 1.0",
       "summary": "Vercel stabilized the Python API, added parity with the TypeScript SDK, and documented synchronous and asynchronous modes.",
       "url": "https://vercel.com/changelog/vercel-sandbox-python-sdk-1-0-is-now-available",
-      "source": "Vercel changelog"
+      "source": "Vercel changelog",
+      "tweetUrl": "https://x.com/vercel_dev/status/2123063465149636957"
     },
     {
       "company": "e2b",
@@ -5075,7 +5130,8 @@
       "title": "BrowserPod 4.0 goes free for production",
       "summary": "Leaning Technologies released BrowserPod 4.0 with expanded networking and built-in programs, and made browser-local use free for commercial production.",
       "url": "https://labs.leaningtech.com/blog/browserpod-40",
-      "source": "Leaning Technologies release"
+      "source": "Leaning Technologies release",
+      "tweetUrl": "https://x.com/leaningtech/status/2122296846597144906"
     },
     {
       "company": "boat",
@@ -5137,6 +5193,17 @@
       "front": "State"
     },
     {
+      "company": "e2b",
+      "date": "2026-11-16",
+      "kind": "feature",
+      "title": "E2B Cookbook adds a Hatchet sandbox example",
+      "summary": "The example runs a durable Hatchet task in an E2B sandbox and demonstrates reconnecting to verify that files survived a snapshot.",
+      "url": "https://github.com/e2b-dev/e2b-cookbook/pull/179",
+      "source": "E2B Cookbook pull request",
+      "front": "Workflow",
+      "tweetUrl": "https://x.com/e2b/status/2122410914637127987"
+    },
+    {
       "company": "instabox",
       "date": "2026-11-15",
       "kind": "feature",
@@ -5171,7 +5238,8 @@
       "title": "Regional caches speed sandbox startup",
       "summary": "Vercel reported up to 4× faster startup outside its Washington, D.C. region when image data hits a regional cache.",
       "url": "https://vercel.com/changelog/vercel-sandbox-starts-up-to-four-times-faster",
-      "source": "Vercel internal benchmark"
+      "source": "Vercel internal benchmark",
+      "tweetUrl": "https://x.com/vercel_dev/status/2121346552476377102"
     },
     {
       "company": "runloop",
@@ -5189,7 +5257,8 @@
       "title": "Cloud Agent tasks open to external workflows",
       "summary": "Railway added asynchronous tasks that can start or resume a cloud agent VM through the CLI, MCP, or API and return results without an open session.",
       "url": "https://railway.com/changelog/2026-11-13-cloud-agent-tasks",
-      "source": "Railway changelog"
+      "source": "Railway changelog",
+      "tweetUrl": "https://x.com/Railway/status/2121366497205387366"
     },
     {
       "company": "opencomputer",
@@ -5209,6 +5278,17 @@
       "url": "https://techcommunity.microsoft.com/blog/appsonazureblog/introducing-azure-container-apps-sandboxes-in-visual-studio-code/4573296",
       "source": "Microsoft Azure announcement",
       "front": "Workflow"
+    },
+    {
+      "company": "tembo",
+      "date": "2026-11-13",
+      "kind": "feature",
+      "title": "Tembo adds sandbox VM commands in sessions",
+      "summary": "Tembo added a /vm command that lets users start, stop, or restart a sandbox VM from a session without leaving the conversation.",
+      "url": "https://www.tembo.io/changelog/session-folders-custom-roles-and-voice-dictation",
+      "source": "Tembo changelog",
+      "front": "Execution",
+      "tweetUrl": "https://x.com/tembo/status/2121634264156696584"
     },
     {
       "company": "tensorlake",
