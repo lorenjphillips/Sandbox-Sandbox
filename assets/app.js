@@ -3,6 +3,27 @@ import { mountAchievements } from './achievements.js';
 import { mountEasterEggPlayer } from './easter-eggs.js';
 import { mountHistoryCalendar } from './history-calendar.js';
 const $ = selector => document.querySelector(selector);
+const agentsButton=$('#agents-copy');
+const agentsCopyLabel=agentsButton.querySelector('span');
+const agentPrompt='Use https://sandboxsandbox.org/api/v1/catalog.json to compare AI sandboxes for my workload. Use the published billing units and minimums, cite the pricing sources, and mark any unknown rates.';
+let agentsCopyTimer;
+
+agentsButton.addEventListener('click',async()=>{
+  try {
+    await navigator.clipboard.writeText(agentPrompt);
+  } catch {
+    window.prompt('Copy the Sandbox Sandbox agent prompt',agentPrompt);
+    return;
+  }
+  clearTimeout(agentsCopyTimer);
+  agentsCopyLabel.textContent='Copied';
+  $('#agents-copy-status').textContent='Agent prompt copied.';
+  agentsCopyTimer=setTimeout(()=>{
+    agentsCopyLabel.textContent='For agents';
+    $('#agents-copy-status').textContent='';
+  },1600);
+});
+
 const DAY = 86_400_000;
 const LOOKBACK_DAYS = 180;
 const MARKER_DAYS = 14;

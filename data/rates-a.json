@@ -1,0 +1,2360 @@
+{
+  "e2b": [
+    {
+      "label": "Hobby",
+      "status": "published",
+      "sourceUrl": "https://e2b.dev/pricing",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "subscription",
+          "amount": 0,
+          "currency": "USD",
+          "unit": "month",
+          "variant": "Hobby",
+          "basis": "base_fee"
+        }
+      ]
+    },
+    {
+      "label": "Pro",
+      "status": "published",
+      "sourceUrl": "https://e2b.dev/pricing",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "subscription",
+          "amount": 150,
+          "currency": "USD",
+          "unit": "month",
+          "variant": "Pro",
+          "basis": "base_fee"
+        },
+        {
+          "meter": "concurrency_add_on",
+          "amount": 500,
+          "currency": "USD",
+          "unit": "month",
+          "variant": "600 concurrent"
+        },
+        {
+          "meter": "concurrency_add_on",
+          "amount": 1000,
+          "currency": "USD",
+          "unit": "month",
+          "variant": "1,100 concurrent"
+        }
+      ]
+    },
+    {
+      "label": "Enterprise",
+      "status": "published",
+      "sourceUrl": "https://e2b.dev/pricing",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "subscription",
+          "minAmount": 2000,
+          "currency": "USD",
+          "unit": "month",
+          "variant": "Enterprise",
+          "basis": "minimum_commitment"
+        }
+      ]
+    },
+    {
+      "label": "CPU",
+      "status": "published",
+      "sourceUrl": "https://e2b.dev/pricing",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "cpu",
+          "amount": 0.0504,
+          "currency": "USD",
+          "unit": "vcpu_hour",
+          "basis": "running"
+        }
+      ]
+    },
+    {
+      "label": "Memory",
+      "status": "published",
+      "sourceUrl": "https://e2b.dev/pricing",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "memory",
+          "amount": 0.0162,
+          "currency": "USD",
+          "unit": "gib_hour",
+          "basis": "running"
+        }
+      ]
+    }
+  ],
+  "vercel": [
+    {
+      "label": "Hobby",
+      "status": "free",
+      "sourceUrl": "https://vercel.com/docs/sandbox/pricing",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "subscription",
+          "amount": 0,
+          "currency": "USD",
+          "unit": "month",
+          "variant": "Hobby",
+          "basis": "base_fee"
+        }
+      ]
+    },
+    {
+      "label": "Pro",
+      "status": "published",
+      "sourceUrl": "https://vercel.com/docs/sandbox/pricing",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "subscription",
+          "amount": 20,
+          "currency": "USD",
+          "unit": "month",
+          "variant": "Pro",
+          "basis": "base_fee_with_monthly_usage_credit"
+        },
+        {
+          "meter": "cpu",
+          "amount": 0.128,
+          "currency": "USD",
+          "unit": "vcpu_hour",
+          "variant": "Pro",
+          "basis": "active_cpu",
+          "region": "iad1"
+        },
+        {
+          "meter": "memory",
+          "amount": 0.0212,
+          "currency": "USD",
+          "unit": "gb_hour",
+          "variant": "Pro",
+          "basis": "provisioned",
+          "region": "iad1"
+        },
+        {
+          "meter": "sandbox_creation",
+          "amount": 0.6,
+          "currency": "USD",
+          "unit": "million_creations",
+          "variant": "Pro"
+        },
+        {
+          "meter": "snapshot_storage",
+          "amount": 0.08,
+          "currency": "USD",
+          "unit": "gb_month",
+          "variant": "Pro"
+        }
+      ]
+    },
+    {
+      "label": "Enterprise",
+      "status": "quote",
+      "sourceUrl": "https://vercel.com/docs/sandbox/pricing",
+      "verifiedAt": null,
+      "charges": []
+    },
+    {
+      "label": "Drives",
+      "status": "published",
+      "sourceUrl": "https://vercel.com/docs/sandbox/pricing",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "drive_storage",
+          "amount": 0.05,
+          "currency": "USD",
+          "unit": "gb_month",
+          "region": "iad1"
+        },
+        {
+          "meter": "drive_reads",
+          "amount": 0.0015,
+          "currency": "USD",
+          "unit": "gb",
+          "variant": "Pro",
+          "region": "iad1"
+        },
+        {
+          "meter": "drive_writes",
+          "amount": 0.004,
+          "currency": "USD",
+          "unit": "gb",
+          "variant": "Pro",
+          "region": "iad1"
+        }
+      ]
+    }
+  ],
+  "cloudflare": [
+    {
+      "label": "Workers Paid",
+      "status": "published",
+      "sourceUrl": "https://developers.cloudflare.com/containers/platform/pricing/",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "subscription",
+          "minAmount": 5,
+          "currency": "USD",
+          "unit": "month",
+          "variant": "Workers Paid",
+          "basis": "required_plan"
+        }
+      ]
+    },
+    {
+      "label": "Container CPU",
+      "status": "published",
+      "sourceUrl": "https://developers.cloudflare.com/containers/platform/pricing/",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "cpu",
+          "amount": 0.00002,
+          "currency": "USD",
+          "unit": "vcpu_second",
+          "basis": "active_cpu_after_allowance"
+        }
+      ]
+    },
+    {
+      "label": "Container memory",
+      "status": "published",
+      "sourceUrl": "https://developers.cloudflare.com/containers/platform/pricing/",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "memory",
+          "amount": 0.0000025,
+          "currency": "USD",
+          "unit": "gib_second",
+          "basis": "provisioned_while_running_after_allowance"
+        }
+      ]
+    },
+    {
+      "label": "Container disk",
+      "status": "published",
+      "sourceUrl": "https://developers.cloudflare.com/containers/platform/pricing/",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "disk",
+          "amount": 7e-8,
+          "currency": "USD",
+          "unit": "gb_second",
+          "basis": "provisioned_while_running_after_allowance"
+        }
+      ]
+    }
+  ],
+  "modal": [
+    {
+      "label": "Starter",
+      "status": "published",
+      "sourceUrl": "https://modal.com/pricing",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "subscription",
+          "amount": 0,
+          "currency": "USD",
+          "unit": "month",
+          "variant": "Starter",
+          "basis": "base_fee"
+        }
+      ]
+    },
+    {
+      "label": "Team",
+      "status": "published",
+      "sourceUrl": "https://modal.com/pricing",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "subscription",
+          "amount": 250,
+          "currency": "USD",
+          "unit": "month",
+          "variant": "Team",
+          "basis": "base_fee"
+        }
+      ]
+    },
+    {
+      "label": "Enterprise",
+      "status": "quote",
+      "sourceUrl": "https://modal.com/pricing",
+      "verifiedAt": null,
+      "charges": []
+    },
+    {
+      "label": "Sandbox CPU",
+      "status": "published",
+      "sourceUrl": "https://modal.com/pricing",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "cpu",
+          "amount": 0.00003942,
+          "currency": "USD",
+          "unit": "physical_core_second",
+          "basis": "sandbox_compute"
+        }
+      ]
+    },
+    {
+      "label": "Sandbox memory",
+      "status": "published",
+      "sourceUrl": "https://modal.com/pricing",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "memory",
+          "amount": 0.00000667,
+          "currency": "USD",
+          "unit": "gib_second",
+          "basis": "sandbox_compute"
+        }
+      ]
+    }
+  ],
+  "daytona": [
+    {
+      "label": "Starter",
+      "status": "published",
+      "sourceUrl": "https://www.daytona.com/pricing",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "subscription",
+          "amount": 0,
+          "currency": "USD",
+          "unit": "month",
+          "variant": "Starter",
+          "basis": "base_fee"
+        }
+      ]
+    },
+    {
+      "label": "Team",
+      "status": "published",
+      "sourceUrl": "https://www.daytona.com/pricing",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "compute_commitment",
+          "minAmount": 250,
+          "currency": "USD",
+          "unit": "month",
+          "variant": "Team",
+          "basis": "minimum_compute_commitment"
+        }
+      ]
+    },
+    {
+      "label": "Enterprise",
+      "status": "quote",
+      "sourceUrl": "https://www.daytona.com/pricing",
+      "verifiedAt": null,
+      "charges": []
+    },
+    {
+      "label": "On-demand CPU",
+      "status": "published",
+      "sourceUrl": "https://www.daytona.com/pricing",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "cpu",
+          "minAmount": 0.101,
+          "maxAmount": 0.235,
+          "currency": "USD",
+          "unit": "physical_core_hour",
+          "basis": "processor_generation_dependent"
+        }
+      ]
+    },
+    {
+      "label": "Memory and volumes",
+      "status": "published",
+      "sourceUrl": "https://www.daytona.com/pricing",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "memory",
+          "amount": 0.0162,
+          "currency": "USD",
+          "unit": "gib_hour"
+        },
+        {
+          "meter": "volume_storage",
+          "amount": 0.000108,
+          "currency": "USD",
+          "unit": "gib_hour"
+        }
+      ]
+    },
+    {
+      "label": "On-demand GPUs",
+      "status": "published",
+      "sourceUrl": "https://www.daytona.com/pricing",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "gpu",
+          "amount": 0.99,
+          "currency": "USD",
+          "unit": "gpu_hour",
+          "variant": "RTX 4090"
+        },
+        {
+          "meter": "gpu",
+          "amount": 1.29,
+          "currency": "USD",
+          "unit": "gpu_hour",
+          "variant": "RTX 5090"
+        },
+        {
+          "meter": "gpu",
+          "amount": 3.03,
+          "currency": "USD",
+          "unit": "gpu_hour",
+          "variant": "RTX PRO 6000"
+        },
+        {
+          "meter": "gpu",
+          "amount": 3.95,
+          "currency": "USD",
+          "unit": "gpu_hour",
+          "variant": "H100"
+        },
+        {
+          "meter": "gpu",
+          "amount": 4.54,
+          "currency": "USD",
+          "unit": "gpu_hour",
+          "variant": "H200"
+        },
+        {
+          "meter": "gpu",
+          "amount": 5.99,
+          "currency": "USD",
+          "unit": "gpu_hour",
+          "variant": "MI355X"
+        },
+        {
+          "meter": "gpu",
+          "amount": 6.25,
+          "currency": "USD",
+          "unit": "gpu_hour",
+          "variant": "B200"
+        },
+        {
+          "meter": "gpu",
+          "amount": 7.1,
+          "currency": "USD",
+          "unit": "gpu_hour",
+          "variant": "B300"
+        }
+      ]
+    },
+    {
+      "label": "OS per core-hour",
+      "status": "published",
+      "sourceUrl": "https://www.daytona.com/pricing",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "os",
+          "amount": 0,
+          "currency": "USD",
+          "unit": "core_hour",
+          "variant": "Linux"
+        },
+        {
+          "meter": "os",
+          "amount": 0.0082,
+          "currency": "USD",
+          "unit": "core_hour",
+          "variant": "macOS",
+          "basis": "separate_reservation_required"
+        },
+        {
+          "meter": "os",
+          "amount": 0.172,
+          "currency": "USD",
+          "unit": "core_hour",
+          "variant": "Windows"
+        }
+      ]
+    }
+  ],
+  "sprites": [
+    {
+      "label": "CPU time",
+      "status": "published",
+      "sourceUrl": "https://fly.io/pricing-update/",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "cpu",
+          "amount": 0.03825,
+          "currency": "USD",
+          "unit": "cpu_hour",
+          "basis": "active_cpu"
+        }
+      ]
+    },
+    {
+      "label": "Memory",
+      "status": "published",
+      "sourceUrl": "https://fly.io/pricing-update/",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "memory",
+          "amount": 0.021875,
+          "currency": "USD",
+          "unit": "gb_hour",
+          "basis": "actual_while_active"
+        }
+      ]
+    },
+    {
+      "label": "Storage",
+      "status": "published",
+      "sourceUrl": "https://fly.io/pricing-update/",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "storage",
+          "amount": 0.5,
+          "currency": "USD",
+          "unit": "gb_month",
+          "variant": "hot",
+          "basis": "awake"
+        },
+        {
+          "meter": "storage",
+          "amount": 0.02,
+          "currency": "USD",
+          "unit": "gb_month",
+          "variant": "cold",
+          "basis": "retention"
+        }
+      ]
+    },
+    {
+      "label": "Plans",
+      "status": "published",
+      "sourceUrl": "https://fly.io/pricing-update/",
+      "verifiedAt": null,
+      "charges": []
+    }
+  ],
+  "freestyle": [
+    {
+      "label": "Free",
+      "status": "free",
+      "sourceUrl": "https://www.freestyle.sh/docs/vms/pricing-and-limits",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "subscription",
+          "amount": 0,
+          "currency": "USD",
+          "unit": "month",
+          "variant": "Free",
+          "basis": "base_fee"
+        }
+      ]
+    },
+    {
+      "label": "Hobby",
+      "status": "published",
+      "sourceUrl": "https://www.freestyle.sh/docs/vms/pricing-and-limits",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "subscription",
+          "amount": 50,
+          "currency": "USD",
+          "unit": "month",
+          "variant": "Hobby",
+          "basis": "minimum_credited_to_usage"
+        }
+      ]
+    },
+    {
+      "label": "Pro",
+      "status": "published",
+      "sourceUrl": "https://www.freestyle.sh/docs/vms/pricing-and-limits",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "subscription",
+          "amount": 500,
+          "currency": "USD",
+          "unit": "month",
+          "variant": "Pro",
+          "basis": "minimum_credited_to_usage"
+        }
+      ]
+    },
+    {
+      "label": "Enterprise",
+      "status": "quote",
+      "sourceUrl": "https://www.freestyle.sh/docs/vms/pricing-and-limits",
+      "verifiedAt": null,
+      "charges": []
+    },
+    {
+      "label": "VM usage",
+      "status": "published",
+      "sourceUrl": "https://www.freestyle.sh/docs/vms/pricing-and-limits",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "cpu",
+          "amount": 0.04032,
+          "currency": "USD",
+          "unit": "vcpu_hour"
+        },
+        {
+          "meter": "memory",
+          "amount": 0.0129,
+          "currency": "USD",
+          "unit": "gib_hour"
+        },
+        {
+          "meter": "storage",
+          "amount": 0.000086,
+          "currency": "USD",
+          "unit": "gib_hour"
+        },
+        {
+          "meter": "data_transfer",
+          "amount": 0.02,
+          "currency": "USD",
+          "unit": "gb",
+          "basis": "after_allowance"
+        }
+      ]
+    }
+  ],
+  "microsandbox": [
+    {
+      "label": "Local runtime",
+      "status": "free",
+      "sourceUrl": "https://github.com/superradcompany/microsandbox",
+      "verifiedAt": null,
+      "charges": []
+    },
+    {
+      "label": "Cloud trial",
+      "status": "free",
+      "sourceUrl": "https://microsandbox.dev/pricing",
+      "verifiedAt": null,
+      "charges": []
+    },
+    {
+      "label": "Cloud Builder",
+      "status": "published",
+      "sourceUrl": "https://microsandbox.dev/pricing",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "subscription",
+          "amount": 20,
+          "currency": "USD",
+          "unit": "month",
+          "variant": "Cloud Builder",
+          "basis": "base_fee_waitlist"
+        }
+      ]
+    },
+    {
+      "label": "Cloud Teams",
+      "status": "published",
+      "sourceUrl": "https://microsandbox.dev/pricing",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "subscription",
+          "amount": 200,
+          "currency": "USD",
+          "unit": "month",
+          "variant": "Cloud Teams",
+          "basis": "base_fee_waitlist"
+        }
+      ]
+    },
+    {
+      "label": "Cloud Enterprise",
+      "status": "quote",
+      "sourceUrl": "https://microsandbox.dev/pricing",
+      "verifiedAt": null,
+      "charges": []
+    },
+    {
+      "label": "Cloud compute",
+      "status": "published",
+      "sourceUrl": "https://microsandbox.dev/pricing",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "cpu",
+          "amount": 0.048,
+          "currency": "USD",
+          "unit": "vcpu_hour"
+        },
+        {
+          "meter": "memory",
+          "amount": 0.003,
+          "currency": "USD",
+          "unit": "gib_hour"
+        },
+        {
+          "meter": "root_disk",
+          "amount": 0.0000625,
+          "currency": "USD",
+          "unit": "gib_hour"
+        }
+      ]
+    },
+    {
+      "label": "Cloud storage",
+      "status": "published",
+      "sourceUrl": "https://microsandbox.dev/pricing",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "volume_storage",
+          "amount": 0.15,
+          "currency": "USD",
+          "unit": "gib_month"
+        },
+        {
+          "meter": "snapshot_storage",
+          "amount": 0.08,
+          "currency": "USD",
+          "unit": "gib_month"
+        }
+      ]
+    }
+  ],
+  "runloop": [
+    {
+      "label": "Basic (historical)",
+      "status": "historical",
+      "sourceUrl": "https://runloop.ai/pricing",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "subscription",
+          "amount": 0,
+          "currency": "USD",
+          "unit": "month",
+          "variant": "Basic",
+          "basis": "historical_base_fee"
+        }
+      ]
+    },
+    {
+      "label": "Pro (historical)",
+      "status": "historical",
+      "sourceUrl": "https://runloop.ai/pricing",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "subscription",
+          "amount": 250,
+          "currency": "USD",
+          "unit": "month",
+          "variant": "Pro",
+          "basis": "historical_base_fee"
+        }
+      ]
+    },
+    {
+      "label": "Enterprise (historical)",
+      "status": "historical",
+      "sourceUrl": "https://runloop.ai/pricing",
+      "verifiedAt": null,
+      "charges": []
+    },
+    {
+      "label": "Compute (historical)",
+      "status": "historical",
+      "sourceUrl": "https://runloop.ai/pricing",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "cpu",
+          "amount": 0.108,
+          "currency": "USD",
+          "unit": "cpu_hour"
+        },
+        {
+          "meter": "memory",
+          "amount": 0.0252,
+          "currency": "USD",
+          "unit": "gb_hour"
+        },
+        {
+          "meter": "snapshot_storage",
+          "amount": 0.000072,
+          "currency": "USD",
+          "unit": "gb_hour"
+        }
+      ]
+    }
+  ],
+  "morph": [
+    {
+      "label": "Free plan",
+      "status": "published",
+      "sourceUrl": "https://cloud.morph.so/web/subscribe",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "subscription",
+          "amount": 0,
+          "currency": "USD",
+          "unit": "month",
+          "variant": "Free",
+          "basis": "base_fee"
+        }
+      ]
+    },
+    {
+      "label": "Developer",
+      "status": "published",
+      "sourceUrl": "https://cloud.morph.so/web/subscribe",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "subscription",
+          "amount": 40,
+          "currency": "USD",
+          "unit": "month",
+          "variant": "Developer",
+          "basis": "base_fee"
+        }
+      ]
+    },
+    {
+      "label": "Team",
+      "status": "published",
+      "sourceUrl": "https://cloud.morph.so/web/subscribe",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "subscription",
+          "amount": 250,
+          "currency": "USD",
+          "unit": "month",
+          "variant": "Team",
+          "basis": "base_fee"
+        }
+      ]
+    },
+    {
+      "label": "Enterprise",
+      "status": "quote",
+      "sourceUrl": "https://cloud.morph.so/web/subscribe",
+      "verifiedAt": null,
+      "charges": []
+    },
+    {
+      "label": "Compute unit",
+      "status": "published",
+      "sourceUrl": "https://cloud.morph.so/web/subscribe",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "compute",
+          "amount": 0.05,
+          "currency": "USD",
+          "unit": "mcu",
+          "basis": "highest_resource_tier"
+        }
+      ]
+    }
+  ],
+  "blaxel": [
+    {
+      "label": "Pay as you go",
+      "status": "published",
+      "sourceUrl": "https://blaxel.ai/pricing",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "subscription",
+          "amount": 0,
+          "currency": "USD",
+          "unit": "month",
+          "variant": "Pay as you go",
+          "basis": "base_fee"
+        }
+      ]
+    },
+    {
+      "label": "Custom",
+      "status": "quote",
+      "sourceUrl": "https://blaxel.ai/pricing",
+      "verifiedAt": null,
+      "charges": []
+    },
+    {
+      "label": "Sandbox active compute",
+      "status": "published",
+      "sourceUrl": "https://blaxel.ai/pricing",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "compute",
+          "amount": 0.0000115,
+          "currency": "USD",
+          "unit": "gb_second",
+          "basis": "allocated_ram_while_active"
+        }
+      ]
+    },
+    {
+      "label": "Snapshots and images",
+      "status": "published",
+      "sourceUrl": "https://blaxel.ai/pricing",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "snapshot_storage",
+          "amount": 0.2,
+          "currency": "USD",
+          "unit": "gb_month"
+        },
+        {
+          "meter": "image_storage",
+          "amount": 0.045,
+          "currency": "USD",
+          "unit": "gb_month"
+        }
+      ]
+    }
+  ],
+  "together": [
+    {
+      "label": "Code Sandbox CPU",
+      "status": "published",
+      "sourceUrl": "https://www.together.ai/pricing",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "cpu",
+          "amount": 0.0446,
+          "currency": "USD",
+          "unit": "vcpu_hour",
+          "variant": "Code Sandbox"
+        }
+      ]
+    },
+    {
+      "label": "Code Sandbox memory",
+      "status": "published",
+      "sourceUrl": "https://www.together.ai/pricing",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "memory",
+          "amount": 0.0149,
+          "currency": "USD",
+          "unit": "gib_hour",
+          "variant": "Code Sandbox"
+        }
+      ]
+    },
+    {
+      "label": "Shared filesystem",
+      "status": "published",
+      "sourceUrl": "https://www.together.ai/pricing",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "shared_filesystem",
+          "amount": 0.16,
+          "currency": "USD",
+          "unit": "gib_month"
+        }
+      ]
+    }
+  ],
+  "northflank": [
+    {
+      "label": "Sandbox plan",
+      "status": "free",
+      "sourceUrl": "https://northflank.com/pricing",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "subscription",
+          "amount": 0,
+          "currency": "USD",
+          "unit": "month",
+          "variant": "Sandbox",
+          "basis": "base_fee"
+        }
+      ]
+    },
+    {
+      "label": "Cloud CPU and memory",
+      "status": "published",
+      "sourceUrl": "https://northflank.com/pricing",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "cpu",
+          "amount": 0.01667,
+          "currency": "USD",
+          "unit": "vcpu_hour",
+          "variant": "Cloud"
+        },
+        {
+          "meter": "memory",
+          "amount": 0.00833,
+          "currency": "USD",
+          "unit": "gb_hour",
+          "variant": "Cloud"
+        }
+      ]
+    },
+    {
+      "label": "BYOC",
+      "status": "published",
+      "sourceUrl": "https://northflank.com/pricing",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "platform_management",
+          "amount": 0.02083,
+          "currency": "USD",
+          "unit": "vcpu_hour",
+          "variant": "BYOC",
+          "basis": "per_node_vcpu"
+        }
+      ]
+    },
+    {
+      "label": "Enterprise",
+      "status": "quote",
+      "sourceUrl": "https://northflank.com/pricing",
+      "verifiedAt": null,
+      "charges": []
+    }
+  ],
+  "riza": [
+    {
+      "label": "Hosted API",
+      "status": "historical",
+      "sourceUrl": "https://riza.io/blog/shutting-down-hosted-code-interpreter",
+      "verifiedAt": null,
+      "charges": []
+    },
+    {
+      "label": "Self-hosted",
+      "status": "unverified",
+      "sourceUrl": "https://riza.io/blog/shutting-down-hosted-code-interpreter",
+      "verifiedAt": null,
+      "charges": []
+    }
+  ],
+  "deno": [
+    {
+      "label": "New customers",
+      "status": "historical",
+      "sourceUrl": "https://deno.com/blog/introducing-deno-sandbox",
+      "verifiedAt": null,
+      "charges": []
+    },
+    {
+      "label": "Historical usage",
+      "status": "historical",
+      "sourceUrl": "https://deno.com/blog/introducing-deno-sandbox",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "cpu",
+          "amount": 0.05,
+          "currency": "USD",
+          "unit": "cpu_hour"
+        },
+        {
+          "meter": "memory",
+          "amount": 0.016,
+          "currency": "USD",
+          "unit": "gb_hour"
+        },
+        {
+          "meter": "volume_storage",
+          "amount": 0.2,
+          "currency": "USD",
+          "unit": "gib_month"
+        }
+      ]
+    }
+  ],
+  "aws": [
+    {
+      "label": "Code Interpreter / Browser",
+      "status": "published",
+      "sourceUrl": "https://aws.amazon.com/bedrock/agentcore/pricing/",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "cpu",
+          "amount": 0.0895,
+          "currency": "USD",
+          "unit": "vcpu_hour",
+          "variant": "Code Interpreter / Browser",
+          "basis": "active_cpu"
+        },
+        {
+          "meter": "memory",
+          "amount": 0.00945,
+          "currency": "USD",
+          "unit": "gb_hour",
+          "variant": "Code Interpreter / Browser",
+          "basis": "session_time"
+        }
+      ]
+    },
+    {
+      "label": "Runtime microVM v2",
+      "status": "published",
+      "sourceUrl": "https://aws.amazon.com/bedrock/agentcore/pricing/",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "cpu",
+          "amount": 0.1276,
+          "currency": "USD",
+          "unit": "vcpu_hour",
+          "variant": "Runtime microVM v2",
+          "basis": "consumption"
+        },
+        {
+          "meter": "memory",
+          "amount": 0.0169,
+          "currency": "USD",
+          "unit": "gb_hour",
+          "variant": "Runtime microVM v2",
+          "basis": "consumption"
+        }
+      ]
+    },
+    {
+      "label": "Runtime microVM v1",
+      "status": "published",
+      "sourceUrl": "https://aws.amazon.com/bedrock/agentcore/pricing/",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "cpu",
+          "amount": 0.0895,
+          "currency": "USD",
+          "unit": "vcpu_hour",
+          "variant": "Runtime microVM v1"
+        },
+        {
+          "meter": "memory",
+          "amount": 0.00945,
+          "currency": "USD",
+          "unit": "gb_hour",
+          "variant": "Runtime microVM v1"
+        }
+      ]
+    }
+  ],
+  "azure": [
+    {
+      "label": "Container Apps Sandboxes",
+      "status": "published",
+      "sourceUrl": "https://sandboxes.azure.com/docs/sandboxes/cost",
+      "verifiedAt": null,
+      "charges": []
+    },
+    {
+      "label": "Hosted code interpreter",
+      "status": "published",
+      "sourceUrl": "https://azure.microsoft.com/en-us/pricing/details/container-apps/",
+      "verifiedAt": null,
+      "charges": []
+    },
+    {
+      "label": "Custom containers",
+      "status": "published",
+      "sourceUrl": "https://azure.microsoft.com/en-us/pricing/details/container-apps/",
+      "verifiedAt": null,
+      "charges": []
+    }
+  ],
+  "openai": [
+    {
+      "label": "1 GB / 4 GB",
+      "status": "published",
+      "sourceUrl": "https://platform.openai.com/pricing/",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "container",
+          "amount": 0.03,
+          "currency": "USD",
+          "unit": "container_session_20_minutes",
+          "variant": "1 GB"
+        },
+        {
+          "meter": "container",
+          "amount": 0.12,
+          "currency": "USD",
+          "unit": "container_session_20_minutes",
+          "variant": "4 GB"
+        }
+      ]
+    },
+    {
+      "label": "16 GB / 64 GB",
+      "status": "published",
+      "sourceUrl": "https://platform.openai.com/pricing/",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "container",
+          "amount": 0.48,
+          "currency": "USD",
+          "unit": "container_session_20_minutes",
+          "variant": "16 GB"
+        },
+        {
+          "meter": "container",
+          "amount": 1.92,
+          "currency": "USD",
+          "unit": "container_session_20_minutes",
+          "variant": "64 GB"
+        }
+      ]
+    },
+    {
+      "label": "Agents API sandbox",
+      "status": "published",
+      "sourceUrl": "https://developers.openai.com/api/docs/guides/agents-api/environments/openai-hosted",
+      "verifiedAt": null,
+      "charges": []
+    }
+  ],
+  "instabox": [
+    {
+      "label": "Free",
+      "status": "free",
+      "sourceUrl": "https://instabox.sh/pricing",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "subscription",
+          "amount": 0,
+          "currency": "USD",
+          "unit": "month",
+          "variant": "Free",
+          "basis": "base_fee"
+        }
+      ]
+    },
+    {
+      "label": "Pro",
+      "status": "published",
+      "sourceUrl": "https://instabox.sh/pricing",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "subscription",
+          "amount": 20,
+          "currency": "USD",
+          "unit": "month",
+          "variant": "Pro",
+          "basis": "base_fee"
+        }
+      ]
+    },
+    {
+      "label": "Builder",
+      "status": "published",
+      "sourceUrl": "https://instabox.sh/pricing",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "subscription",
+          "amount": 100,
+          "currency": "USD",
+          "unit": "month",
+          "variant": "Builder",
+          "basis": "base_fee"
+        }
+      ]
+    },
+    {
+      "label": "Team / Enterprise",
+      "status": "published",
+      "sourceUrl": "https://instabox.sh/pricing",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "subscription",
+          "amount": 500,
+          "currency": "USD",
+          "unit": "month",
+          "variant": "Team",
+          "basis": "base_fee"
+        }
+      ]
+    },
+    {
+      "label": "GPU machines",
+      "status": "published",
+      "sourceUrl": "https://instabox.sh/pricing",
+      "verifiedAt": null,
+      "charges": []
+    }
+  ],
+  "proton": [
+    {
+      "label": "Running compute (historical)",
+      "status": "historical",
+      "sourceUrl": "https://proton.computer/",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "cpu",
+          "amount": 6,
+          "currency": "USD",
+          "unit": "vcpu_per_730_hours",
+          "basis": "running"
+        }
+      ]
+    },
+    {
+      "label": "Paused computer (historical)",
+      "status": "historical",
+      "sourceUrl": "https://proton.computer/",
+      "verifiedAt": null,
+      "charges": []
+    }
+  ],
+  "docker": [
+    {
+      "label": "Local sandboxes",
+      "status": "free",
+      "sourceUrl": "https://www.docker.com/products/docker-sandboxes/",
+      "verifiedAt": null,
+      "charges": []
+    },
+    {
+      "label": "Micro / Small",
+      "status": "published",
+      "sourceUrl": "https://www.docker.com/products/docker-sandboxes/",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "sandbox",
+          "amount": 0.07,
+          "currency": "USD",
+          "unit": "sandbox_hour",
+          "variant": "Micro (1 vCPU / 2 GB)"
+        },
+        {
+          "meter": "sandbox",
+          "amount": 0.14,
+          "currency": "USD",
+          "unit": "sandbox_hour",
+          "variant": "Small (2 vCPU / 4 GB)"
+        }
+      ]
+    },
+    {
+      "label": "Medium / Large / XL",
+      "status": "published",
+      "sourceUrl": "https://www.docker.com/products/docker-sandboxes/",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "sandbox",
+          "amount": 0.28,
+          "currency": "USD",
+          "unit": "sandbox_hour",
+          "variant": "Medium (4 vCPU / 8 GB)"
+        },
+        {
+          "meter": "sandbox",
+          "amount": 0.56,
+          "currency": "USD",
+          "unit": "sandbox_hour",
+          "variant": "Large (8 vCPU / 16 GB)"
+        },
+        {
+          "meter": "sandbox",
+          "amount": 1.12,
+          "currency": "USD",
+          "unit": "sandbox_hour",
+          "variant": "XL (16 vCPU / 32 GB)"
+        }
+      ]
+    },
+    {
+      "label": "Cloud billing",
+      "status": "published",
+      "sourceUrl": "https://docs.docker.com/agentic-platform/signup/",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "subscription",
+          "amount": 0,
+          "currency": "USD",
+          "unit": "month",
+          "variant": "Cloud",
+          "basis": "base_fee"
+        }
+      ]
+    },
+    {
+      "label": "New account promotion",
+      "status": "included",
+      "sourceUrl": "https://www.docker.com/c/sbx-promo/",
+      "verifiedAt": null,
+      "charges": []
+    }
+  ],
+  "upstash": [
+    {
+      "label": "Free",
+      "status": "free",
+      "sourceUrl": "https://upstash.com/pricing/box",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "subscription",
+          "amount": 0,
+          "currency": "USD",
+          "unit": "month",
+          "variant": "Free",
+          "basis": "base_fee"
+        }
+      ]
+    },
+    {
+      "label": "Pay as you go",
+      "status": "published",
+      "sourceUrl": "https://upstash.com/pricing/box",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "cpu",
+          "minAmount": 0.1,
+          "currency": "USD",
+          "unit": "cpu_hour",
+          "variant": "Small (2 vCPU / 4 GB)",
+          "basis": "active_cpu"
+        }
+      ]
+    },
+    {
+      "label": "Keep-alive",
+      "status": "published",
+      "sourceUrl": "https://upstash.com/pricing/box",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "sandbox",
+          "amount": 8,
+          "currency": "USD",
+          "unit": "sandbox_month",
+          "variant": "Small",
+          "basis": "keep_alive"
+        },
+        {
+          "meter": "sandbox",
+          "amount": 16,
+          "currency": "USD",
+          "unit": "sandbox_month",
+          "variant": "Medium",
+          "basis": "keep_alive"
+        },
+        {
+          "meter": "sandbox",
+          "amount": 32,
+          "currency": "USD",
+          "unit": "sandbox_month",
+          "variant": "Large",
+          "basis": "keep_alive"
+        }
+      ]
+    },
+    {
+      "label": "Disk and snapshots",
+      "status": "published",
+      "sourceUrl": "https://upstash.com/pricing/box",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "disk_and_snapshot_storage",
+          "amount": 0.1,
+          "currency": "USD",
+          "unit": "gb_month"
+        }
+      ]
+    }
+  ],
+  "tensorlake": [
+    {
+      "label": "Free",
+      "status": "free",
+      "sourceUrl": "https://www.tensorlake.ai/pricing",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "subscription",
+          "amount": 0,
+          "currency": "USD",
+          "unit": "month",
+          "variant": "Free",
+          "basis": "base_fee"
+        }
+      ]
+    },
+    {
+      "label": "Prepaid",
+      "status": "published",
+      "sourceUrl": "https://www.tensorlake.ai/pricing",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "cpu",
+          "amount": 0.07,
+          "currency": "USD",
+          "unit": "vcpu_hour",
+          "variant": "Prepaid"
+        },
+        {
+          "meter": "memory",
+          "amount": 0.015,
+          "currency": "USD",
+          "unit": "gb_hour",
+          "variant": "Prepaid"
+        }
+      ]
+    },
+    {
+      "label": "Pro",
+      "status": "published",
+      "sourceUrl": "https://www.tensorlake.ai/pricing",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "subscription",
+          "amount": 250,
+          "currency": "USD",
+          "unit": "month",
+          "variant": "Pro",
+          "basis": "base_fee"
+        },
+        {
+          "meter": "cpu",
+          "amount": 0.042,
+          "currency": "USD",
+          "unit": "vcpu_hour",
+          "variant": "Pro"
+        },
+        {
+          "meter": "memory",
+          "amount": 0.009,
+          "currency": "USD",
+          "unit": "gb_hour",
+          "variant": "Pro"
+        }
+      ]
+    },
+    {
+      "label": "Enterprise / reserved GPUs",
+      "status": "published",
+      "sourceUrl": "https://www.tensorlake.ai/pricing",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "gpu",
+          "amount": 3.95,
+          "currency": "USD",
+          "unit": "gpu_hour",
+          "variant": "H100",
+          "basis": "reserved"
+        }
+      ]
+    }
+  ],
+  "koyeb": [
+    {
+      "label": "Compute",
+      "status": "published",
+      "sourceUrl": "https://www.koyeb.com/blog/koyeb-sandboxes-fast-scalable-fully-isolated-environments-for-ai-agents",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "sandbox",
+          "minAmount": 0.0036,
+          "currency": "USD",
+          "unit": "sandbox_hour",
+          "basis": "launch_example"
+        }
+      ]
+    },
+    {
+      "label": "Pro / Scale",
+      "status": "published",
+      "sourceUrl": "https://www.koyeb.com/pricing",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "subscription",
+          "amount": 29,
+          "currency": "USD",
+          "unit": "month",
+          "variant": "Pro",
+          "basis": "base_fee"
+        },
+        {
+          "meter": "subscription",
+          "amount": 299,
+          "currency": "USD",
+          "unit": "month",
+          "variant": "Scale",
+          "basis": "base_fee"
+        }
+      ]
+    },
+    {
+      "label": "Enterprise",
+      "status": "published",
+      "sourceUrl": "https://www.koyeb.com/pricing",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "subscription",
+          "minAmount": 1000,
+          "currency": "USD",
+          "unit": "month",
+          "variant": "Enterprise",
+          "basis": "starting_price"
+        }
+      ]
+    }
+  ],
+  "namespace": [
+    {
+      "label": "Devbox compute",
+      "status": "published",
+      "sourceUrl": "https://namespace.so/pricing",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "devbox_compute",
+          "minAmount": 0.004,
+          "currency": "USD",
+          "unit": "minute",
+          "basis": "depends_on_size_and_os"
+        }
+      ]
+    },
+    {
+      "label": "Developer / Team / Business",
+      "status": "published",
+      "sourceUrl": "https://namespace.so/pricing",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "subscription",
+          "amount": 0,
+          "currency": "USD",
+          "unit": "month",
+          "variant": "Developer",
+          "basis": "base_fee"
+        },
+        {
+          "meter": "subscription",
+          "amount": 100,
+          "currency": "USD",
+          "unit": "month",
+          "variant": "Team",
+          "basis": "base_fee"
+        },
+        {
+          "meter": "subscription",
+          "amount": 250,
+          "currency": "USD",
+          "unit": "month",
+          "variant": "Business",
+          "basis": "base_fee"
+        }
+      ]
+    },
+    {
+      "label": "Enterprise",
+      "status": "quote",
+      "sourceUrl": "https://namespace.so/pricing",
+      "verifiedAt": null,
+      "charges": []
+    }
+  ],
+  "beam": [
+    {
+      "label": "Performance",
+      "status": "published",
+      "sourceUrl": "https://www.beam.cloud/pricing",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "cpu",
+          "amount": 0.05,
+          "currency": "USD",
+          "unit": "vcpu_hour",
+          "variant": "Performance"
+        },
+        {
+          "meter": "memory",
+          "amount": 0.01,
+          "currency": "USD",
+          "unit": "gib_hour",
+          "variant": "Performance"
+        }
+      ]
+    },
+    {
+      "label": "Shared",
+      "status": "published",
+      "sourceUrl": "https://www.beam.cloud/pricing",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "cpu",
+          "amount": 0.011,
+          "currency": "USD",
+          "unit": "vcpu_hour",
+          "variant": "Shared"
+        },
+        {
+          "meter": "memory",
+          "amount": 0.0055,
+          "currency": "USD",
+          "unit": "gib_hour",
+          "variant": "Shared"
+        }
+      ]
+    },
+    {
+      "label": "Spot",
+      "status": "published",
+      "sourceUrl": "https://www.beam.cloud/pricing",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "cpu",
+          "amount": 0.0063,
+          "currency": "USD",
+          "unit": "vcpu_hour",
+          "variant": "Spot",
+          "basis": "interruptible"
+        },
+        {
+          "meter": "memory",
+          "amount": 0.00135,
+          "currency": "USD",
+          "unit": "gib_hour",
+          "variant": "Spot",
+          "basis": "interruptible"
+        }
+      ]
+    },
+    {
+      "label": "Storage / BYOC",
+      "status": "published",
+      "sourceUrl": "https://www.beam.cloud/pricing",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "volume_storage",
+          "amount": 0.0001,
+          "currency": "USD",
+          "unit": "gb_hour"
+        },
+        {
+          "meter": "platform_management_cpu",
+          "amount": 0.019,
+          "currency": "USD",
+          "unit": "vcpu_hour",
+          "variant": "BYOC"
+        },
+        {
+          "meter": "platform_management_memory",
+          "amount": 0.009,
+          "currency": "USD",
+          "unit": "gb_hour",
+          "variant": "BYOC"
+        }
+      ]
+    }
+  ],
+  "machine0": [
+    {
+      "label": "CPU VM",
+      "status": "published",
+      "sourceUrl": "https://machine0.io/",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "sandbox",
+          "minAmount": 0.013,
+          "currency": "USD",
+          "unit": "sandbox_hour",
+          "variant": "CPU VM (1 vCPU / 1 GB)",
+          "basis": "per_minute_billing"
+        }
+      ]
+    },
+    {
+      "label": "GPU VM",
+      "status": "published",
+      "sourceUrl": "https://machine0.io/",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "sandbox",
+          "minAmount": 0.836,
+          "currency": "USD",
+          "unit": "sandbox_hour",
+          "variant": "GPU VM",
+          "basis": "hardware_and_availability_dependent"
+        }
+      ]
+    },
+    {
+      "label": "Actions compute",
+      "status": "published",
+      "sourceUrl": "https://machine0.io/changelog",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "action_compute",
+          "amount": 0.000031,
+          "currency": "USD",
+          "unit": "gib_second",
+          "basis": "requested_memory_duration_100ms_rounding"
+        }
+      ]
+    }
+  ],
+  "boat": [
+    {
+      "label": "Trial",
+      "status": "free",
+      "sourceUrl": "https://boat.dev/",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "trial",
+          "amount": 0,
+          "currency": "USD",
+          "unit": "trial",
+          "variant": "7-day trial"
+        }
+      ]
+    },
+    {
+      "label": "Small / default / large",
+      "status": "published",
+      "sourceUrl": "https://boat.dev/",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "sandbox",
+          "amount": 0.018,
+          "currency": "USD",
+          "unit": "sandbox_hour",
+          "variant": "Small (2 vCPU / 4 GB)",
+          "basis": "per_second_billing"
+        },
+        {
+          "meter": "sandbox",
+          "amount": 0.036,
+          "currency": "USD",
+          "unit": "sandbox_hour",
+          "variant": "Default (4 vCPU / 8 GB)",
+          "basis": "per_second_billing"
+        },
+        {
+          "meter": "sandbox",
+          "amount": 0.072,
+          "currency": "USD",
+          "unit": "sandbox_hour",
+          "variant": "Large (8 vCPU / 16 GB)",
+          "basis": "per_second_billing"
+        },
+        {
+          "meter": "monthly_minimum",
+          "amount": 20,
+          "currency": "USD",
+          "unit": "month",
+          "basis": "credited_to_usage"
+        }
+      ]
+    },
+    {
+      "label": "XL",
+      "status": "published",
+      "sourceUrl": "https://boat.dev/",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "sandbox",
+          "amount": 0.2,
+          "currency": "USD",
+          "unit": "sandbox_hour",
+          "variant": "XL (16 vCPU / 32 GB / 251 GB disk)"
+        },
+        {
+          "meter": "required_plan",
+          "minAmount": 100,
+          "currency": "USD",
+          "unit": "month",
+          "variant": "XL"
+        }
+      ]
+    },
+    {
+      "label": "Starts over allowance",
+      "status": "published",
+      "sourceUrl": "https://boat.dev/",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "sandbox_creation",
+          "minAmount": 0.03,
+          "maxAmount": 0.07,
+          "currency": "USD",
+          "unit": "creation",
+          "basis": "after_allowance"
+        }
+      ]
+    },
+    {
+      "label": "Saved snapshots",
+      "status": "published",
+      "sourceUrl": "https://boat.dev/",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "snapshot_storage",
+          "amount": 0.056,
+          "currency": "USD",
+          "unit": "snapshot_day"
+        }
+      ]
+    }
+  ],
+  "pine": [
+    {
+      "label": "Running computer",
+      "status": "published",
+      "sourceUrl": "https://console.pinecomputer.io/docs/overview#usage-and-credits",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "sandbox",
+          "amount": 0.003,
+          "currency": "USD",
+          "unit": "sandbox_minute",
+          "basis": "running_including_idle"
+        }
+      ]
+    },
+    {
+      "label": "Browser egress",
+      "status": "published",
+      "sourceUrl": "https://console.pinecomputer.io/docs/overview#usage-and-credits",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "browser_egress",
+          "amount": 4,
+          "currency": "USD",
+          "unit": "gb",
+          "basis": "selected_exit_region"
+        }
+      ]
+    }
+  ],
+  "instavm": [
+    {
+      "label": "Free",
+      "status": "published",
+      "sourceUrl": "https://instavm.io/pricing",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "subscription",
+          "amount": 0,
+          "currency": "USD",
+          "unit": "month",
+          "variant": "Free",
+          "basis": "base_fee"
+        }
+      ]
+    },
+    {
+      "label": "Pro",
+      "status": "published",
+      "sourceUrl": "https://instavm.io/pricing",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "subscription",
+          "amount": 100,
+          "currency": "USD",
+          "unit": "month",
+          "variant": "Pro",
+          "basis": "base_fee"
+        }
+      ]
+    },
+    {
+      "label": "Compute",
+      "status": "published",
+      "sourceUrl": "https://instavm.io/pricing",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "cpu",
+          "amount": 0.000014,
+          "currency": "USD",
+          "unit": "vcpu_second"
+        },
+        {
+          "meter": "memory",
+          "amount": 0.0000045,
+          "currency": "USD",
+          "unit": "gb_second"
+        },
+        {
+          "meter": "volume_storage",
+          "amount": 0.0002,
+          "currency": "USD",
+          "unit": "gb_hour",
+          "basis": "after_allowance"
+        }
+      ]
+    },
+    {
+      "label": "Enterprise",
+      "status": "quote",
+      "sourceUrl": "https://instavm.io/pricing",
+      "verifiedAt": null,
+      "charges": []
+    }
+  ],
+  "celesto": [
+    {
+      "label": "Micro / Small",
+      "status": "published",
+      "sourceUrl": "https://celesto.ai/pricing",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "sandbox",
+          "amount": 0.015,
+          "currency": "USD",
+          "unit": "sandbox_hour",
+          "variant": "Micro (1 vCPU / 2 GB / 20 GB disk)"
+        },
+        {
+          "meter": "sandbox",
+          "amount": 0.02,
+          "currency": "USD",
+          "unit": "sandbox_hour",
+          "variant": "Small (1 vCPU / 4 GB / 25 GB disk)"
+        }
+      ]
+    },
+    {
+      "label": "Standard / Memory",
+      "status": "published",
+      "sourceUrl": "https://celesto.ai/pricing",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "sandbox",
+          "amount": 0.03,
+          "currency": "USD",
+          "unit": "sandbox_hour",
+          "variant": "Standard (2 vCPU / 4 GB / 30 GB disk)"
+        },
+        {
+          "meter": "sandbox",
+          "amount": 0.04,
+          "currency": "USD",
+          "unit": "sandbox_hour",
+          "variant": "Memory (2 vCPU / 8 GB / 40 GB disk)"
+        }
+      ]
+    },
+    {
+      "label": "Large / XL",
+      "status": "published",
+      "sourceUrl": "https://celesto.ai/pricing",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "sandbox",
+          "amount": 0.08,
+          "currency": "USD",
+          "unit": "sandbox_hour",
+          "variant": "Large (4 vCPU / 16 GB / 60 GB disk)"
+        },
+        {
+          "meter": "sandbox",
+          "amount": 0.16,
+          "currency": "USD",
+          "unit": "sandbox_hour",
+          "variant": "XL (8 vCPU / 32 GB / 100 GB disk)"
+        }
+      ]
+    },
+    {
+      "label": "Trial",
+      "status": "included",
+      "sourceUrl": "https://celesto.ai/pricing",
+      "verifiedAt": null,
+      "charges": []
+    }
+  ],
+  "prized": [
+    {
+      "label": "CPU / memory / disk",
+      "status": "published",
+      "sourceUrl": "https://prized.dev/docs/billing",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "cpu",
+          "amount": 0.04,
+          "currency": "USD",
+          "unit": "vcpu_hour",
+          "basis": "running"
+        },
+        {
+          "meter": "memory",
+          "amount": 0.0125,
+          "currency": "USD",
+          "unit": "gb_hour",
+          "basis": "running"
+        },
+        {
+          "meter": "disk",
+          "amount": 0.0001,
+          "currency": "USD",
+          "unit": "gb_hour",
+          "basis": "running"
+        }
+      ]
+    },
+    {
+      "label": "Example 2 vCPU + 4 GB",
+      "status": "published",
+      "sourceUrl": "https://prized.dev/docs/billing",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "sandbox",
+          "amount": 0.131,
+          "currency": "USD",
+          "unit": "sandbox_hour",
+          "variant": "2 vCPU / 4 GB / 10 GB disk",
+          "basis": "example_running_bundle"
+        },
+        {
+          "meter": "sandbox",
+          "minAmount": 0.066,
+          "maxAmount": 2.881,
+          "currency": "USD",
+          "unit": "sandbox_hour",
+          "variant": "Base shapes",
+          "basis": "example_running_bundle_range"
+        }
+      ]
+    },
+    {
+      "label": "Paused storage",
+      "status": "published",
+      "sourceUrl": "https://prized.dev/docs/billing",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "paused_storage",
+          "amount": 0.05,
+          "currency": "USD",
+          "unit": "gb_month",
+          "basis": "paused_after_allowance"
+        }
+      ]
+    },
+    {
+      "label": "Devboxes",
+      "status": "published",
+      "sourceUrl": "https://prized.dev/docs/billing",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "devbox_monthly_cap",
+          "amount": 10,
+          "currency": "USD",
+          "unit": "month",
+          "variant": "Nano",
+          "basis": "usage_cap"
+        },
+        {
+          "meter": "devbox_monthly_cap",
+          "amount": 25,
+          "currency": "USD",
+          "unit": "month",
+          "variant": "Micro",
+          "basis": "usage_cap"
+        },
+        {
+          "meter": "devbox_monthly_cap",
+          "amount": 50,
+          "currency": "USD",
+          "unit": "month",
+          "variant": "Extra Small",
+          "basis": "usage_cap"
+        },
+        {
+          "meter": "devbox_monthly_cap",
+          "amount": 100,
+          "currency": "USD",
+          "unit": "month",
+          "variant": "Small",
+          "basis": "usage_cap"
+        }
+      ]
+    },
+    {
+      "label": "L4 GPU box",
+      "status": "published",
+      "sourceUrl": "https://prized.dev/docs/billing",
+      "verifiedAt": null,
+      "charges": [
+        {
+          "meter": "gpu_box",
+          "amount": 1.25,
+          "currency": "USD",
+          "unit": "sandbox_hour",
+          "variant": "L4 GPU box",
+          "basis": "awake"
+        },
+        {
+          "meter": "gpu_box",
+          "amount": 0.05,
+          "currency": "USD",
+          "unit": "sandbox_hour",
+          "variant": "L4 GPU box",
+          "basis": "asleep_with_500_gb_disk"
+        }
+      ]
+    },
+    {
+      "label": "Trial",
+      "status": "included",
+      "sourceUrl": "https://prized.dev/docs/billing",
+      "verifiedAt": null,
+      "charges": []
+    }
+  ],
+  "agent37": [
+    {
+      "label": "Compute",
+      "status": "published",
+      "sourceUrl": "https://www.agent37.com/pricing",
+      "verifiedAt": "2026-10-21",
+      "charges": [
+        {
+          "meter": "cpu",
+          "amount": 0.0011,
+          "currency": "USD",
+          "unit": "vcpu_hour",
+          "variant": "Standard",
+          "basis": "running"
+        }
+      ]
+    },
+    {
+      "label": "Memory",
+      "status": "published",
+      "sourceUrl": "https://www.agent37.com/pricing",
+      "verifiedAt": "2026-10-21",
+      "charges": [
+        {
+          "meter": "memory",
+          "amount": 0.00096,
+          "currency": "USD",
+          "unit": "gb_hour",
+          "variant": "Standard",
+          "basis": "running"
+        }
+      ]
+    },
+    {
+      "label": "Disk",
+      "status": "published",
+      "sourceUrl": "https://www.agent37.com/pricing",
+      "verifiedAt": "2026-10-21",
+      "charges": [
+        {
+          "meter": "disk",
+          "amount": 0.00012,
+          "currency": "USD",
+          "unit": "gb_hour",
+          "basis": "retained"
+        }
+      ]
+    },
+    {
+      "label": "Linux sandbox VM",
+      "status": "published",
+      "sourceUrl": "https://www.agent37.com/pricing",
+      "verifiedAt": null,
+      "charges": []
+    },
+    {
+      "label": "Trial",
+      "status": "included",
+      "sourceUrl": "https://www.agent37.com/pricing",
+      "verifiedAt": null,
+      "charges": []
+    }
+  ]
+}

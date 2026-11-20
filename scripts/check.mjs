@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFile, readdir } from 'node:fs/promises';
 import { BED, RIM, TRAY, HOME_PITCH, MIN_PITCH, MAX_PITCH, orthographic } from '../assets/geometry.js';
+import { pricingDocuments } from './pricing-api.mjs';
 
 const root = new URL('../', import.meta.url);
 const readJson = async path => JSON.parse(await readFile(new URL(path, root), 'utf8'));
@@ -93,3 +94,8 @@ for (const pitch of [MIN_PITCH, HOME_PITCH, MAX_PITCH]) {
   }
 }
 console.log('Regular tray, uniform wall thickness and orthographic projection verified at 72 camera angles.');
+
+const api = await pricingDocuments();
+const catalog = api.get('catalog.json');
+const prices = catalog.offerings.flatMap(offering => offering.pricing);
+console.log(catalog.offerings.length + ' API offerings, ' + prices.length + ' price entries, ' + prices.reduce((count,price) => count+price.charges.length,0) + ' structured charges.');
