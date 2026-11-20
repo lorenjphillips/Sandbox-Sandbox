@@ -1,5 +1,7 @@
-import { paintSandboxToy, paintHourglassToy, paintScarabToy, paintGrassToy } from './toy-art.js';
+import { paintHourglassToy, paintScarabToy, paintGrassToy } from './toy-art.js';
 import { drawBucketModel, drawTruckModel } from './board-models.js';
+import { eggModels } from './egg-models.js';
+import { drawNestedSandboxModel, nestedSandboxHitPoints } from './nested-sandbox-model.js';
 import { WIDTH, HEIGHT, TRAY, RIM, BED, HOME_YAW, HOME_PITCH, MIN_PITCH, MAX_PITCH, orthographic } from './geometry.js';
 
 export { WIDTH, HEIGHT };
@@ -140,11 +142,10 @@ function sceneArea(box) {
   return {left:box.left-88,top:box.top-48,right:box.right+92,bottom:box.bottom+70};
 }
 
-let trayBounds=sceneBounds();
-let SCENE=sceneArea(trayBounds);
+let SCENE=sceneArea(sceneBounds());
 const FRAME_WIDTH=2*(TRAY.radius+76);
 const FRAME_HEIGHT=2*(TRAY.radius*Math.sin(MAX_PITCH)+(TRAY.lip-TRAY.floor)*Math.cos(MAX_PITCH)+23);
-const ORIGIN=project(WIDTH/2,HEIGHT/2,TRAY.floor);
+const trayCenter=()=>project(WIDTH/2,HEIGHT/2,TRAY.floor);
 
 function fitsTray(x,y) {
   for(let i=0;i<6;i++) {
@@ -393,172 +394,17 @@ function rake(ctx,x,y) {
   ctx.restore();
 }
 
-function paintedShape(ctx,path,fill,edge,width=1) {
-  const outline=new Path2D(path);
-  ctx.fillStyle=fill;
-  ctx.fill(outline);
-  if(edge) {
-    ctx.strokeStyle=edge;
-    ctx.lineWidth=width;
-    ctx.stroke(outline);
-  }
-}
-
-function sandSpill(ctx,x,y,rx,ry) {
-  const shade=ctx.createRadialGradient(x,y,0,x,y,rx);
-  shade.addColorStop(0,'#e1caa5');
-  shade.addColorStop(.63,'#e7d4b5db');
-  shade.addColorStop(1,'#e8d6bb00');
-  ctx.save();
-  ctx.translate(0,y);
-  ctx.scale(1,ry/rx);
-  ctx.translate(0,-y);
-  ellipse(ctx,x,y,rx,rx,shade);
-  ctx.restore();
-  for(let i=0;i<40;i++) {
-    const angle=hash(i,65)*Math.PI*2;
-    const radius=Math.sqrt(hash(77,i));
-    const px=x+Math.cos(angle)*radius*rx,py=y+Math.sin(angle)*radius*ry;
-    ctx.fillStyle=i%3?'#997d554d':'#fff2d5a6';
-    ctx.fillRect(px,py,.36+hash(i,41)*.63,.5);
-  }
-}
-
-function sandworm(ctx) {
-  ctx.rotate(-.12);
-  toyShadow(ctx,2,4.1,22,4.6);
-  const body='M-14-11 C-5-17 7-10 13-5 Q19-1 25-1 Q21 7 13 7 C6 8 0 7-9 10 Q-18 10-14-11Z';
-  paintedShape(ctx,body,ramp(ctx,{x:0,y:-14},{x:0,y:10},[[0,'#cfac7e'],[.32,'#b39570'],[.68,'#937859'],[1,'#735c46']]),'#806c53',.7);
-  ctx.save();
-  ctx.clip(new Path2D(body));
-  for(let i=0;i<10;i++) {
-    const x=-12+i*4.15;
-    const y=-12+Math.max(0,i-2)*1.3;
-    const rib=new Path2D();
-    rib.moveTo(x,y-2);
-    rib.bezierCurveTo(x+5,y-1,x+7,4,x+2,10);
-    ctx.strokeStyle='#66513db3';
-    ctx.lineWidth=1.35;
-    ctx.stroke(rib);
-    ctx.translate(.75,0);
-    ctx.strokeStyle='#e7c999ad';
-    ctx.lineWidth=.65;
-    ctx.stroke(rib);
-    ctx.translate(-.75,0);
-  }
-  ctx.restore();
-  ctx.save();
-  ctx.translate(-12,-1);
-  ctx.rotate(.20);
-  ellipse(ctx,0,0,10,11.9,ramp(ctx,{x:-8,y:-9},{x:8,y:11},[[0,'#d7bc93'],[.46,'#ab8b63'],[1,'#785e46']]));
-  ellipse(ctx,-.7,.1,8.1,9.6,'#604735');
-  ellipse(ctx,-1,0,5.6,6.8,'#392d26');
-  for(let i=0;i<40;i++) {
-    const a=i*Math.PI/20;
-    const length=.53+hash(i,59)*.20;
-    const x=Math.cos(a)*7.7,y=Math.sin(a)*9.1;
-    ctx.beginPath();
-    ctx.moveTo(x-.7,y+.15);
-    ctx.lineTo(x*length-.7,y*length+.3);
-    ctx.lineTo(Math.cos(a+.09)*7.7-.7,Math.sin(a+.09)*9.1);
-    ctx.fillStyle=i%3?'#caaf86':'#ead1ac';
-    ctx.fill();
-  }
-  ctx.restore();
-  sandSpill(ctx,20,3,11,5);
-  sandSpill(ctx,-8,10,11,2.5);
-}
-
-function anakinFigure(ctx) {
-  ctx.rotate(.34);
-  ctx.lineJoin='round';
-  ctx.lineCap='round';
-  toyShadow(ctx,3,6,9,13);
-  paintedShape(ctx,'M-6 5 L0 5 0 14-4 23-8 23-8 20-5 13Z','#48382e','#362d26',.7);
-  paintedShape(ctx,'M.2 5 L5 4 7 13 10 17 7 20 3 16 1 13Z','#524034','#392b23',.7);
-  paintedShape(ctx,'M-5.8 15 L-1.7 16-4 24-10 24 Q-11 21-7 20Z','#392e29');
-  paintedShape(ctx,'M3.8 16 L7.5 13.8 10.8 17.5 10 21 7 21Z','#342b27');
-  paintedShape(ctx,'M-4.8-9 Q0-12 4.3-9 L7-5 3 1 5 8 1.5 10-1.6 8-6.4 9-5 1-7-5Z',
-    ramp(ctx,{x:-6,y:-6},{x:5,y:6},[[0,'#85624a'],[.35,'#4f3c32'],[.75,'#655043'],[1,'#3f322c']]),'#46362b',.65);
-  paintedShape(ctx,'M-4.7-9 L-2-10 2-4 .2-1Z','#48352d');
-  paintedShape(ctx,'M2.2-9 L5-8 1 2-2.8 2Z','#312b28','#826b54',.45);
-  paintedShape(ctx,'M-5.2 .7 L3.9 .6 4.6 2.6-5.3 3Z','#352c28');
-  ctx.fillStyle='#b79b71';
-  ctx.fillRect(-.3,1.2,1.8,1.3);
-  paintedShape(ctx,'M-5.5-7 Q-8.4-8.3-9-4 L-9.2 2.1-7.2 6-5.7 4.8-6.6 1.6-4.2-3Z','#705341','#46372d',.65);
-  ellipse(ctx,-6.6,5.9,1.65,2.2,'#c59973');
-  paintedShape(ctx,'M4.7-8 Q8-8 8-5 L7.6-1 9.2-1 13-6.8 15.4-5.4 12 1.6 9 3.2 5.4 1.1 4.2-3.7Z','#4b3b32','#362f29',.75);
-  ctx.save();
-  ctx.translate(14.3,-6.7);
-  ctx.rotate(.20);
-  for(const [a,b,width,ink] of [[-3,-21,2.7,'#548dac'],[-3.3,-20.6,1.05,'#bfe6eb'],[1.7,-3.6,2.7,'#646b67'],[0,-3.1,.8,'#c8c4a5']]) {
-    ctx.beginPath();
-    ctx.moveTo(0,a);
-    ctx.lineTo(0,b);
-    ctx.lineWidth=width;
-    ctx.strokeStyle=ink;
-    ctx.stroke();
-  }
-  ellipse(ctx,-.7,.6,1.6,1.7,'#47392e');
-  ctx.restore();
-  ellipse(ctx,-.4,-10.5,2.45,2.8,'#bf906a');
-  paintedShape(ctx,'M-5.4-17 Q-6-23.6.5-23.3 6.2-23.1 5.3-16.2 L3.5-11.5 .5-10.7-2.3-11.8-4.5-14Z','#cfaa84','#775d47',.6);
-  paintedShape(ctx,'M-5.5-14.8 Q-8-16.7-6.3-19.6-7.3-22.5-4.4-23.3-3.8-25.4-.8-24.7 2.2-26.3 4.2-24.1 6.8-23.6 6.3-20.5 7-18.5 5-15.6 L4.1-18.5 2.6-20.7 Q.6-18.9-2.8-19.1 L-4-15.3-4.2-12.9Z','#71503a','#49372d',.6);
-  paintedShape(ctx,'M-5.3-21.8 Q-3-25 .2-23.6 2.5-25 4.6-22.9 2-23.7 .1-22.4-2.2-23.4-5.3-21.8Z','#a27851');
-  ctx.fillStyle='#5d4839';
-  ctx.fillRect(-2.6,-16.8,1.3,.55);
-  ctx.fillRect(1.5,-16.9,1.45,.55);
-  sandSpill(ctx,-4,23,7.2,2.4);
-}
-
-function cassetteRadio(ctx) {
-  ctx.rotate(-.15);
-  ctx.lineJoin='round';
-  toyShadow(ctx,2,6.5,17.3,4.2);
-  paintedShape(ctx,'M-10-6.5 L-9.7-12 Q-9.6-14-7.4-14 L7-14 Q10-14 10.2-11.8 L10.4-7 8.4-7 8-11.8-7.6-11.8-8-6.5Z','#555b51','#40463e',.6);
-  paintedShape(ctx,'M-18-7 L-14.7-10.4 17-10.4 18.8-8.1 17.1-5Z','#a6ada0','#656f64',.7);
-  paintedShape(ctx,'M-18-7 Q-17.8-8.2-16-8 L17.5-8 18.5-6.3 18.5 7.2 16.8 9-16.5 9.4-18.5 7.6Z',
-    ramp(ctx,{x:-4,y:-8},{x:3,y:10},[[0,'#94a397'],[.37,'#84968b'],[1,'#67786d']]),'#515e54',.85);
-  for(const x of [-12.8,12.6]) {
-    ellipse(ctx,x,1.4,4.3,5.2,'#536156');
-    ellipse(ctx,x,1.4,3.5,4.4,'#6d7c70');
-    for(let y=-1;y<=4;y+=1.4) {
-      const width=Math.sqrt(Math.max(0,1-((y-1.4)/4.4)**2))*5.3;
-      ctx.fillStyle='#414e43';
-      ctx.fillRect(x-width/2,y,width,.65);
-    }
-  }
-  ctx.fillStyle='#536359';
-  ctx.fillRect(-7.1,-1.3,14,8.8);
-  ctx.fillStyle='#afbaaa';
-  ctx.fillRect(-6.5,-.7,12.7,7.1);
-  ctx.fillStyle='#58665c';
-  ctx.fillRect(-5.25,.8,10.3,3.7);
-  for(const x of [-2.9,2.7]) {
-    ellipse(ctx,x,2.65,1.25,1.25,'#d4cbb1');
-    ellipse(ctx,x,2.65,.55,.55,'#576158');
-  }
-  ctx.fillStyle='#e3c896';
-  ctx.fillRect(-8.4,-6.2,16.7,4.1);
-  ctx.font='bold 2.75px sans-serif';
-  ctx.textAlign='center';
-  ctx.fillStyle='#514d3d';
-  ctx.fillText('SANDSTORM',0,-3.05,15);
-  for(let x=-6;x<=6;x+=3) {
-    ctx.fillStyle=x===6?'#ae7357':'#566056';
-    ctx.fillRect(x,-10.3,2.1,1.5);
-  }
-  sandSpill(ctx,11,8.2,12.5,4.1);
-}
-
 const EGGS=[
-  {id:'worm',label:'Inspect the little sandworm',x:796,y:-10,width:50,height:32,paint:sandworm},
-  {id:'anakin',label:'Inspect the Anakin Skywalker figure',x:293,y:10,width:43,height:57,paint:anakinFigure},
-  {id:'radio',label:'Play the buried cassette radio',x:837,y:560,width:43,height:33,paint:cassetteRadio}
-];
+  {id:'worm',label:'Inspect the little sandworm',x:796,y:-10,extent:45},
+  {id:'anakin',label:'Inspect the Anakin Skywalker figure',x:293,y:10,extent:65},
+  {id:'radio',label:'Play the buried cassette radio',x:837,y:560,extent:42}
+].map(egg=>{
+  const {model,paintWorld}=eggModels[egg.id];
+  return {...egg,paintWorld,hitPoints:model.vertices};
+});
 
 const PLAY_TOYS=[
-  {id:'sandbox',label:'Open the miniature sandbox',x:325,y:625,width:48,height:26,offsetY:-5,paint:paintSandboxToy},
+  {id:'sandbox',label:'Open the miniature sandbox',x:325,y:672,extent:62,paintWorld:drawNestedSandboxModel,hitPoints:nestedSandboxHitPoints()},
   {id:'hourglass',label:'Flip the hourglass and go back one day',x:167,y:16,width:25,height:35,offsetY:-14,paint:paintHourglassToy},
   {id:'scarab',label:'Disturb the buried scarab',x:478,y:619,width:25,height:20,offsetY:-3,paint:paintScarabToy},
   {id:'grass',label:'Touch grass',x:548,y:RIM[3][1]+27,z:TRAY.base,width:31,height:25,offsetY:-6,paint:paintGrassToy}
@@ -847,7 +693,7 @@ export class Board {
     this.logoAnchorCache=new WeakMap();
     this.logoAnchors=new Map();
     this.pulses=new Set();
-    this.camera={...ORIGIN,z:MIN_ZOOM};
+    this.camera={...trayCenter(),z:MIN_ZOOM};
     this.activityTiles=[];
     this.activityCursor=0;
     this.category='all';
@@ -872,7 +718,7 @@ export class Board {
       {x:TOYS.bucket.x,y:TOYS.bucket.y+31,extent:110,paintWorld:drawBucketModel},
       {x:TOYS.rake.x,y:TOYS.rake.y,extent:95,paintWorld:rake},
       {x:TOYS.truck.x,y:TOYS.truck.y+5,extent:90,paintWorld:drawTruckModel},
-      ...EGGS.map(egg=>({...egg,flat:true})),
+      ...EGGS.map(egg=>({...egg})),
       ...PLAY_TOYS.map(toy=>({...toy,playable:true}))
     ];
     this.toys=this.props.filter(prop=>prop.playable);
@@ -960,6 +806,10 @@ export class Board {
       prop.center=center;
       prop.depth=viewAxes.depth(prop.x,prop.y);
       prop.bounds={left:center.x-extent,top:center.y-extent,right:center.x+extent,bottom:center.y+extent};
+      if(prop.hitPoints) {
+        const floor=prop.z??TRAY.floor;
+        prop.hitBounds=bounds(prop.hitPoints.map(([x,y,z])=>project(prop.x+x,prop.y+y,floor+z)));
+      }
       prop.covered=prop.id==='grass' && contains(sceneArt.tray.outerRim,center.x,center.y);
     }
     this.paintOrder=[...this.depthOrder,...this.props].sort((a,b)=>a.depth-b.depth);
@@ -968,11 +818,11 @@ export class Board {
   paintProp(ctx,prop,now) {
     if(prop.covered) return;
     ctx.save();
-    if(prop.paintWorld) prop.paintWorld(ctx,prop.x,prop.y,TRAY.floor,viewAxes);
+    const state={elapsed:prop.started==null?0:(now-prop.started)/1000,active:prop.started!=null,reduced:motionReduced.matches};
+    if(prop.paintWorld) prop.paintWorld(ctx,prop.x,prop.y,prop.z??TRAY.floor,viewAxes,state);
     else {
       ctx.translate(prop.center.x,prop.center.y);
-      if(prop.flat) rotateGroundProp(ctx);
-      prop.paint(ctx,{elapsed:prop.started==null?0:(now-prop.started)/1000,active:prop.started!=null,reduced:motionReduced.matches});
+      prop.paint(ctx,state);
     }
     ctx.restore();
   }
@@ -999,15 +849,18 @@ export class Board {
   }
 
   turnTo(angle,pitch,interactive) {
-    cancelAnimationFrame(this.travel);
     clearTimeout(this.detailTimer);
     this.detailArt=null;
     this.detailKey=null;
-    const focus=viewAxes.unproject(this.camera.x,this.camera.y,TRAY.floor);
+    const previousCenter=trayCenter();
     viewAxes=orthographic(angle,pitch);
-    trayBounds=sceneBounds();
-    SCENE=sceneArea(trayBounds);
-    this.camera={...project(focus.x,focus.y,TRAY.floor),z:this.camera.z};
+    const center=trayCenter();
+    SCENE=sceneArea(sceneBounds());
+    this.camera={
+      x:center.x+(this.camera.x-previousCenter.x),
+      y:center.y+(this.camera.y-previousCenter.y),
+      z:this.camera.z
+    };
     this.orbiting=interactive;
     const ratio=interactive ? clamp(this.viewport().zoom,.36,.82) : 1.45;
     sceneArt={tray:createTrayLayer(SCENE,ratio,interactive),area:SCENE};
@@ -1495,9 +1348,8 @@ export class Board {
     if(updatePositions) {
       const zoomed=this.camera.z>MIN_ZOOM+.001;
       const turned=Math.abs(Math.sin((viewAxes.yaw-HOME_YAW)/2))>.001 || Math.abs(viewAxes.pitch-HOME_PITCH)>.001;
-      const panned=range(this.camera,ORIGIN)*v.zoom>1;
       this.elements.stage.classList.toggle('is-zoomed',zoomed);
-      this.elements.stage.classList.toggle('view-adjusted',zoomed||turned||panned);
+      this.elements.stage.classList.toggle('view-adjusted',zoomed||turned);
       this.placeTokens(v);
       this.callbacks.placed?.();
     }
@@ -1509,13 +1361,11 @@ export class Board {
     const inside=(at,padding=14)=>at.x>padding && at.x<v.width-padding && at.y>padding && at.y<v.height-padding &&
       !sceneArt.tray.occlusions.some(face=>contains(face,(at.x-v.dx)/v.zoom,(at.y-v.dy)/v.zoom));
     const toySeats=[];
-    for(const {node,center,width,height,offsetY=0,covered,depth,flat} of this.hotspots) {
-      const x=v.dx+center.x*v.zoom,y=v.dy+(center.y+offsetY)*v.zoom;
-      const turn=flat?viewAxes.yaw-HOME_YAW:0;
-      const sin=Math.abs(Math.sin(turn)),cos=Math.abs(Math.cos(turn));
-      const w=(width*cos+height*sin/Math.sin(HOME_PITCH))*v.zoom;
-      const h=(flat?viewAxes.ground*(width*sin+height*cos/Math.sin(HOME_PITCH)):height)*v.zoom;
-      const hit={x:center.x,y:center.y+offsetY};
+    for(const {node,center,width,height,offsetY=0,covered,depth,hitBounds} of this.hotspots) {
+      const hit=hitBounds ? {x:(hitBounds.left+hitBounds.right)/2,y:(hitBounds.top+hitBounds.bottom)/2} : {x:center.x,y:center.y+offsetY};
+      const x=v.dx+hit.x*v.zoom,y=v.dy+hit.y*v.zoom;
+      const w=(hitBounds ? hitBounds.right-hitBounds.left : width)*v.zoom;
+      const h=(hitBounds ? hitBounds.bottom-hitBounds.top : height)*v.zoom;
       const walled=sceneArt.tray.occlusions.some(face=>contains(face,hit.x,hit.y));
       const terrain=this.projectedTileAt(hit);
       node.hidden=covered||walled||(terrain && terrain.depth>depth)||x+w/2<=0||x-w/2>=v.width||y+h/2<=0||y-h/2>=v.height;
@@ -1526,7 +1376,7 @@ export class Board {
       node.style.height=hitHeight+'px';
       node.style.left=left+'px';
       node.style.top=top+'px';
-      if(node.dataset.toy) toySeats.push({left,top,right:left+hitWidth,bottom:top+hitHeight});
+      toySeats.push({left,top,right:left+hitWidth,bottom:top+hitHeight});
     }
     const occupied=[];
     const compact=v.width<650;
@@ -1626,10 +1476,6 @@ export class Board {
     return company&&(this.category==='all'||company.category===this.category) ? id : undefined;
   }
 
-  move(target,animate=true) {
-    return this.travelTo(target,animate);
-  }
-
   resetView() {
     cancelAnimationFrame(this.orbitFrame);
     this.orbitFrame=null;
@@ -1637,7 +1483,7 @@ export class Board {
     this.requestedYaw=HOME_YAW;
     this.requestedPitch=HOME_PITCH;
     if(viewAxes.yaw!==HOME_YAW || viewAxes.pitch!==HOME_PITCH || this.orbiting) this.turnTo(HOME_YAW,HOME_PITCH,false);
-    return this.travelTo({...ORIGIN,z:MIN_ZOOM},false);
+    this.setCamera({...trayCenter(),z:MIN_ZOOM});
   }
 
   zoomBy(factor,anchor,destination=anchor) {
@@ -1645,7 +1491,7 @@ export class Board {
     const current=this.camera;
     const z=clamp(current.z*factor,MIN_ZOOM,MAX_ZOOM);
 
-    if(z===current.z && (!anchor || (anchor.x===destination.x&&anchor.y===destination.y))) return z;
+    if(z===current.z && (z===MIN_ZOOM || !anchor || (anchor.x===destination.x&&anchor.y===destination.y))) return z;
     let {x,y}=current;
     if(anchor) {
       const view=this.viewport();
@@ -1653,32 +1499,20 @@ export class Board {
       x+=(anchor.x-view.width/2)/view.zoom-(destination.x-view.width/2)/zoom;
       y+=(anchor.y-view.height/2)/view.zoom-(destination.y-view.height/2)/zoom;
     }
-    return this.travelTo({x,y,z},false);
+    this.setCamera({x,y,z});
+    return z;
   }
 
-  travelTo(target,animate=true) {
-    cancelAnimationFrame(this.travel);
-    const z=clamp(target.z,MIN_ZOOM,MAX_ZOOM);
-    const camera={
-      x:clamp(target.x,trayBounds.left+58,trayBounds.right-58),
-      y:clamp(target.y,trayBounds.top+52,trayBounds.bottom-56),z
+  setCamera({x,y,z}) {
+    const center=trayCenter();
+    const reach=TRAY.radius*(1-MIN_ZOOM/z);
+    const rise=reach*Math.sin(MAX_PITCH);
+    this.camera={
+      x:clamp(x,center.x-reach,center.x+reach),
+      y:clamp(y,center.y-rise,center.y+rise),
+      z
     };
-    if(!animate||motionReduced.matches) {
-      this.camera=camera;
-      this.draw();
-      return z;
-    }
-    const before=this.camera;
-    const start=performance.now();
-    const tick=time=>{
-      const progress=clamp((time-start)/290);
-      const ease=1-(1-progress)**3;
-      this.camera={x:lerp(before.x,camera.x,ease),y:lerp(before.y,camera.y,ease),z:lerp(before.z,camera.z,ease)};
-      this.draw();
-      if(progress<1) this.travel=requestAnimationFrame(tick);
-    };
-    this.travel=requestAnimationFrame(tick);
-    return z;
+    this.draw();
   }
 
   bind() {
@@ -1699,8 +1533,8 @@ export class Board {
       this.animateToys();
     };
     const pointer=event=>({x:event.clientX,y:event.clientY});
-    const startDrag=(id,{x,y},mode='orbit',button=null,secondary=false)=>{
-      drag={id,x,y,lastX:x,lastY:y,camera:this.camera,zoom:this.viewport().zoom,moved:false,mode,button,secondary};
+    const startDrag=(id,{x,y},button=null,secondary=false)=>{
+      drag={id,x,y,lastX:x,lastY:y,moved:false,button,secondary};
     };
     const orbitScale=()=>Math.PI*2/Math.max(510,stage.clientWidth*.83);
     const measurePinch=()=>{
@@ -1738,7 +1572,8 @@ export class Board {
       }
     },true);
     stage.addEventListener('pointerdown',event=>{
-      if(![0,1,2].includes(event.button)) return;
+      if(event.button===1) event.preventDefault();
+      if(event.button!==0 && event.button!==2) return;
       if(!touches.size) suppressClick=false;
       if(event.pointerType==='touch') {
         if(drag&&!touches.size) return;
@@ -1750,7 +1585,6 @@ export class Board {
             return;
           }
           for(const id of touches.keys()) stage.setPointerCapture(id);
-          cancelAnimationFrame(this.travel);
           drag=null;
           stage.classList.remove('dragging');
           pinch={last:measurePinch(),active:false};
@@ -1758,12 +1592,11 @@ export class Board {
         }
       } else if(touches.size) return;
       if(drag) return;
-      cancelAnimationFrame(this.travel);
       const button=event.target.closest('button');
-      const secondary=event.button!==0;
-      const pan=event.shiftKey || event.button===1 || (event.ctrlKey && event.button===2);
+      const secondary=event.button===2;
       if(secondary) event.preventDefault();
-      startDrag(event.pointerId,pointer(event),pan?'pan':'orbit',button,secondary);
+      if(secondary && this.camera.z===MIN_ZOOM) return;
+      startDrag(event.pointerId,pointer(event),button,secondary);
       if(!button || secondary) stage.setPointerCapture(event.pointerId);
     });
     stage.addEventListener('pointermove',event=>{
@@ -1782,14 +1615,16 @@ export class Board {
       suppressClick=true;
       stage.classList.add('dragging');
       if(!stage.hasPointerCapture(event.pointerId)) stage.setPointerCapture(event.pointerId);
-      if(drag.mode==='orbit') {
-        const tiltScale=Math.PI/(2*Math.max(280,stage.clientHeight));
-        this.orbitBy((event.clientX-drag.lastX)*orbitScale(),(event.clientY-drag.lastY)*tiltScale);
-        drag.lastX=event.clientX;
-        drag.lastY=event.clientY;
+      const dx=event.clientX-drag.lastX,dy=event.clientY-drag.lastY;
+      if(drag.secondary) {
+        const {zoom}=this.viewport();
+        this.setCamera({x:this.camera.x-dx/zoom,y:this.camera.y-dy/zoom,z:this.camera.z});
       } else {
-        this.travelTo({x:drag.camera.x-x/drag.zoom,y:drag.camera.y-y/drag.zoom,z:drag.camera.z},false);
+        const tiltScale=Math.PI/(2*Math.max(280,stage.clientHeight));
+        this.orbitBy(dx*orbitScale(),dy*tiltScale);
       }
+      drag.lastX=event.clientX;
+      drag.lastY=event.clientY;
     });
     const finishPointer=event=>{
       if(event.type==='lostpointercapture' && (event.target!==stage || stage.hasPointerCapture(event.pointerId))) return;
@@ -1831,13 +1666,8 @@ export class Board {
     stage.addEventListener('pointercancel',finishPointer);
     stage.addEventListener('lostpointercapture',finishPointer);
     stage.addEventListener('wheel',event=>{
-      if(!event.ctrlKey && Math.abs(event.deltaX)>Math.abs(event.deltaY)) {
-        event.preventDefault();
-        this.orbitBy(-event.deltaX*orbitScale());
-        return;
-      }
-      if(!event.deltaY) return;
       event.preventDefault();
+      if(!event.deltaY || (!event.ctrlKey && Math.abs(event.deltaX)>Math.abs(event.deltaY))) return;
       const box=stage.getBoundingClientRect();
       const units=event.deltaMode===1?16:event.deltaMode===2?stage.clientHeight:1;
       wheelDelta+=clamp(event.deltaY*units,-210,210);
@@ -1852,17 +1682,11 @@ export class Board {
     },{passive:false});
     stage.addEventListener('keydown',event=>{
       if(event.target!==stage) return;
-      const directions={ArrowLeft:[-40,0],ArrowRight:[40,0],ArrowUp:[0,-35],ArrowDown:[0,35]};
-      const offset=directions[event.key];
-      if(offset) {
+      const rotation={arrowleft:[-1,0],arrowright:[1,0],arrowup:[0,1],arrowdown:[0,-1],q:[-1,0],e:[1,0],w:[0,1],s:[0,-1]};
+      const turn=rotation[event.key.toLowerCase()];
+      if(turn) {
         event.preventDefault();
-        this.travelTo({...this.camera,x:this.camera.x+offset[0],y:this.camera.y+offset[1]});
-      } else if(['q','e'].includes(event.key.toLowerCase())) {
-        event.preventDefault();
-        this.orbitBy((event.key.toLowerCase()==='q'?-1:1)*Math.PI/12);
-      } else if(['w','s'].includes(event.key.toLowerCase())) {
-        event.preventDefault();
-        this.orbitBy(0,(event.key.toLowerCase()==='w'?1:-1)*Math.PI/36);
+        this.orbitBy(turn[0]*Math.PI/12,turn[1]*Math.PI/36);
       } else if(['+','=','-','0'].includes(event.key)) {
         event.preventDefault();
         if(event.key==='0') this.resetView();

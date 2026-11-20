@@ -52,68 +52,6 @@ function moment({active, reduced, elapsed}, still) {
   return active ? (reduced ? still : elapsed) : 0;
 }
 
-const caseTop = 'M-21 -1 L-13 -10 L10 -10 L21 -2 L14 6 L-10 7 Z';
-const lid = 'M-21 9 L-13 0 L10 0 L21 8 L14 16 L-10 17 Z';
-const grainLines = 'M-22 5 Q-12 3.6 -5 4.6 T15 4 M-19 10 Q-11 9 -8 10 Q-3 12 6 10 T21 10 M-18 14 Q-8 12.2 2 14 T18 13.5';
-
-function woodenLid(ctx, angle) {
-  const depth = Math.cos(angle) - 1.65 * Math.sin(angle);
-  const underside = depth < 0;
-  ctx.save();
-  ctx.translate(0, -10.35);
-  ctx.transform(1, 0, -.08 * Math.sin(angle), depth, 0, 0);
-  const wood = gradient(ctx, -15, 0, 14, 17, underside ? [[0,'#89512e'],[.5,'#b17b4a'],[1,'#dba56c']] : [[0,'#f2cd94'],[.46,'#dbaa71'],[1,'#b88353']]);
-  paint(ctx, lid, wood, '#7b5035', .8);
-  ctx.save();
-  ctx.clip(path(lid));
-  paint(ctx, 'M-18 6 L19 5.5 M-20 12 L21 11.4', null, '#805634', .72);
-  paint(ctx, 'M-18 6.7 L19 6.2 M-19 12.7 L20 12.1', null, '#efd0a0', .49);
-  paint(ctx, grainLines, null, '#8c593a82', .5);
-  oval(ctx, -3, 9.9, 2.2, .58, '#976841');
-  if (underside) {
-    paint(ctx, 'M-12 0 L-9 0 L-9 17 L-12 17 Z M8 0 L11 0 L11 17 L8 17 Z', '#875935', '#dba879', .55);
-  } else {
-    paint(ctx, 'M-2 14 C-2 10 4 9.8 4 13.5', null, '#70543c', 1.7);
-    paint(ctx, 'M-1.7 13 C-1 10.8 2.5 10.5 3.6 12.6', null, '#f6dc99', .75);
-  }
-  ctx.restore();
-  ctx.restore();
-}
-
-export function paintSandboxToy(ctx, state) {
-  const t = moment(state, 1.8);
-  const angle = 1.72 * (ease(t, 0, .64) - ease(t, 3.36, 4.17));
-  ctx.save();
-  ctx.rotate(-.095);
-  shadow(ctx, 3, 5, 25, 7, .38);
-  paint(ctx, 'M-21 -1 L-10 7 L14 6 L21 -2 L21 1 L14 9 L-10 10 L-21 2 Z', '#946341', '#765137', .65);
-  paint(ctx, 'M-10 7 L14 6 L14 9 L-10 10 Z', '#b78250');
-  paint(ctx, caseTop, '#e2bd86', '#835e40', .8);
-  paint(ctx, 'M-17 -1 L-11 -7.7 L9 -7.7 L17 -2 L11.8 4 L-8.5 4.7 Z', '#926943');
-  paint(ctx, 'M-16 -.2 L-10 -6 L8.6 -6.2 L16.1 -1.5 L11.5 3.4 L-8.3 4 Z', '#eaca8f');
-  ctx.save();
-  ctx.translate(-4, -1);
-  ctx.scale(1, .61);
-  const cells = [[-5,0,'#bb9466'],[-2,-2,'#bd7961'],[-2,2,'#c4866d'],[1,0,'#8b9d85'],[4,-2,'#82a9a6'],[4,2,'#9fb2a2']];
-  for (const [x,y,fill] of cells) {
-    ctx.save();
-    ctx.translate(x, y);
-    paint(ctx, 'M-2 0 L-1 -1.7 L1 -1.7 L2 0 L1 1.7 L-1 1.7 Z', fill, '#e9cda5', .24);
-    ctx.restore();
-  }
-  ctx.restore();
-  paint(ctx, 'M3 1.5 L10 -4', null, '#815832', 1.25);
-  paint(ctx, 'M3.2 1 L9.4 -4', null, '#e5b57a', .68);
-  paint(ctx, 'M8.5 -3.8 L9 -5.8 L11.6 -4.8 L10 -3.4 Z', null, '#3f736c', .8);
-  paint(ctx, 'M1.5 -.1 L4 1 Q4.6 2.5 1.5 3.3 Q-.2 3.6 -.5 2.4 Z', '#5c8c7d', '#416d60', .4);
-  woodenLid(ctx, angle);
-  for (const x of [-8, 6]) {
-    oval(ctx, x, -10.3, 1.9, .82, '#67492d');
-    oval(ctx, x-.2, -10.65, 1.55, .45, '#d6b771');
-  }
-  ctx.restore();
-}
-
 const glass = 'M-6.5 -11 C-6.7 -4.8 -2.1 -3.2 -1.1 -.9 Q-.6 0 -1.1 1 C-2.5 3.8 -6.9 5 -6.5 11 Q0 13 6.5 11 C6.7 4.8 2.1 3.2 1.1 .9 Q.6 0 1.1 -1 C2.5 -3.8 6.9 -5 6.5 -11 Q0 -13 -6.5 -11 Z';
 const brassStops = [[0,'#6e5534'],[.23,'#c8a767'],[.42,'#f6dc98'],[.65,'#be974f'],[1,'#705132']];
 

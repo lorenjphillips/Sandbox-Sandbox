@@ -11,7 +11,7 @@ const cross = (a, b) => [
 ];
 const light = unit([-.48, -.55, 1]);
 
-function face(mesh, points, color) {
+export function face(mesh, points, color) {
   const normal = unit(cross(sub(points[1], points[0]), sub(points[2], points[0])));
   if (points.length === 4 && Math.abs(dot(sub(points[3], points[0]), normal)) > EPSILON) {
     face(mesh, [points[0], points[1], points[2]], color);
@@ -23,7 +23,7 @@ function face(mesh, points, color) {
   mesh.push({points, normal, offset: dot(points[0], normal), fill: 'rgb(' + rgb.join(',') + ')'});
 }
 
-function join(mesh, a, b, color) {
+export function join(mesh, a, b, color) {
   for (let i = 0; i < a.length; i++) {
     const j = (i + 1) % a.length;
     face(mesh, [a[i], a[j], b[j], b[i]], color);
@@ -92,7 +92,7 @@ function footprint(left, right, width, bevel, height) {
     [right-bevel,width], [left+bevel,width], [left,width-bevel], [left,-width+bevel]].map(([x,y]) => [x, y, z(x)]);
 }
 
-function solid(mesh, bottom, top, color) {
+export function solid(mesh, bottom, top, color) {
   join(mesh, bottom, top, color);
   face(mesh, top, color);
   face(mesh, bottom.slice().reverse(), color);
@@ -214,7 +214,7 @@ function partition(faces) {
   return {normal:plane.normal, flat, near:partition(near), far:partition(far)};
 }
 
-function compile(faces) {
+export function compile(faces) {
   const tree = partition(faces);
   const vertices = [], indices = new Map();
   function index(node) {
@@ -239,7 +239,7 @@ function compile(faces) {
 const bucket = compile(bucketMesh());
 const truck = compile(truckMesh());
 
-function shadow(ctx, x, y, floor, camera, rx, ry) {
+export function shadow(ctx, x, y, floor, camera, rx, ry) {
   const center = camera.project(x+1.8,y+2.4,floor+.1);
   ctx.save();
   ctx.transform(camera.cosine, camera.sine*camera.ground, -camera.sine, camera.cosine*camera.ground, center.x, center.y);
@@ -253,7 +253,7 @@ function shadow(ctx, x, y, floor, camera, rx, ry) {
   ctx.restore();
 }
 
-function draw(ctx, x, y, floor, camera, model) {
+export function draw(ctx, x, y, floor, camera, model) {
   const points = model.vertices.map(([u,v,w]) => camera.project(x+u,y+v,floor+w));
   const eye = [camera.sine*camera.up,camera.cosine*camera.up,camera.ground];
   ctx.lineJoin = 'round';
