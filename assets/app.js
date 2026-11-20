@@ -53,7 +53,7 @@ function findFront(event) {
 const elements = {
   stage:$('#stage'),canvas:$('#board-canvas'),lawn:$('#lawn-canvas'),labels:$('#map-labels'),markers:$('#marker-layer'),eggLayer:$('#egg-layer'),
   popover:$('#map-popover'),search:$('#map-search'),searchResults:$('#search-results'),
-  updates:$('#updates-feed'),historyToggle:$('#history-calendar-toggle'),historyPlay:$('#history-play'),
+  updates:$('#updates-feed'),historyToggle:$('#history-calendar-toggle'),historyPlay:$('#history-play'),historyClock:$('#history-clock'),
   playbackTether:$('#playback-tether'),
   zoomHint:$('#zoom-hint'),profile:$('#profile')
 };
@@ -452,6 +452,7 @@ function showSnapshot(next, announce=false, playback=false) {
   }
   currentDate=next;
   elements.stage.dataset.historyDate=isoDate(currentDate);
+  renderHistoryClock();
   clearSelection(false);
   playbackEvent=playingHistory ? replayHighlight(currentDate) : null;
   updateBoard(flash,playback);
@@ -463,6 +464,40 @@ function showSnapshot(next, announce=false, playback=false) {
     $('#announcements').textContent=`${formatDate(currentDate,true)}. ${activity} for this day.`;
   }
   return flash.size;
+}
+
+function renderHistoryClock() {
+  const clock=elements.historyClock;
+  if(!playingHistory && pausedHistoryDate===null) {
+    if(!clock.hidden) {
+      clock.hidden=true;
+      clock.replaceChildren();
+      clock.removeAttribute('datetime');
+      clock.removeAttribute('title');
+    }
+    return;
+  }
+  const date=isoDate(currentDate);
+  const previous=clock.lastElementChild;
+  if(clock.dateTime===date && previous) {
+    if(!playingHistory) {
+      previous.classList.remove('is-entering');
+      clock.replaceChildren(previous);
+    }
+    return;
+  }
+  const current=document.createElement('span');
+  current.className='history-clock-current';
+  current.textContent=formatDate(currentDate);
+  if(previous && playingHistory && !clock.hidden) {
+    previous.className='history-clock-outgoing';
+    previous.setAttribute('aria-hidden','true');
+    current.classList.add('is-entering');
+    clock.replaceChildren(previous,current);
+  } else clock.replaceChildren(current);
+  clock.dateTime=date;
+  clock.title=formatDate(currentDate,true);
+  clock.hidden=false;
 }
 
 function setPlaybackButton() {
@@ -483,6 +518,7 @@ function stopHistory(resume=false) {
   drawPopover();
   board.stopHistoryOrbit();
   setPlaybackButton();
+  renderHistoryClock();
   return true;
 }
 

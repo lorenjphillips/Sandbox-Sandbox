@@ -650,6 +650,33 @@ body:has(#atlas-view[hidden]) .map-tools { display: none; }
   color: #fff8e9;
 }
 .history-play:hover { background: #733d1e; }
+.history-clock {
+  display: grid;
+  place-items: center;
+  width: 72px;
+  min-height: 36px;
+  overflow: hidden;
+  border: 1px solid #b99b74;
+  border-radius: 6px;
+  background: var(--paper);
+  box-shadow: 0 2px 8px #231d1638;
+  color: var(--body);
+  font-size: 12px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.history-clock span { grid-area: 1 / 1; }
+.history-clock-current.is-entering { animation: history-date-enter 115ms ease-out both; }
+.history-clock-outgoing { animation: history-date-exit 115ms ease-out both; }
+@keyframes history-date-enter {
+  from { opacity: 0; transform: translateY(.85em); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes history-date-exit {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(-.85em); }
+}
 .history-calendar {
   position: absolute;
   top: calc(100% + 8px);
@@ -988,5 +1015,6 @@ td .provider-link { color: var(--ink); font-weight: 700; font-size: 14px; paddin
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .001ms !important; scroll-behavior: auto !important; transition-duration: .001ms !important; }
-  .stage .event-token::after, .zoom-hint { animation: none !important; }
+  .stage .event-token::after, .zoom-hint, .history-clock-current.is-entering { animation: none !important; }
+  .history-clock-outgoing { display: none; }
 }
