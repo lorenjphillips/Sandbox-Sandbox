@@ -29,9 +29,21 @@
           <div class="search-results" id="search-results" hidden></div>
         </div>
       </div>
-      <a class="github-link" href="https://github.com/lorenjphillips/Sandbox-Sandbox" target="_blank" rel="noopener" aria-label="View Sandbox Sandbox on GitHub">
-        <img src="./assets/github.svg" alt="" width="20" height="20">
-      </a>
+      <div class="topbar-actions">
+        <button type="button" class="achievement-toggle" id="achievement-toggle" aria-label="Achievements" aria-expanded="false" aria-controls="achievements-panel">
+          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M8 21h8m-4-6v6m-6-16H3v2a4 4 0 0 0 4 4m11-6h3v2a4 4 0 0 1-4 4M6 3h12v6a6 6 0 0 1-12 0z"/></svg>
+        </button>
+        <section class="achievement-panel" id="achievements-panel" aria-labelledby="achievements-title" hidden>
+          <div class="achievement-heading">
+            <h2 id="achievements-title">Achievements</h2>
+            <span id="achievement-count"></span>
+          </div>
+          <ul id="achievement-list" class="achievement-list"></ul>
+        </section>
+        <a class="github-link" href="https://github.com/lorenjphillips/Sandbox-Sandbox" target="_blank" rel="noopener" aria-label="View Sandbox Sandbox on GitHub">
+          <img src="./assets/github.svg" alt="" width="20" height="20">
+        </a>
+      </div>
     </div>
   </header>
   <main id="main" class="shell">
@@ -136,6 +148,7 @@
   </main>
   <dialog id="profile" class="profile" aria-labelledby="profile-title"></dialog>
   <div id="announcements" class="sr-only" aria-live="polite"></div>
+  <div id="achievement-announcement" class="sr-only" aria-live="polite"></div>
   <noscript><p class="noscript">Enable JavaScript to use the atlas.</p></noscript>
 </body>
 </html>

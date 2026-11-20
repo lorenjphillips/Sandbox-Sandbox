@@ -1,4 +1,5 @@
 import { Board, TERRITORY_WEIGHT } from './map.js';
+import { mountAchievements } from './achievements.js';
 import { mountEasterEggPlayer } from './easter-eggs.js';
 const $ = selector => document.querySelector(selector);
 const DAY = 86_400_000;
@@ -56,7 +57,11 @@ const elements = {
   zoomHint:$('#zoom-hint'),profile:$('#profile')
 };
 const eggPlayer=$('#egg-player');
-const easterEggs=mountEasterEggPlayer(elements.eggLayer,eggPlayer,clearSelection);
+const achievements=mountAchievements($('#achievement-toggle'),$('#achievements-panel'),$('#achievement-announcement'));
+const easterEggs=mountEasterEggPlayer(elements.eggLayer,eggPlayer,id=>{
+  clearSelection();
+  achievements.unlock(id);
+});
 
 let atlas;
 try {
@@ -432,6 +437,7 @@ function toggleHistory() {
 }
 
 function playBoardToy(id) {
+  achievements.unlock(id);
   if(id==='hourglass' && currentDate>oldest) {
     showSnapshot(currentDate-DAY,true);
     return;
@@ -619,6 +625,7 @@ function renderMethod() {
 }
 
 function route() {
+  achievements.close();
   const requested=location.hash.slice(1).split('?')[0];
   const nextView=['compare','method','updates'].includes(requested) ? requested : 'atlas';
   if(nextView!=='atlas') stopHistory();
@@ -751,9 +758,14 @@ document.addEventListener('pointerdown',event=>{
   if(!event.target.closest('.map-search-wrap')) elements.searchResults.hidden=true;
 });
 document.addEventListener('keydown',event=>{
+  if(event.key==='Escape' && achievements.close(true)) {
+    event.preventDefault();
+    return;
+  }
   const editing=event.target.closest('input,select,textarea,[contenteditable]');
   if(event.key==='/' && !editing && !event.metaKey && !event.ctrlKey && !event.altKey) {
     event.preventDefault();
+    achievements.close();
     if(visibleView==='compare') $('#directory-search').focus();
     else {
       if(visibleView!=='atlas') {location.hash='atlas';route();}
