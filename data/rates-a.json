@@ -336,7 +336,7 @@
       "label": "Starter",
       "status": "published",
       "sourceUrl": "https://www.daytona.com/pricing",
-      "verifiedAt": null,
+      "verifiedAt": "2026-11-19",
       "charges": [
         {
           "meter": "subscription",
@@ -397,7 +397,8 @@
           "meter": "memory",
           "amount": 0.0162,
           "currency": "USD",
-          "unit": "gib_hour"
+          "unit": "gib_hour",
+          "basis": "on_demand_running"
         },
         {
           "meter": "volume_storage",
@@ -498,6 +499,141 @@
           "currency": "USD",
           "unit": "core_hour",
           "variant": "Windows"
+        }
+      ]
+    },
+    {
+      "label": "Preemptible compute and OS",
+      "status": "published",
+      "sourceUrl": "https://www.daytona.com/pricing",
+      "verifiedAt": "2026-11-19",
+      "charges": [
+        {
+          "meter": "cpu",
+          "amount": 0.0706,
+          "currency": "USD",
+          "unit": "physical_core_hour",
+          "variant": "AMD Zen 3 / Intel Ice Lake / AWS Graviton 4 / Apple M4",
+          "basis": "preemptible"
+        },
+        {
+          "meter": "cpu",
+          "amount": 0.118,
+          "currency": "USD",
+          "unit": "physical_core_hour",
+          "variant": "AMD Zen 4 / Intel Rapids / AWS Graviton 5 / Apple M4 Pro",
+          "basis": "preemptible"
+        },
+        {
+          "meter": "cpu",
+          "amount": 0.164,
+          "currency": "USD",
+          "unit": "physical_core_hour",
+          "variant": "AMD Zen 5 / Apple M5 Pro",
+          "basis": "preemptible"
+        },
+        {
+          "meter": "memory",
+          "amount": 0.0113,
+          "currency": "USD",
+          "unit": "gib_hour",
+          "basis": "preemptible_running"
+        },
+        {
+          "meter": "gpu",
+          "amount": 0.57,
+          "currency": "USD",
+          "unit": "gpu_hour",
+          "variant": "RTX 4090",
+          "basis": "preemptible"
+        },
+        {
+          "meter": "gpu",
+          "amount": 0.74,
+          "currency": "USD",
+          "unit": "gpu_hour",
+          "variant": "RTX 5090",
+          "basis": "preemptible"
+        },
+        {
+          "meter": "gpu",
+          "amount": 1.14,
+          "currency": "USD",
+          "unit": "gpu_hour",
+          "variant": "L40S",
+          "basis": "preemptible"
+        },
+        {
+          "meter": "gpu",
+          "amount": 1.95,
+          "currency": "USD",
+          "unit": "gpu_hour",
+          "variant": "RTX PRO 6000",
+          "basis": "preemptible"
+        },
+        {
+          "meter": "gpu",
+          "amount": 2.47,
+          "currency": "USD",
+          "unit": "gpu_hour",
+          "variant": "H100",
+          "basis": "preemptible"
+        },
+        {
+          "meter": "gpu",
+          "amount": 2.87,
+          "currency": "USD",
+          "unit": "gpu_hour",
+          "variant": "H200",
+          "basis": "preemptible"
+        },
+        {
+          "meter": "gpu",
+          "amount": 3.56,
+          "currency": "USD",
+          "unit": "gpu_hour",
+          "variant": "MI355X",
+          "basis": "preemptible"
+        },
+        {
+          "meter": "gpu",
+          "amount": 4.3,
+          "currency": "USD",
+          "unit": "gpu_hour",
+          "variant": "B200",
+          "basis": "preemptible"
+        },
+        {
+          "meter": "gpu",
+          "amount": 5.17,
+          "currency": "USD",
+          "unit": "gpu_hour",
+          "variant": "B300",
+          "basis": "preemptible"
+        },
+        {
+          "meter": "os",
+          "amount": 0,
+          "currency": "USD",
+          "unit": "core_hour",
+          "variant": "Linux",
+          "basis": "preemptible"
+        },
+        {
+          "meter": "os",
+          "amount": 0.00574,
+          "currency": "USD",
+          "unit": "core_hour",
+          "variant": "macOS",
+          "basis": "preemptible"
+        },
+        {
+          "meter": "os",
+          "amount": 0.12,
+          "currency": "USD",
+          "unit": "core_hour",
+          "variant": "Windows",
+          "basis": "preemptible"
         }
       ]
     }
@@ -1888,8 +2024,8 @@
     {
       "label": "Small / default / large",
       "status": "published",
-      "sourceUrl": "https://boat.dev/",
-      "verifiedAt": null,
+      "sourceUrl": "https://docs.boat.dev/pricing",
+      "verifiedAt": "2026-11-19",
       "charges": [
         {
           "meter": "sandbox",
@@ -1897,7 +2033,7 @@
           "currency": "USD",
           "unit": "sandbox_hour",
           "variant": "Small (2 vCPU / 4 GB)",
-          "basis": "per_second_billing"
+          "basis": "running_per_second"
         },
         {
           "meter": "sandbox",
@@ -1905,7 +2041,7 @@
           "currency": "USD",
           "unit": "sandbox_hour",
           "variant": "Default (4 vCPU / 8 GB)",
-          "basis": "per_second_billing"
+          "basis": "running_per_second"
         },
         {
           "meter": "sandbox",
@@ -1913,7 +2049,7 @@
           "currency": "USD",
           "unit": "sandbox_hour",
           "variant": "Large (8 vCPU / 16 GB)",
-          "basis": "per_second_billing"
+          "basis": "running_per_second"
         },
         {
           "meter": "monthly_minimum",
@@ -1949,15 +2085,15 @@
     {
       "label": "Starts over allowance",
       "status": "published",
-      "sourceUrl": "https://boat.dev/",
-      "verifiedAt": null,
+      "sourceUrl": "https://docs.boat.dev/pricing",
+      "verifiedAt": "2026-11-19",
       "charges": [
         {
-          "meter": "sandbox_creation",
+          "meter": "sandbox_start",
           "minAmount": 0.03,
           "maxAmount": 0.07,
           "currency": "USD",
-          "unit": "creation",
+          "unit": "sandbox_start",
           "basis": "after_allowance"
         }
       ]
@@ -1965,14 +2101,15 @@
     {
       "label": "Saved snapshots",
       "status": "published",
-      "sourceUrl": "https://boat.dev/",
-      "verifiedAt": null,
+      "sourceUrl": "https://docs.boat.dev/pricing",
+      "verifiedAt": "2026-11-19",
       "charges": [
         {
           "meter": "snapshot_storage",
           "amount": 0.056,
           "currency": "USD",
-          "unit": "snapshot_day"
+          "unit": "snapshot_day",
+          "basis": "after_allowance"
         }
       ]
     }

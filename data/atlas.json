@@ -370,7 +370,7 @@
         {
           "label": "Starter",
           "value": "$0 + compute",
-          "detail": "$200 one-time credits; one-hour sessions."
+          "detail": "$200 one-time credits. Sessions up to 24 hours."
         },
         {
           "label": "Team",
@@ -385,12 +385,12 @@
         {
           "label": "On-demand CPU",
           "value": "$0.101–$0.235/physical core-hr",
-          "detail": "One core is two vCPUs. Rate depends on processor generation. Billed by the second."
+          "detail": "The rate depends on processor generation and is billed per second. A core maps to 2 vCPUs when simultaneous multithreading is available and enabled, and 1 vCPU otherwise."
         },
         {
           "label": "Memory and volumes",
           "value": "$0.0162/GiB-hr RAM",
-          "detail": "Local NVMe included; volumes $0.000108/GiB-hr."
+          "detail": "On-demand RAM is metered while running. Ephemeral NVMe is included. Persistent volumes cost $0.000108/GiB-hour."
         },
         {
           "label": "On-demand GPUs",
@@ -401,6 +401,11 @@
           "label": "OS per core-hour",
           "value": "$0 Linux",
           "detail": "macOS $0.0082 and Windows $0.172 per core-hour; macOS sandbox requires a separate reservation."
+        },
+        {
+          "label": "Preemptible compute and OS",
+          "value": "$0.0706–$0.164/core-hour CPU",
+          "detail": "RAM $0.0113/GiB-hour. GPU $0.57–$5.17/GPU-hour. OS fees per core-hour are $0 for Linux, $0.00574 for macOS, and $0.12 for Windows. Preemptible instances can be reclaimed."
         }
       ],
       "sources": [
@@ -2231,7 +2236,7 @@
         {
           "label": "Small / default / large",
           "value": "$0.018 / $0.036 / $0.072 per hour",
-          "detail": "2 / 4 / 8 vCPU and 4 / 8 / 16 GB RAM, respectively. Billed by the second. $20 monthly minimum credited to usage."
+          "detail": "2 / 4 / 8 vCPU and 4 / 8 / 16 GB RAM, respectively. Billed by the second while running. The $20 monthly minimum is credited to usage."
         },
         {
           "label": "XL",
@@ -2241,12 +2246,12 @@
         {
           "label": "Starts over allowance",
           "value": "$0.03–$0.07 each",
-          "detail": "Monthly plan includes a fixed daily allowance for sandbox starts."
+          "detail": "Starts include creating, forking, and resuming a sandbox. The daily included allowance varies by plan."
         },
         {
           "label": "Saved snapshots",
           "value": "$0.056/day each",
-          "detail": "Applies to saved disk snapshots."
+          "detail": "Applies to saved disk snapshots above the included count."
         }
       ],
       "sources": [
@@ -2269,6 +2274,10 @@
         {
           "label": "Original launch on X",
           "url": "https://x.com/AniC_dev/status/2107131198975938901"
+        },
+        {
+          "label": "Billing and included allowances",
+          "url": "https://docs.boat.dev/pricing"
         }
       ]
     },
