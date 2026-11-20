@@ -56,16 +56,6 @@
     <section id="atlas-view" aria-labelledby="atlas-title">
       <h1 id="atlas-title" class="sr-only">Sandbox map</h1>
 
-      <div class="history-controls">
-        <nav class="history-days" aria-label="Map history" id="history-days"></nav>
-        <div class="history-jump">
-          <button type="button" id="history-play" class="history-play" aria-label="Play history">Play</button>
-          <label for="history-date">Date</label>
-          <input type="date" id="history-date">
-          <button type="button" id="jump-latest" class="latest-button" aria-label="Show latest map" disabled>Latest</button>
-        </div>
-      </div>
-
       <div class="board">
         <div id="stage" class="stage" aria-label="Interactive sandbox provider map" aria-description="Drag to rotate and tilt around the center. Scroll or pinch to zoom. On touch, slide two fingers up or down to tilt. Slide sideways or diagonally to move when zoomed in. On a mouse, right-drag to move when zoomed in. When the map is focused, the arrow keys rotate and tilt, plus and minus zoom, and zero resets the view.">
           <canvas id="lawn-canvas" aria-hidden="true"></canvas>
@@ -75,11 +65,27 @@
           <div id="egg-layer" class="egg-layer"></div>
         </div>
         <button type="button" class="reset-camera" id="reset-camera" aria-keyshortcuts="0">Reset view</button>
-        <p class="playback-note" id="playback-note" hidden></p>
+        <div class="history-controls" role="group" aria-label="History playback">
+          <button type="button" class="history-calendar-toggle" id="history-calendar-toggle" aria-label="Choose a start date" aria-expanded="false" aria-controls="history-calendar">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><rect x="3.5" y="5.5" width="17" height="15" rx="2"/><path d="M7.5 3.5v4m9-4v4m-13 2.5h17m-12 4h1m5 0h1m-7 3h1"/></svg>
+          </button>
+          <button type="button" id="history-play" class="history-play" aria-label="Play history from beginning">Play</button>
+          <section class="history-calendar" id="history-calendar" aria-label="Choose a start date" hidden>
+            <header class="history-calendar-head">
+              <button type="button" data-calendar-month="-1" aria-label="Previous month"><svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m10 3.5-4.5 4.5 4.5 4.5"/></svg></button>
+              <strong id="history-calendar-month" aria-live="polite"></strong>
+              <button type="button" data-calendar-month="1" aria-label="Next month"><svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5 10.5 8 6 12.5"/></svg></button>
+            </header>
+            <div class="history-calendar-week" aria-hidden="true"><span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span></div>
+            <div class="history-calendar-days" data-calendar-days role="group" aria-labelledby="history-calendar-month"></div>
+            <footer class="history-calendar-footer"><button type="button" data-calendar-clear>From beginning</button></footer>
+          </section>
+        </div>
         <div class="zoom-hint" id="zoom-hint" aria-hidden="true" hidden>
           <span class="zoom-hint-mouse">Scroll to zoom</span>
           <span class="zoom-hint-touch">Pinch to zoom</span>
         </div>
+        <span id="playback-tether" class="playback-tether" aria-hidden="true" hidden></span>
         <div id="map-popover" class="map-popover" hidden></div>
       </div>
       <aside id="egg-player" class="egg-player" aria-labelledby="egg-title" hidden>

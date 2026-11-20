@@ -51,6 +51,8 @@ export const MAX_ZOOM = 4.25;
 const AMBIENT_INTERVAL = 7600;
 const AMBIENT_DURATION = 940;
 const TOY_DURATION = 4200;
+const HISTORY_ORBIT_MS = 84000;
+const HISTORY_FRAME_MS = 1000/24;
 
 function hash(x, y) {
   let value = (Math.imul(x, 196613) ^ Math.imul(y, 263167)) >>> 0;
@@ -718,6 +720,7 @@ export class Board {
     if(!Number.isFinite(radians)||!Number.isFinite(tilt)) return;
     const nextPitch=clamp(this.requestedPitch+tilt,MIN_PITCH,MAX_PITCH);
     if(!radians && nextPitch===this.requestedPitch) return;
+    this.interruptHistoryOrbit();
     this.requestedYaw+=radians;
     this.requestedPitch=nextPitch;
     if(this.orbitFrame) return;
@@ -727,13 +730,78 @@ export class Board {
       this.deferLabelLayout();
       this.draw();
       clearTimeout(this.orbitTimer);
-      this.orbitTimer=setTimeout(()=>{
-        this.orbiting=false;
-        sceneArt={tray:createTrayLayer(),area:SCENE};
-        this.terrainRevision++;
-        this.draw();
-      },150);
+      this.orbitTimer=setTimeout(()=>this.settleOrbit(),150);
     });
+  }
+
+  settleOrbit() {
+    this.orbiting=false;
+    sceneArt={tray:createTrayLayer(),area:SCENE};
+    this.terrainRevision++;
+    this.draw();
+  }
+
+  startHistoryOrbit({reset=true}={}) {
+    if(this.historyOrbiting) return;
+    if(reset) this.resetView();
+    this.historyOrbiting=true;
+    this.stopActivity();
+    this.animateHistoryOrbit();
+  }
+
+  stopHistoryOrbit() {
+    if(!this.historyOrbiting) return;
+    this.historyOrbiting=false;
+    this.suspendHistoryOrbit();
+    this.scheduleActivity();
+  }
+
+  interruptHistoryOrbit() {
+    if(!this.historyOrbiting) return;
+    this.stopHistoryOrbit();
+    this.callbacks.navigate?.();
+  }
+
+  animateHistoryOrbit() {
+    if(!this.historyOrbiting || this.historyOrbitFrame!=null || document.hidden || motionReduced.matches) return;
+    cancelAnimationFrame(this.orbitFrame);
+    this.orbitFrame=null;
+    cancelAnimationFrame(this.flashFrame);
+    this.flashFrame=null;
+    clearTimeout(this.orbitTimer);
+    clearTimeout(this.labelSettleTimer);
+    this.labelSettleTimer=null;
+    this.elements.stage.classList.add('camera-moving');
+    this.requestedYaw=viewAxes.yaw;
+    this.requestedPitch=viewAxes.pitch;
+    let previous=null;
+    let nextFrame=0;
+    const tick=time=>{
+      this.historyOrbitFrame=requestAnimationFrame(tick);
+      if(previous===null) {
+        previous=time;
+        nextFrame=time+HISTORY_FRAME_MS;
+        return;
+      }
+      if(time+1<nextFrame) return;
+      const elapsed=time-previous;
+      previous=time;
+      nextFrame=Math.max(nextFrame+HISTORY_FRAME_MS,time+HISTORY_FRAME_MS/2);
+      const turn=2*Math.PI;
+      this.requestedYaw=(this.requestedYaw+turn*Math.min(elapsed,160)/HISTORY_ORBIT_MS)%turn;
+      this.turnTo(this.requestedYaw,this.requestedPitch,true);
+      this.draw();
+    };
+    this.historyOrbitFrame=requestAnimationFrame(tick);
+  }
+
+  suspendHistoryOrbit() {
+    if(this.historyOrbitFrame==null) return;
+    cancelAnimationFrame(this.historyOrbitFrame);
+    this.historyOrbitFrame=null;
+    this.elements.stage.classList.remove('camera-moving');
+    if(this.orbiting) this.settleOrbit();
+    if(this.pulses.size && !document.hidden && performance.now()-this.flashStart<770) this.animateFlash();
   }
 
   turnTo(angle,pitch,interactive) {
@@ -1013,7 +1081,7 @@ export class Board {
   }
 
   animateFlash() {
-    if(this.flashFrame || motionReduced.matches) return;
+    if(this.flashFrame || this.historyOrbitFrame!=null || motionReduced.matches) return;
     const tick=()=>{
       this.flashFrame=null;
       this.draw(false);
@@ -1067,7 +1135,7 @@ export class Board {
   }
 
   canAnimateActivity() {
-    return this.activityTiles.length && !motionReduced.matches && !document.hidden && this.elements.stage.clientWidth>0;
+    return this.activityTiles.length && !this.historyOrbiting && !motionReduced.matches && !document.hidden && this.elements.stage.clientWidth>0;
   }
 
   scheduleActivity() {
@@ -1237,7 +1305,7 @@ export class Board {
       const zoomed=this.camera.z>MIN_ZOOM+.001;
       const turned=Math.abs(Math.sin((viewAxes.yaw-HOME_YAW)/2))>.001 || Math.abs(viewAxes.pitch-HOME_PITCH)>.001;
       this.elements.stage.classList.toggle('is-zoomed',zoomed);
-      this.elements.stage.classList.toggle('view-adjusted',zoomed||turned);
+      this.elements.stage.classList.toggle('view-adjusted',!this.historyOrbiting && (zoomed||turned));
       this.placeTokens(v);
       this.callbacks.placed?.();
     }
@@ -1268,7 +1336,7 @@ export class Board {
     }
     const occupied=[];
     const compact=v.width<650;
-    const moving=Boolean(this.labelSettleTimer);
+    const moving=this.labelSettleTimer!=null || this.historyOrbitFrame!=null;
     const sites=[...this.siteList].sort((a,b)=>this.sitePriority(a)-this.sitePriority(b));
     for(const site of sites) {
       const id=site.company.id;
@@ -1368,6 +1436,7 @@ export class Board {
   }
 
   resetView() {
+    this.interruptHistoryOrbit();
     cancelAnimationFrame(this.orbitFrame);
     this.orbitFrame=null;
     clearTimeout(this.orbitTimer);
@@ -1412,11 +1481,13 @@ export class Board {
     const center=trayCenter();
     const reach=TRAY.radius*(1-MIN_ZOOM/z);
     const rise=reach*Math.sin(MAX_PITCH);
-    this.camera={
+    const next={
       x:clamp(x,center.x-reach,center.x+reach),
       y:clamp(y,center.y-rise,center.y+rise),
       z
     };
+    if(moving && (next.x!==this.camera.x || next.y!==this.camera.y || next.z!==this.camera.z)) this.interruptHistoryOrbit();
+    this.camera=next;
     if(moving) this.deferLabelLayout();
     this.draw();
   }
@@ -1433,8 +1504,13 @@ export class Board {
     let wheelFrame;
     stage.tabIndex=0;
     const onMotionChange=()=>{
-      if(document.hidden||motionReduced.matches) this.stopActivity();
-      else this.scheduleActivity();
+      if(document.hidden||motionReduced.matches) {
+        this.stopActivity();
+        this.suspendHistoryOrbit();
+      } else {
+        this.scheduleActivity();
+        this.animateHistoryOrbit();
+      }
       this.draw(false);
       this.animateToys();
     };

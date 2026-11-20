@@ -1,12 +1,13 @@
-import { Board, TERRITORY_WEIGHT } from './map.js';
+import { Board, MIN_ZOOM, TERRITORY_WEIGHT } from './map.js';
 import { mountAchievements } from './achievements.js';
 import { mountEasterEggPlayer } from './easter-eggs.js';
+import { mountHistoryCalendar } from './history-calendar.js';
 const $ = selector => document.querySelector(selector);
 const DAY = 86_400_000;
 const LOOKBACK_DAYS = 180;
 const MARKER_DAYS = 14;
 const HISTORY_MONTHS = 6;
-const BUSY_DAY_MS = 1020;
+const HIGHLIGHT_MS = 2850;
 const QUIET_DAY_MS = 145;
 const dateValue = date => Date.parse(date + 'T00:00:00Z');
 const isoDate = time => new Date(time).toISOString().slice(0,10);
@@ -52,13 +53,14 @@ function findFront(event) {
 const elements = {
   stage:$('#stage'),canvas:$('#board-canvas'),lawn:$('#lawn-canvas'),labels:$('#map-labels'),markers:$('#marker-layer'),eggLayer:$('#egg-layer'),
   popover:$('#map-popover'),search:$('#map-search'),searchResults:$('#search-results'),
-  updates:$('#updates-feed'),historyDate:$('#history-date'),historyDays:$('#history-days'),
-  historyPlay:$('#history-play'),playbackNote:$('#playback-note'),latestButton:$('#jump-latest'),
+  updates:$('#updates-feed'),historyToggle:$('#history-calendar-toggle'),historyPlay:$('#history-play'),
+  playbackTether:$('#playback-tether'),
   zoomHint:$('#zoom-hint'),profile:$('#profile')
 };
 const eggPlayer=$('#egg-player');
 const achievements=mountAchievements($('#achievement-toggle'),$('#achievements-panel'),$('#achievement-announcement'));
 const easterEggs=mountEasterEggPlayer(elements.eggLayer,eggPlayer,id=>{
+  pauseHistory();
   clearSelection();
   achievements.unlock(id);
 });
@@ -92,11 +94,14 @@ for(const event of archiveEvents) {
   if(entries) entries.push(event);
   else eventsByDay.set(event.time,[event]);
 }
-const historyButtons=new Map();
-let historyTabStop=null;
 let currentDate=latest;
 let playingHistory=false;
 let historyTimer=null;
+let chosenHistoryDate=null;
+let pausedHistoryDate=null;
+let playbackEvent=null;
+let playbackSide=null;
+let playbackCardSize=null;
 let category='all';
 let kind='all';
 let focusedEvent=null;
@@ -123,12 +128,23 @@ const eventEvidence = event => {
 };
 const eventToys={launch:'rocket',funding:'coins',partnership:'blocks',adoption:'pawns',retirement:'cone',feature:'gear'};
 
+const historyCalendar=mountHistoryCalendar(elements.historyToggle,$('#history-calendar'),{
+  min:isoDate(oldest),max:atlas.asOf,onSelect:date=>{
+    chosenHistoryDate=date ? dateValue(date) : null;
+    pausedHistoryDate=null;
+    setPlaybackButton();
+    showSnapshot(chosenHistoryDate??latest,true);
+  }
+});
+historyCalendar.setDate(null);
+
 const board = new Board(elements,atlas.companies,{
   pick:openProfile,
   clear:clearSelection,
   playToy:playBoardToy,
   eventButton:makeEventButton,
   eventAnchor:event=>eventMovement(event).anchor,
+  navigate:pauseHistory,
   placed:placePopover
 });
 
@@ -193,12 +209,13 @@ function makeEventButton(event) {
 
 function showHover(event) {
   clearTimeout(hidePopoverTimer);
-  if (pinnedEvent) return;
+  if (pinnedEvent || playingHistory) return;
   hoveredEvent=event;
   drawPopover();
 }
 
 function scheduleHide() {
+  if(playingHistory) return;
   clearTimeout(hidePopoverTimer);
   hidePopoverTimer=setTimeout(()=>{
     if (pinnedEvent || elements.popover.matches(':hover,:focus-within')) return;
@@ -208,12 +225,29 @@ function scheduleHide() {
 }
 
 function drawPopover() {
-  const event=pinnedEvent||hoveredEvent;
-  if(!event) {elements.popover.hidden=true;return;}
+  const event=pinnedEvent||playbackEvent||hoveredEvent;
+  const playing=event && event===playbackEvent;
+  elements.popover.classList.toggle('is-playback',Boolean(playing));
+  if(!playing) elements.popover.style.removeProperty('max-height');
+  elements.playbackTether.hidden=true;
+  if(!event) {
+    elements.popover.hidden=true;
+    delete elements.popover.dataset.eventId;
+    return;
+  }
+  elements.popover.dataset.eventId=event.id;
   const movement=eventMovement(event);
   const signal=signals[event.kind];
   elements.popover.style.setProperty('--signal',frontColors.get(event.front));
-  elements.popover.innerHTML=`
+  if(playing) {
+    playbackSide=null;
+    playbackCardSize=null;
+    elements.playbackTether.style.setProperty('--signal',frontColors.get(event.front));
+    elements.popover.innerHTML=`
+      <div class="playback-meta"><strong>${escaped(companies.get(event.company).name)}</strong><time datetime="${event.date}">${formatDate(event.time)}</time></div>
+      <h3><button type="button" class="playback-headline" data-open-playback-event="${event.id}">${escaped(event.title)}</button></h3>
+      ${movement.delta ? `<p class="playback-territory" title="Same-day net territory change">${signed(movement.delta)} hex${Math.abs(movement.delta)===1?'':'es'}</p>` : ''}`;
+  } else elements.popover.innerHTML=`
     ${pinnedEvent ? '<button type="button" class="popover-close" data-close-popover aria-label="Close update">Close</button>' : ''}
     <h3>${escaped(event.title)}</h3>
     <p class="popover-meta">${escaped(companies.get(event.company).name)} · ${escaped(event.front)} · ${formatDate(event.time)}</p>
@@ -229,11 +263,15 @@ function drawPopover() {
 }
 
 function placePopover() {
-  const event=pinnedEvent||hoveredEvent;
+  const event=pinnedEvent||playbackEvent||hoveredEvent;
   if (!event || elements.popover.hidden || elements.popover.offsetParent===null) return;
+  const viewport=board.viewport();
+  if(event===playbackEvent) {
+    placePlaybackPopover(event,viewport);
+    return;
+  }
   const node=board.markerNodes.get(event.id)?.node;
   const fallback=board.sites.get(event.company);
-  const viewport=board.viewport();
   const x=node&&!node.hidden ? parseFloat(node.style.left) : viewport.dx+fallback.screen.x*viewport.zoom;
   const y=node&&!node.hidden ? parseFloat(node.style.top) : viewport.dy+fallback.screen.y*viewport.zoom;
   const width=elements.popover.offsetWidth;
@@ -246,7 +284,58 @@ function placePopover() {
   elements.popover.style.top=Math.min(Math.max(8,top),viewport.height-height-9)+'px';
 }
 
+function placePlaybackPopover(event,viewport) {
+  const margin=10,gap=20,topEdge=64;
+  const within=(value,min,max)=>Math.max(min,Math.min(max,value));
+  const seat=board.logoAnchors.get(event.company)?.tile||board.sites.get(event.company);
+  const x=within(viewport.dx+seat.screen.x*viewport.zoom,margin,viewport.width-margin);
+  const y=within(viewport.dy+seat.screen.y*viewport.zoom,margin,viewport.height-margin);
+  if(playbackCardSize?.viewWidth!==viewport.width || playbackCardSize.viewHeight!==viewport.height) {
+    elements.popover.style.maxHeight=Math.max(20,viewport.height-topEdge-margin)+'px';
+    playbackCardSize={viewWidth:viewport.width,viewHeight:viewport.height,width:elements.popover.offsetWidth,height:elements.popover.offsetHeight};
+  }
+  const {width,height}=playbackCardSize;
+  const room={
+    right:viewport.width-margin-x-gap-width,
+    left:x-margin-gap-width,
+    below:viewport.height-margin-y-gap-height,
+    above:y-topEdge-gap-height
+  };
+  const marker=board.markerNodes.get(event.id)?.node;
+  const markerX=marker&&!marker.hidden ? parseFloat(marker.style.left) : NaN;
+  const markerY=marker&&!marker.hidden ? parseFloat(marker.style.top) : NaN;
+  const positions=Object.keys(room).map(side=>{
+    const left=within(side==='right' ? x+gap : side==='left' ? x-gap-width : x-width/2,margin,viewport.width-width-margin);
+    const top=within(side==='below' ? y+gap : side==='above' ? y-gap-height : y-height/2,topEdge,viewport.height-height-margin);
+    const blocked=left<markerX+17 && left+width>markerX-17 && top<markerY+9 && top+height>markerY-33;
+    return {side,left,top,blocked};
+  });
+  const current=positions.find(position=>position.side===playbackSide);
+  const penalty=viewport.width+viewport.height;
+  const score=position=>{
+    const outward=Math.hypot(position.left+width/2-viewport.width/2,(position.top+height/2-viewport.height/2)*1.4);
+    return outward-(room[position.side]<0 ? penalty : 0)-(position.blocked ? 2*penalty : 0);
+  };
+  const chosen=current&&!current.blocked&&room[current.side]>=0 ? current :
+    positions.reduce((best,position)=>score(position)>score(best) ? position : best);
+  playbackSide=chosen.side;
+  if(marker) {
+    marker.classList.toggle('playback-covered',chosen.blocked);
+  }
+  const {left,top}=chosen;
+  elements.popover.style.left=left+'px';
+  elements.popover.style.top=top+'px';
+  const dx=within(x,left,left+width)-x,dy=within(y,top,top+height)-y;
+  const line=elements.playbackTether;
+  line.style.left=x+'px';
+  line.style.top=y+'px';
+  line.style.width=Math.hypot(dx,dy)+'px';
+  line.style.transform=`rotate(${Math.atan2(dy,dx)}rad)`;
+  line.hidden=false;
+}
+
 function focusEvent(event) {
+  stopHistory();
   hoveredEvent=null;
   focusedEvent=event.id;
   pinnedEvent=event;
@@ -271,9 +360,14 @@ const matchesKind=event=>kind==='all' || event.kind===kind || 'front:'+event.fro
 const matchesCategory=event=>category==='all' || companies.get(event.company).category===category;
 
 function updateBoard(flash=new Set(),replay=false) {
-  board.selected=pinnedEvent?.company || (visibleView==='atlas' ? currentProfile?.id : null);
+  board.selected=(pinnedEvent||playbackEvent)?.company || (visibleView==='atlas' ? currentProfile?.id : null);
   board.setLayout(board.layout(scoreOn(currentDate)),'all',flash,{replay});
-  const showRecent=currentDate===latest && !playingHistory;
+  if(playingHistory) {
+    board.setEventMarkers(playbackEvent ? [playbackEvent] : [],playbackEvent?.id);
+    board.setActivityTiles([]);
+    return;
+  }
+  const showRecent=currentDate===latest;
   const filtered=showRecent ? archiveEvents.filter(event=>event.time>latest-MARKER_DAYS*DAY) : eventsByDay.get(currentDate)||[];
   const featured=showRecent
     ? Array.from(new Map(filtered.toReversed().map(event=>[event.company,event])).values())
@@ -324,60 +418,44 @@ function renderUpdates() {
     </section>`).join('');
 }
 
-function buildHistory() {
-  const dates=[];
-  for(let time=oldest;time<=latest;time+=DAY) {
-    const date=isoDate(time);
-    const busy=eventsByDay.has(time);
-    const monthStart=date.endsWith('-01') && time!==oldest;
-    dates.push(`<button type="button" class="history-day" tabindex="-1" data-history-date="${date}" ${busy ? 'data-has-events' : ''} ${monthStart ? 'data-month-start' : ''} aria-label="${formatDate(time,true)}${busy ? ', has updates' : ''}">${formatDate(time)}</button>`);
+function replayHighlight(date) {
+  let best=null;
+  let highest=-Infinity;
+  for(const event of eventsByDay.get(date)||[]) {
+    if(event.relatedCompany) continue;
+    const weight=Math.abs(signals[event.kind].points);
+    const movement=eventMovement(event);
+    if(weight<4 && event.kind!=='funding' && movement.changed.length<4) continue;
+    const rank=weight*7+Math.min(12,movement.changed.length)*3;
+    if(rank>highest) {
+      best=event;
+      highest=rank;
+    }
   }
-  elements.historyDate.min=isoDate(oldest);
-  elements.historyDate.max=atlas.asOf;
-  elements.historyDays.innerHTML=dates.join('');
-  for(const button of elements.historyDays.querySelectorAll('[data-history-date]')) historyButtons.set(button.dataset.historyDate,button);
-}
-
-function setHistoryTabStop(button) {
-  if(historyTabStop) historyTabStop.tabIndex=-1;
-  historyTabStop=button;
-  if(button) button.tabIndex=0;
-}
-
-function revealHistoryDay(button) {
-  const strip=elements.historyDays.getBoundingClientRect();
-  const rect=button.getBoundingClientRect();
-  if(rect.left<strip.left || rect.right>strip.right) {
-    elements.historyDays.scrollLeft+=rect.left-strip.left-(strip.width-rect.width)/2;
-  }
-}
-
-function syncLatestButton() {
-  const strip=elements.historyDays;
-  const atRightEdge=strip.scrollWidth-strip.clientWidth-strip.scrollLeft<2;
-  elements.latestButton.disabled=currentDate===latest && atRightEdge;
+  return best;
 }
 
 function showSnapshot(next, announce=false, playback=false) {
   if(!Number.isFinite(next) || next<oldest || next>latest) return;
   const flash=new Set();
-  if(playback) {
+  if(playback && next===currentDate+DAY) {
     const prior=board.layout(scoreOn(currentDate));
     board.layout(scoreOn(next)).forEach((owner,index)=>{
       if(owner!==prior[index]) flash.add(index);
     });
-  } else stopHistory();
-  historyButtons.get(isoDate(currentDate))?.removeAttribute('aria-current');
+  } else if(!playback) {
+    stopHistory();
+    if(pausedHistoryDate!==null) {
+      pausedHistoryDate=null;
+      setPlaybackButton();
+    }
+  }
   currentDate=next;
-  const activeDate=isoDate(currentDate);
-  const activeButton=historyButtons.get(activeDate);
-  activeButton.setAttribute('aria-current','date');
-  setHistoryTabStop(activeButton);
-  elements.historyDate.value=activeDate;
-  revealHistoryDay(activeButton);
-  syncLatestButton();
+  elements.stage.dataset.historyDate=isoDate(currentDate);
   clearSelection(false);
+  playbackEvent=playingHistory ? replayHighlight(currentDate) : null;
   updateBoard(flash,playback);
+  drawPopover();
   if(elements.profile.open && activeProfileTab==='evidence') renderProfile();
   if(announce) {
     const count=eventsByDay.get(currentDate)?.length||0;
@@ -388,28 +466,34 @@ function showSnapshot(next, announce=false, playback=false) {
 }
 
 function setPlaybackButton() {
-  elements.historyPlay.textContent=playingHistory ? 'Pause' : 'Play';
-  elements.historyPlay.setAttribute('aria-label',playingHistory ? 'Pause history' : 'Play history');
+  const label=playingHistory ? 'Pause' : pausedHistoryDate!==null ? 'Resume' : 'Play';
+  const start=chosenHistoryDate===null ? 'from beginning' : `from ${formatDate(chosenHistoryDate,true)}`;
+  elements.historyPlay.textContent=label;
+  elements.historyPlay.setAttribute('aria-label',`${label} history${label==='Play' ? ' '+start : ''}`);
 }
 
-function stopHistory() {
-  if(!playingHistory) return;
+function stopHistory(resume=false) {
+  if(!playingHistory) return false;
   clearTimeout(historyTimer);
   historyTimer=null;
   playingHistory=false;
-  elements.playbackNote.hidden=true;
+  pausedHistoryDate=resume ? currentDate : null;
+  if(playbackEvent) board.markerNodes.get(playbackEvent.id)?.node.classList.remove('playback-covered');
+  playbackEvent=null;
+  drawPopover();
+  board.stopHistoryOrbit();
   setPlaybackButton();
+  return true;
 }
 
-function scheduleHistory(territoryChanged=false) {
-  const entries=eventsByDay.get(currentDate)||[];
-  const lead=entries.reduce((best,entry)=>!best ||
-    Math.abs(signals[entry.kind].points)>Math.abs(signals[best.kind].points) ? entry : best,null);
-  elements.playbackNote.hidden=!lead;
-  if(lead) {
-    const extra=entries.length>1 ? ` +${entries.length-1} more` : '';
-    elements.playbackNote.textContent=`${companies.get(lead.company).name} · ${lead.title}${extra}`;
-  }
+function pauseHistory() {
+  if(!stopHistory(true)) return;
+  updateBoard();
+  $('#announcements').textContent=`History paused on ${formatDate(currentDate,true)}.`;
+}
+
+function scheduleHistory(territoryChanged=false,first=false) {
+  const delay=playbackEvent ? HIGHLIGHT_MS : first ? 740 : territoryChanged ? 240 : QUIET_DAY_MS;
   historyTimer=setTimeout(()=>{
     if(currentDate===latest) {
       stopHistory();
@@ -419,24 +503,31 @@ function scheduleHistory(territoryChanged=false) {
     }
     const changed=showSnapshot(currentDate+DAY,false,true);
     scheduleHistory(changed>0);
-  },lead || territoryChanged ? BUSY_DAY_MS : QUIET_DAY_MS);
+  },delay);
 }
 
 function toggleHistory() {
   if(playingHistory) {
-    stopHistory();
-    updateBoard();
-    $('#announcements').textContent=`History paused on ${formatDate(currentDate,true)}.`;
+    pauseHistory();
     return;
   }
-  if(currentDate===latest) showSnapshot(oldest);
+  const resume=pausedHistoryDate!==null;
+  const start=pausedHistoryDate??chosenHistoryDate??oldest;
+  pausedHistoryDate=null;
+  historyCalendar.close();
+  if(elements.profile.open) elements.profile.close();
+  if(easterEggs.isOpen()) easterEggs.close();
+  elements.zoomHint.hidden=true;
   playingHistory=true;
   setPlaybackButton();
-  scheduleHistory();
+  showSnapshot(start,false,true);
+  board.startHistoryOrbit({reset:!resume || board.camera.z!==MIN_ZOOM});
+  scheduleHistory(false,true);
   $('#announcements').textContent=`Playing history from ${formatDate(currentDate,true)}.`;
 }
 
 function playBoardToy(id) {
+  pauseHistory();
   achievements.unlock(id);
   if(id==='hourglass' && currentDate>oldest) {
     showSnapshot(currentDate-DAY,true);
@@ -535,6 +626,7 @@ function renderDirectory() {
 
 function openProfile(id) {
   if(!companies.has(id)) return;
+  pauseHistory();
   elements.searchResults.hidden=true;
   elements.search.value='';
   clearSelection(false);
@@ -619,13 +711,14 @@ function renderMethod() {
     <section class="method-section"><h2>Fronts</h2>
       <ul>${fronts.map(([name,meaning,color])=>`<li style="--signal:${color}"><strong>${escaped(name)}</strong><span class="muted">${escaped(meaning)}</span></li>`).join('')}</ul></section>
     <section class="method-section"><h2>Coverage</h2>
-      <p>The catalog covers ${companies.size} offerings. Some share an owner. The map calendar and Updates cover six months. Play starts from the selected date, or from the beginning if Latest is selected. The current catalog and home hexes stay fixed in historical views, while territory and flags follow dated sources. Company facts and prices reflect the catalog snapshot.</p>
+      <p>The catalog covers ${companies.size} offerings. Some share an owner. The map calendar and Updates cover six months. Play starts from a chosen date or from the beginning. Playback calls out launches, funding, retirements, and large territory changes. The current catalog and home hexes stay fixed in historical views, while territory and flags follow dated sources. Company facts and prices reflect the catalog snapshot.</p>
       <p>Figures identify their scope and source where available. Public prices use each provider’s billing units.</p>
       <p>Snapshot ${formatDate(latest,true)}. ${evidenceLink('https://battleships.dev/','Battleships pricing reference')}.</p></section>`;
 }
 
 function route() {
   achievements.close();
+  historyCalendar.close();
   const requested=location.hash.slice(1).split('?')[0];
   const nextView=['compare','method','updates'].includes(requested) ? requested : 'atlas';
   if(nextView!=='atlas') stopHistory();
@@ -639,8 +732,6 @@ function route() {
   }
   if(visibleView==='atlas') requestAnimationFrame(()=>{
     updateBoard();
-    revealHistoryDay(historyButtons.get(isoDate(currentDate)));
-    syncLatestButton();
     if(!zoomHintShown) {
       zoomHintShown=true;
       elements.zoomHint.hidden=false;
@@ -674,56 +765,33 @@ elements.updates.addEventListener('click',click=>{
 elements.popover.addEventListener('mouseenter',()=>clearTimeout(hidePopoverTimer));
 elements.popover.addEventListener('mouseleave',scheduleHide);
 elements.popover.addEventListener('click',event=>{
+  const replayed=event.target.closest('[data-open-playback-event]');
+  if(replayed) focusEvent(eventsById.get(replayed.dataset.openPlaybackEvent));
   if(event.target.closest('[data-close-popover]')) clearSelection();
 });
 eventFilter.addEventListener('change',event=>{
   kind=event.target.value;
   renderUpdates();
 });
-elements.historyDays.addEventListener('scroll',syncLatestButton,{passive:true});
 elements.historyPlay.addEventListener('click',toggleHistory);
+elements.historyToggle.addEventListener('click',pauseHistory);
+$('#achievement-toggle').addEventListener('click',pauseHistory);
 document.addEventListener('visibilitychange',()=>{
-  if(document.hidden) stopHistory();
+  if(document.hidden) pauseHistory();
 });
 $('#reset-camera').addEventListener('click',()=>{
   board.resetView();
   elements.stage.focus({preventScroll:true});
 });
-elements.historyDays.addEventListener('click',event=>{
-  const date=event.target.closest('[data-history-date]')?.dataset.historyDate;
-  if(date) showSnapshot(dateValue(date),true);
-});
-elements.historyDays.addEventListener('keydown',event=>{
-  const date=event.target.closest('[data-history-date]')?.dataset.historyDate;
-  if(!date) return;
-  const time=dateValue(date);
-  const offsets={ArrowLeft:-DAY,ArrowRight:DAY,PageUp:-7*DAY,PageDown:7*DAY};
-  const next=event.key==='Home' ? oldest : event.key==='End' ? latest : time+(offsets[event.key]||0);
-  if(next===time) return;
-  event.preventDefault();
-  const button=historyButtons.get(isoDate(Math.max(oldest,Math.min(latest,next))));
-  setHistoryTabStop(button);
-  button.focus({preventScroll:true});
-  revealHistoryDay(button);
-});
-elements.historyDate.addEventListener('input',()=>{
-  const date=dateValue(elements.historyDate.value);
-  if(date!==currentDate) showSnapshot(date,true);
-});
-elements.historyDate.addEventListener('change',()=>{
-  elements.historyDate.value=isoDate(currentDate);
-});
-elements.latestButton.addEventListener('click',()=>{
-  showSnapshot(latest,true);
-  historyButtons.get(atlas.asOf).focus({preventScroll:true});
-});
-
 document.querySelector('.category-filter')?.addEventListener('click',event=>{
   const next=event.target.closest('[data-category]')?.dataset.category;
   if(next) changeCategory(next);
 });
 elements.search.addEventListener('input',()=>mapSearch(true));
-elements.search.addEventListener('focus',()=>mapSearch(true));
+elements.search.addEventListener('focus',()=>{
+  pauseHistory();
+  mapSearch(true);
+});
 elements.search.addEventListener('click',()=>mapSearch(true));
 elements.search.closest('.map-search-wrap').addEventListener('focusout',event=>{
   if(event.relatedTarget && !event.currentTarget.contains(event.relatedTarget)) elements.searchResults.hidden=true;
@@ -774,7 +842,8 @@ document.addEventListener('keydown',event=>{
     }
   }
   if(event.key==='Escape' && elements.searchResults.hidden) {
-    if(elements.profile.open && !eggPlayer.contains(event.target)) elements.profile.close();
+    if(playingHistory) pauseHistory();
+    else if(elements.profile.open && !eggPlayer.contains(event.target)) elements.profile.close();
     else if(easterEggs.isOpen()) easterEggs.close(true);
     else clearSelection();
   }
@@ -820,6 +889,5 @@ $('.wordmark').addEventListener('click',()=>{
 
 compared=new Set(compareSelection());
 renderMethod();
-buildHistory();
 showSnapshot(latest);
 route();
